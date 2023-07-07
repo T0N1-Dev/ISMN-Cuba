@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+<!-- Title on tab browser -->
+{% block title %} Add Patient {% endblock title %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-user-plus"></i>&nbsp;&nbsp; Add Patient
+{% endblock navbar-content %}
+
+<!-- Button on navbar -->
+{% block nav-btn %}
+    <a class="btn btn-outline-danger border-light text-light btn-sn" id="btn-nav" data-bs-toggle="modal" data-bs-target="#exampleModal">Logout</a>
+{% endblock nav-btn %}
+
+<!-- PAGE CONTENT -->
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-body border-dark mt-5">
+                    <span class="text-center"> {% block card-title %} <span class="text-primary"> FILL OUT THE FORM BELOW </span> {% endblock card-title %} </span>
+                </div>
+                
+                <!-- Form -->
+                <form {% block Action %} action="/add_patient/" {% endblock Action %} method="POST" enctype="multipart/form-data" class="card p-3 border-dark mt-3">
+                    {% csrf_token %}
+
+                    <!-- Input ID denied here -->
+                    {% block Id-hidden %} {% endblock Id-hidden %}
+
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text side-label">Name</span>
+                        <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Patient name" " required {% block Value-name %}{% endblock Value-name %}>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text side-label">Phone</span>
+                        <input type="text" class="form-control" name="phone" id="phone" placeholder="Patient phone" required {% block Value-phone %}{% endblock Value-phone %}>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text side-label">Email</span>
+                        <input type="email" class="form-control" maxlength="40" name="email" id="email" placeholder="Patient email" required {% block Value-email %}{% endblock Value-email %}>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text side-label">Age</span>
+                        <input type="text" class="form-control" name="age" id="age" maxlength="3" placeholder="Patient age" required {% block Value-age %}{% endblock Value-age %}>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <label class="input-group-text side-label">Gender</label>
+                        <select class="form-select" name="gender" id="gender" required>
+                            {% block option %}
+                                <option value="" hidden>Select the gender</option>
+                            {% endblock %}
+                            <option disabled></option>
+                            <option>M</option>
+                            <option>F</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                      <textarea class="form-control text-sm" name="note" maxlength="1000" id="note" rows="7" placeholder="Description is optional...">{% block Value-description %}{% endblock Value-description %}</textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+
+                        <!-- Add Button -->
+                        <button type="submit" class="btn btn-primary btn-sm" id="btn-add">
+                            {% block Btn-content %} <i class="fas fa-plus">&nbsp;&nbsp;</i>Add {% endblock Btn-content %}
+                        </button>
+
+                        <!-- Reset button denied here -->
+                        {% block Btn-reset %} {% endblock Btn-reset %}
+
+                        <!-- Back Button -->
+                        <a href="{% url 'backend' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

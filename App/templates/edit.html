@@ -1,0 +1,36 @@
+{% extends 'add.html' %}
+
+<!-- Title on tab browser -->
+{% block title %} Patient {% endblock title %}
+
+<!-- Input ID passed here -->
+{% block Id-hidden %} <input type="text" name="id" value="{{ patient.id }}" hidden> {% endblock Id-hidden %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-user-edit"></i>&nbsp;&nbsp; {{ patient.name }}
+{% endblock navbar-content %}
+
+<!-- Title in card -->
+{% block card-title %} Registered at: <span class="text-primary"> <strong> {{ patient.created_at | date:'m/d/Y (H:i)' }} </strong></span> {% endblock card-title %}
+
+<!-- Form Action -->
+{% block Action %} action="/edit_patient/" {% endblock Action %}
+
+<!--=========== Extends all <inputs> from add.html ===========-->
+{% block Value-name %} value = "{{ patient.name }}" {% endblock Value-name %}
+{% block Value-phone %} value = "{{ patient.phone }}" {% endblock Value-phone %}
+{% block Value-email %} value = "{{ patient.email }}" {% endblock Value-email %}
+{% block Value-age %} value = "{{ patient.age }}" {% endblock Value-age %}
+
+{% block option %} <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ patient.gender }} {% endblock %}
+{% block Value-description %}{{ patient.note }}{% endblock Value-description %}
+
+
+<!-- Extends ADD Button -->
+{% block Btn-content %} <i class="fas fa-hdd">&nbsp;&nbsp;</i> Save {% endblock Btn-content %}
+
+<!-- Extends Reset Button -->
+{% block Btn-reset %}
+    <button type="reset" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i>&nbsp;&nbsp; Reset</button>
+ {% endblock Btn-reset %}
