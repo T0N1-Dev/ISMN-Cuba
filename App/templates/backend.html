@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 <!-- Title on tab browser -->
-{% block title %} All Patients {% endblock title %}
+{% block title %} Editores {% endblock title %}
 
 <!-- Navbar content -->
 {% block navbar-content %}
-    <i class="fas fa-hospital-user"></i>&nbsp;&nbsp;Patients
+    <i class="fas fa-users"></i>&nbsp;&nbsp;Editores
 {% endblock navbar-content %}
 
 <!-- Button on navbar -->
@@ -21,7 +21,7 @@
 
         <div class="d-flex justify-content-between">
             <!-- 1) column ADD Patient -->
-            <a href="{% url 'add_patient' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Add Patient</a>
+            <a href="{% url 'add_patient' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editor</a>
         </div>
 
         <form>
@@ -71,14 +71,14 @@
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete Patient</h1>
+                        <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete Editor</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body text-center">
                         <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                           <div class="text-center text-danger">
-                              <span>DO YOU WANT TO DELETE THIS PATIENT ???</span>
-                              <div class="text-dark mt-3 mb-2 "><strong>Patient: {{ patient.name }}</strong></div>
+                              <span>DO YOU WANT TO DELETE THIS EDITOR ???</span>
+                              <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ patient.name }}</strong></div>
                           </div>
                       </div>
                       <div class="modal-footer">
