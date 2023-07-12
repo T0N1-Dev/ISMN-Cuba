@@ -3,6 +3,15 @@
 <!-- Title on tab browser -->
 {% block title %} Editores {% endblock title %}
 
+<!-- Time -->
+{% block time %}
+    <div class="col-sm">
+        <center>
+            <span style="color: #89cff0" id="clock"></span>
+        </center>
+    </div>
+{% endblock time %}
+
 <!-- Navbar content -->
 {% block navbar-content %}
     <i class="fas fa-users"></i>&nbsp;&nbsp;Editores
@@ -14,124 +23,14 @@
 {% endblock nav-btn %}
 
 <!-- CONTENT PAGE -->
+
 {% block content %}
-    <div class="container">
-
-        <br><br>
-
-        <div class="d-flex justify-content-between">
-            <!-- 1) column ADD Patient -->
-            <a href="{% url 'add_patient' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editor</a>
-        </div>
-
-        <form>
-            <div class="input-group input-group-sm mb-3 mt-4">
-                <input name="q" type="text" class="form-control" placeholder="Search for..." value="{{ request.GET.q }}">
-                <button class="btn btn-secondary"><i class="fas fa-search"></i></button>
-                <a href="{% url 'backend' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
-            </div>
-        </form>
-
-        <center>
-            <table class="table table-bordered table-sm mt-4" style="text-align: center; font-size: 14px;">
-                <thead class="table-secondary">
-                    <tr>
-                        <th style="width: 21%">Name</th>
-                        <th style="width: 15%">Phone</th>
-                        <th style="width: 21%">Email</th>
-                        <th style="width: 8%">Age</th>
-                        <th style="width: 7%">Gender</th>
-                        <th style="width: 10%">Registered</th>
-                        <th style="width: 10%" colspan="2">Action</th>
-                    </tr>
-                </thead>
-                <!-- DATA FROM BACKEND -->
-                {% for patient in patients %}
-                <tr>
-                    <td>{{ patient.name }}</td>
-                    <td>{{ patient.phone }}</td>
-                    <td>{{ patient.email }}</td>
-                    <td>{{ patient.age }}</td>
-                    <td>{{ patient.gender }}</td>
-                    <td>{{ patient.created_at | date:'m/d/Y (H:i)' }}</td>
-                    <td>
-                        <a href="/patient/{{ patient.id }}" class="btn btn-primary" title="Edit Patient">
-                            <i class="fas fa-pen"></i>
-                        </a>
-                    </td>
-                    <td>
-                        <a class="btn btn-secondary" title="Delete Patient" data-bs-toggle="modal" data-bs-target="#deleteModal{{ patient.pk }}">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>
-
-                <!-- Delete confirmation -->
-                <div class="modal fade" id="deleteModal{{ patient.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete Editor</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body text-center">
-                        <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
-                          <div class="text-center text-danger">
-                              <span>DO YOU WANT TO DELETE THIS EDITOR ???</span>
-                              <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ patient.name }}</strong></div>
-                          </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                        <a href="/delete_patient/{{ patient.id }}" type="button" class="btn btn-outline-danger btn-sm">Delete</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {% endfor %}
-            </table>
-        </center>
-
-    <!-- PAGINATION -->
-    <nav class="mt-4" aria-label="Page navigation example">
-        {% if patients.has_other_pages %}
-            <ul class="pagination justify-content-left">
-            {% if patients.has_previous %}
-                <a href="?page=1" class="btn btn-outline-primary mb-4" style="width: 60px; border-radius: 1px; border: 1px solid #d3d3d3">First</a>
-                <li class="page-item"><a class="page-link" href="?page={{ patients.previous_page_number }}"><i class="fas fa-angle-double-left"></i></a></li>
-            {% else %}
-                <li class="page-item disabled"></li>
-            {% endif %}
-
-            {% for i in patients.paginator.page_range %}
-                {% if patients.number == i %}
-                    <li class="page-item active"><span class="page-link">{{ i }}<span class="sr-only"></span></span></li>
-                {% else %}
-                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-                {% endif %}
-            {% endfor %}
-
-            {% if patients.has_next %}
-                <li class="page-item"><a class="page-link" href="?page={{ patients.next_page_number }}"><i class="fas fa-angle-double-right"></i></a></li>
-                <a href="?page={{ patients.paginator.num_pages }}" class="btn btn-outline-primary mb-4" style="width: 60px; border-radius: 1px; border: 1px solid #d3d3d3; border-left: none;">Last</a>
-            {% else %}
-                <li class="page-item disabled"></li>
-            {% endif %}
-            </ul>
-        {% endif %}
-    </nav>
-
-    <!-- Messages from backend -->
-    {% for message in messages %}
-        {% if message.tags == 'success' %}
-            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-            <script>
-                var n = "{{ message }}"
-                swal("Perfect !", n, "success")
-            </script>
-        {% endif %} 
-    {% endfor %}
-
-    </div> <!-- END // container -->
+    {% if request.user.is_superuser %}
+        <!-- Si inicia sesión el admin -->
+        {% include 'editores-list.html' %}
+    {% else %}
+        <!-- Si inicia sesión un user -->
+        <span class="text-danger" >Access Denied</span>
+    {% endif %}
 {% endblock content %}
+

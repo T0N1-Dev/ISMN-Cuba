@@ -35,8 +35,20 @@ body {
 }
 
 /* -------------------------------
-# PATIENT (add.html)
+# EDITORS (add.html)
  -------------------------------*/
 .side-label {
     width: 80px;
+}
+
+/* --------------------------------------
+# BACKEND | EDITORS LIST (backend.html)
+ ---------------------------------------*/
+#no-data, #no-access {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    font-size: 50px;
 }

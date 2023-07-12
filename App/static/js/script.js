@@ -1,7 +1,6 @@
 /*----------------------------------------------------
 # All the script here it will extends to all the pages
 * -----------------------------------------------*/
-
 // 1) Script tp validate all inputs
 function validateEmail(email){
     var regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -18,6 +17,10 @@ function validateAll() {
 
     if (name == '') {
         swal("Opsss !", "Name field cannot be empty.", "error");
+        return false;
+    }
+    else if (name.split(' ').length < 2) {
+        swal("Opsss !", "The LAST name is required", "info");
         return false;
     }
     else if (phone == '') {
@@ -54,15 +57,21 @@ $("#btn-add").bind("click", validateAll);
 
 // 2) Script (Name field) only letter is allowed
 $(document).ready(function (){
+
     // Only letter
     jQuery('input[name="name').keyup(function () {
         var letter = jQuery(this).val();
-        var allow = letter.replace(/[^a-zA-Z]/g, '');
+        var allow = letter.replace(/[^a-zA-Z _]/g, '');
         jQuery(this).val(allow);
     });
-    //prevent starting with space
-    $('#input').on("keypress", function(e) {
+
+    //prevent starting with space and not more than one space in the input
+    $('input').on("keypress", function(e) {
+        // Not starting with space
         if (e.which === 32 && ! this.value.length)
+            e.preventDefault();
+        // Not more tha two spaces continues
+        if (e.which === 32 && this.value[this.value.length-1] === ' ')
             e.preventDefault();
     });
 });
@@ -82,7 +91,7 @@ $(document).ready(function (){
 
 // 5) Script to allow only numbers in AGE
 $("#age").keyup(function () {
-    else if(!/^[0-9]*$/.test(this.value)) {
+    if(!/^[0-9]*$/.test(this.value)) {
         this.value = this.value.split(/[^0-9]/).join('');
     }
 });
@@ -109,7 +118,21 @@ $(document).ready(function (){
 
 // 8) Prevent starting by zero in AGE field
 $("#age").on("input", function() {
-    if(/^0/.text(this.value)) {
+    if(/^0/.test(this.value)) {
         this.value = this.value.replace(/^0/, "");
     }
 });
+
+// 10) Time running at real time
+setInterval(function (){
+    var date = new Date();
+    $("#clock").html(
+        (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds()
+    );
+}, 500);
+
+// 11) If not there editors, show a message
+var verify = $("#chk_td").length;
+if (verify == 0) {
+    $("#no-data").text("No editors found");
+}
