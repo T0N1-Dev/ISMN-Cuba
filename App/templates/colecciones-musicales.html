@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+<!-- Title on tab browser -->
+{% block title %} Colecciones Musicales {% endblock title %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-music"></i>&nbsp;&nbsp;Publicaciones Musicales
+{% endblock navbar-content %}
+
+<!-- Button on navbar -->
+{% block nav-btn %}
+    <a href="{% url 'frontend' %}" class="btn border-dark text-light btn-sn" id="btn-nav" ><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
+{% endblock nav-btn %}
+
+<!-- CONTENT PAGE -->
+{% block content %}
+
+    <div class="container">
+
+        <br><br>
+
+        <!-- Barra de búsqueda -->
+        <form>
+            <div class="input-group input-group-sm mb-3 mt-4">
+                <input name="q" type="text" class="form-control" placeholder="Search for..." value="{{ request.GET.q }}">
+                <button class="btn btn-secondary"><i class="fas fa-search"></i></button>
+                <a data-fancybox="gallery" href="{% url 'musical_colections' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
+            </div>
+        </form>
+
+
+        <div class="musicales">
+            {% for p in publicaciones_musicales %}
+                <div class="musical">
+                    <div class="contenedor_musical">
+                        {% if p.imagen %}
+                            <img src="{{ p.imagen.url }}" alt="imagen musical">
+                        {% endif %}
+                        <div class="detalle">
+                            <h5>{{ p.gender }}</h5>
+                            <h2>{{ p.name | title }}</h2>
+                            <h3>{{ p.autor | capfirst }}</h3>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% if mensaje %}
+            <h1 class="display-4 text-center mt-5 text-danger">{{ mensaje }}</h1>
+        {% endif %}
+    </div>
+
+{% endblock content %}

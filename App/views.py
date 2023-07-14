@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from App.models import Patient
+from App.models import Patient, Musical_Publication
 from django.views.decorators.cache import cache_control
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -50,7 +50,7 @@ def add_patient(request):
             patient.gender = request.POST.get('gender')
             patient.note = request.POST.get('note')
             patient.save()
-            messages.success(request, "Patient added successfully !")
+            messages.success(request, "Editor added successfully !")
             return HttpResponseRedirect('/backend')
     else:
         return render(request, "add.html")
@@ -62,7 +62,7 @@ def add_patient(request):
 def delete_patient(request, patient_id):
     patient = Patient.objects.get(id=patient_id)
     patient.delete()
-    messages.success(request, "Patient removed succesfully !")
+    messages.success(request, "Editor removed succesfully !")
     return HttpResponseRedirect('/backend')
 
 # Function to access the patient individually
@@ -87,5 +87,25 @@ def edit_patient(request):
             patient.gender = request.POST.get("gender")
             patient.note = request.POST.get("note")
             patient.save()
-            messages.success(request, "Patient upload successfully !")
+            messages.success(request, "Editor upload successfully !")
             return HttpResponseRedirect('/backend')
+
+# Function to show musical collections
+def musical_colections_list(request):
+
+    Musical_Collections_Objects = Musical_Publication.objects.all()
+    data = {
+        'publicaciones_musicales': Musical_Collections_Objects,
+    }
+
+    if not Musical_Collections_Objects:
+        data['mensaje'] = "No hay publicaciones musicales en el sistema"
+        return render(request, 'colecciones-musicales.html', data)
+    elif 'q' in request.GET:
+        q = request.GET['q']
+        data['publicaciones_musicales'] = Musical_Publication.objects.filter(
+            Q(name__icontains=q) | Q(autor__icontains=q) | Q(gender__icontains=q)
+        )
+        if not data['publicaciones_musicales']:
+            data['mensaje'] = "No hay coincidencias"
+    return render(request, 'colecciones-musicales.html', data)

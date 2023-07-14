@@ -38,15 +38,21 @@
 
                             <div class="collapse navbar-collapse" id="navbarSupportedContent" style=" z-index: 999; position: fixed; background: #212529; right: 10px; top: 63px; padding: 10px;">
                               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{% url 'login' %}">Iniciar Sesion</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#">Colecciones Digitales</a>
-                                </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
-                                </li>
+                                  {% block nav-btn-list %}
+                                      {% if not request.user.is_authenticated %}
+                                        <li class="nav-item">
+                                          <a class="nav-link" href="{% url 'login' %}">Iniciar Sesion</a>
+                                        </li>
+                                      {% endif %}
+                                    <li class="nav-item">
+                                      <a class="nav-link" href="{% url 'musical_colections' %}">Colecciones Digitales</a>
+                                    </li>
+                                  {% endblock nav-btn-list %}
+                                {% if request.user.is_authenticated %}
+                                    <li class="nav-item">
+                                      <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                                    </li>
+                                {% endif %}
                               </ul>
                             </div>
                         </div>
