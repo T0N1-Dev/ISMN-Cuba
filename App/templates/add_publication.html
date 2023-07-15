@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+<!-- Title on tab browser -->
+{% block title %} Add Publication {% endblock title %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-plus-square"></i>&nbsp;&nbsp; Añadir Publicación Musical
+{% endblock navbar-content %}
+
+<!-- Time -->
+{% block time %}
+    <div class="col-sm">
+        <center>
+            <span style="color: #89cff0" id="clock"></span>
+        </center>
+    </div>
+{% endblock time %}
+
+<!-- Button on navbar -->
+{% block nav-btn %}
+    <a class="btn btn-outline-danger border-light text-light btn-sn nav-btn" id="btn-nav" data-bs-toggle="modal" data-bs-target="#exampleModal">Cerrar Sesión</a>
+{% endblock nav-btn %}
+
+<!-- PAGE CONTENT -->
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+{#                <div class="card card-body border-dark mt-5">#}
+{#                    <span class="text-center"> {% block card-title %} <span class="text-primary"> FILL OUT THE FORM BELOW </span> {% endblock card-title %} </span>#}
+{#                </div>#}
+
+                <!-- Form -->
+                <form {% block Action %} {% endblock Action %} method="POST" enctype="multipart/form-data" class="card p-3 border-dark mt-3">
+                    {% csrf_token %}
+
+                    <!-- Input ID denied here -->
+                    {% block Id-hidden %} {% endblock Id-hidden %}
+
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text side-label">Título</span>
+                        <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Título de la obra" required {% block Value-name %}{% endblock Value-name %}>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text side-label">Autor</span>
+                        <input type="text" class="form-control" name="autor" id="autor" placeholder="Autor de la publicación" required {% block Value-autor %}{% endblock Value-autor %}>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text side-label">ISMN</span>
+                        <input type="text" class="form-control" maxlength="20" name="ismn" id="ismn" placeholder="International standart music number" required {% block Value-ismn %}{% endblock Value-ismn %}>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text side-label">Fecha</span>
+                        <input type="date" class="form-control" maxlength="20" name="date_time" id="date_time" placeholder="Fecha de creación de la obra" required {% block Value-date_time %}{% endblock Value-date_time %}>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <label class="input-group-text ">Género Musical</label>
+                        <select class="form-select" name="gender" id="gender" required>
+                            {% block option %}
+                                <option value="" hidden>Seleccione un género musical</option>
+                            {% endblock %}
+                            <option disabled></option>
+                            <option>Danzón</option>
+                            <option>Bolero</option>
+                            <option>Popular Bailable</option>
+                            <option>Mambo</option>
+                            <option>ChaChaCha</option>
+                            <option>Rumba</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                      <textarea class="form-control text-sm" name="letter_contain" maxlength="1000" id="letter_contain" rows="4" placeholder="Letra de la cancion...">{% block Value-letter %}{% endblock Value-letter %}</textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
+                      <textarea class="form-control text-sm" name="description" maxlength="1000" id="letter_contain" rows="4" placeholder="Descripcion de la obra es opcional...">{% block Value-description %}{% endblock Value-description %}</textarea>
+                    </div>
+
+                    <div id="div_id_imagen" class="form-group">
+                        <label for="id_imagen">Imagen</label>
+                        <div><input type="file" name="imagen" id="id_imagen" accept="image/*" class="clearable-file-input form-control-file"></div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+
+                        <!-- Add Button -->
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            {% block Btn-content %} <i class="fas fa-plus">&nbsp;&nbsp;</i>Add {% endblock Btn-content %}
+                        </button>
+
+                        <!-- Reset button denied here -->
+                        {% block Btn-reset %} {% endblock Btn-reset %}
+
+                        <!-- Back Button -->
+                        <a href="{% url 'backend' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

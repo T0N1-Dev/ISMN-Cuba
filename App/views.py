@@ -20,7 +20,7 @@ def backend(request):
     if 'q' in request.GET:
         q = request.GET['q']
         all_patient_list = Patient.objects.filter(
-            Q(name__icontains=q) | Q(phone=q) | Q(email=q) | Q(age=q) | Q(gender=q) | Q(note=q)
+            Q(name__icontains=q) | Q(email=q) | Q(gender=q) | Q(note=q)
         ).order_by('-created_at')
     else:
         all_patient_list = Patient.objects.all().order_by('-created_at')
@@ -109,3 +109,31 @@ def musical_colections_list(request):
         if not data['publicaciones_musicales']:
             data['mensaje'] = "No hay coincidencias"
     return render(request, 'colecciones-musicales.html', data)
+
+# Function to add a musical publication
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url = "login")
+def add_musical_publication(request):
+    if request.method == 'POST':
+        if request.POST.get('name') \
+                and request.POST.get('autor') \
+                and request.POST.get('ismn') \
+                and request.POST.get('letter_contain') \
+                and request.POST.get('description') \
+                and request.POST.get('date_time') \
+                and request.POST.get('gender') \
+                or request.POST.get('imagen'):
+            musical_publication = Musical_Publication()
+            musical_publication.name = request.POST.get('name')
+            musical_publication.autor = request.POST.get('autor')
+            musical_publication.ismn = request.POST.get('ismn')
+            musical_publication.letter_contain = request.POST.get('letter_contain')
+            musical_publication.description = request.POST.get('description')
+            musical_publication.date_time = request.POST.get('date_time')
+            musical_publication.gender = request.POST.get('gender')
+            musical_publication.imagen = request.FILES.get('imagen')
+            musical_publication.save()
+            messages.success(request, "Publicación musical añadida correctamente !")
+            return HttpResponseRedirect('/backend')
+    else:
+        return render(request, "add_publication.html")

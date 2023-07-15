@@ -19,7 +19,12 @@
 
 <!-- List button on navbar -->
 {% block nav-btn-list %}
-    <a class="btn btn-danger border-light text-light btn-sn" id="btn-nav" data-bs-toggle="modal" data-bs-target="#exampleModal">Logout</a>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'add_musical_publicaction' %}" ><i class="fas fa-plus"></i>&nbsp;&nbsp;Añadir publicacion musical</a>
+    </li>
+    <li class="nav-item">
+        <a href="{% url 'frontend' %}" class="nav-link" ><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
+    </li>
 {% endblock nav-btn-list %}
 
 <!-- CONTENT PAGE -->

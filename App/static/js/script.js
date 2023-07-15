@@ -77,7 +77,7 @@ $(document).ready(function (){
 });
 
 // 3) Script to put First Letter capitalized
-$("#name").keyup(function () {
+$("#name, #autor").keyup(function () {
     var txt = $(this).val();
     $(this).val(txt.replace(/^(.)|\s(.)/g, function ($1){return $1.toUpperCase( );}));
 });
@@ -136,3 +136,14 @@ var verify = $("#chk_td").length;
 if (verify == 0) {
     $("#no-data").text("No editors found");
 }
+
+// 12) ISMN mask
+$(document).ready(function (){
+    let ismn_init = "\\97\\9-0"
+    $('#ismn').inputmask({"mask": ismn_init + "-9999-9999-9"},
+        { "onincomplete": function () {
+        swal('Opsss !', 'ISMN incompleto. Revise', 'error');
+        return false;
+        }
+    });
+});
