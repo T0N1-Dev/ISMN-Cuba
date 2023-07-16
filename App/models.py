@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-class Patient(models.Model):
+class Editor(models.Model):
 
     GENDER = {
         ('F','F'),

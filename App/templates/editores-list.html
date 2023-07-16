@@ -3,8 +3,8 @@
     <br><br>
 
     <div class="d-flex justify-content-between">
-        <!-- 1) Column ADD Patient -->
-        <a href="{% url 'add_patient' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editor</a>
+        <!-- 1) Column ADD Editor -->
+        <a href="{% url 'add_editor' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editor</a>
 
         <!-- 2) Column Get users -->
         <span>
@@ -34,28 +34,28 @@
                 </tr>
             </thead>
             <!-- DATA FROM BACKEND -->
-            {% for patient in patients %}
+            {% for editor in editores %}
             <tr id="chk_td">
-                <td>{{ patient.name }}</td>
-                <td>{{ patient.phone }}</td>
-                <td>{{ patient.email }}</td>
-                <td>{{ patient.age }}</td>
-                <td>{{ patient.gender }}</td>
-                <td>{{ patient.created_at | date:'m/d/Y (H:i)' }}</td>
+                <td>{{ editor.name }}</td>
+                <td>{{ editor.phone }}</td>
+                <td>{{ editor.email }}</td>
+                <td>{{ editor.age }}</td>
+                <td>{{ editor.gender }}</td>
+                <td>{{ editor.created_at | date:'m/d/Y (H:i)' }}</td>
                 <td>
-                    <a href="/patient/{{ patient.id }}" class="btn btn-primary" title="Edit Patient">
+                    <a href="/editor/{{ editor.id }}" class="btn btn-primary" title="Edit Editor">
                         <i class="fas fa-pen"></i>
                     </a>
                 </td>
                 <td>
-                    <a class="btn btn-secondary" title="Delete Patient" data-bs-toggle="modal" data-bs-target="#deleteModal{{ patient.pk }}">
+                    <a class="btn btn-secondary" title="Delete Editor" data-bs-toggle="modal" data-bs-target="#deleteModal{{ editor.pk }}">
                         <i class="fas fa-trash"></i>
                     </a>
                 </td>
             </tr>
 
             <!-- Delete confirmation -->
-            <div class="modal fade" id="deleteModal{{ patient.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal fade" id="deleteModal{{ editor.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -66,12 +66,12 @@
                     <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                       <div class="text-center text-danger">
                           <span>DO YOU WANT TO DELETE THIS EDITOR ???</span>
-                          <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ patient.name }}</strong></div>
+                          <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ editor.name }}</strong></div>
                       </div>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <a href="/delete_patient/{{ patient.id }}" type="button" class="btn btn-outline-danger btn-sm">Delete</a>
+                    <a href="/delete_editor/{{ editor.id }}" type="button" class="btn btn-outline-danger btn-sm">Delete</a>
                   </div>
                 </div>
               </div>
@@ -83,26 +83,26 @@
 
 <!-- PAGINATION -->
 <nav class="mt-4" aria-label="Page navigation example">
-    {% if patients.has_other_pages %}
+    {% if editores.has_other_pages %}
         <ul class="pagination justify-content-left">
-        {% if patients.has_previous %}
+        {% if editores.has_previous %}
             <a href="?page=1" class="btn btn-outline-primary mb-4" style="width: 60px; border-radius: 1px; border: 1px solid #d3d3d3">First</a>
-            <li class="page-item"><a class="page-link" href="?page={{ patients.previous_page_number }}"><i class="fas fa-angle-double-left"></i></a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ editores.previous_page_number }}"><i class="fas fa-angle-double-left"></i></a></li>
         {% else %}
             <li class="page-item disabled"></li>
         {% endif %}
 
-        {% for i in patients.paginator.page_range %}
-            {% if patients.number == i %}
+        {% for i in editores.paginator.page_range %}
+            {% if editores.number == i %}
                 <li class="page-item active"><span class="page-link">{{ i }}<span class="sr-only"></span></span></li>
             {% else %}
                 <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
             {% endif %}
         {% endfor %}
 
-        {% if patients.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ patients.next_page_number }}"><i class="fas fa-angle-double-right"></i></a></li>
-            <a href="?page={{ patients.paginator.num_pages }}" class="btn btn-outline-primary mb-4" style="width: 60px; border-radius: 1px; border: 1px solid #d3d3d3; border-left: none;">Last</a>
+        {% if editores.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ editores.next_page_number }}"><i class="fas fa-angle-double-right"></i></a></li>
+            <a href="?page={{ editores.paginator.num_pages }}" class="btn btn-outline-primary mb-4" style="width: 60px; border-radius: 1px; border: 1px solid #d3d3d3; border-left: none;">Last</a>
         {% else %}
             <li class="page-item disabled"></li>
         {% endif %}

@@ -32,7 +32,7 @@
                 </div>
                 
                 <!-- Form -->
-                <form {% block Action %} action="/add_patient/" {% endblock Action %} method="POST" enctype="multipart/form-data" class="card p-3 border-dark mt-3">
+                <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST" enctype="multipart/form-data" class="card p-3 border-dark mt-3">
                     {% csrf_token %}
 
                     <!-- Input ID denied here -->
