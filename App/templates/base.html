@@ -48,6 +48,11 @@
                                       <a class="nav-link" href="{% url 'musical_colections' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Colecciones Digitales</a>
                                     </li>
                                   {% endblock nav-btn-list %}
+                                {% if request.user.is_authenticated and request.user.is_superuser %}
+                                    <li class="nav-item">
+                                      <a class="nav-link" href="{% url 'backend' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Lista de Editores</a>
+                                    </li>
+                                {% endif %}
                                 {% if request.user.is_authenticated %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>

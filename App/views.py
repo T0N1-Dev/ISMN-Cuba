@@ -137,3 +137,39 @@ def add_musical_publication(request):
             return HttpResponseRedirect('/backend')
     else:
         return render(request, "add_publication.html")
+
+# Function to access the musical_publication individually
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def musical_publication(request, musical_publication_id):
+    musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
+    if musical_publication:
+        return render(request, "edit_publication.html", {"musical_publication":musical_publication})
+
+# Function to edit the patients
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def edit_musical_publication(request):
+    if request.method == "POST":
+        musical_publication = Musical_Publication.objects.get(id = request.POST.get('id'))
+        if musical_publication:
+            musical_publication.name = request.POST.get('name')
+            musical_publication.autor = request.POST.get('autor')
+            musical_publication.ismn = request.POST.get('ismn')
+            musical_publication.letter_contain = request.POST.get('letter_contain')
+            musical_publication.description = request.POST.get('description')
+            musical_publication.date_time = request.POST.get('date_time')
+            musical_publication.gender = request.POST.get('gender')
+            musical_publication.imagen = request.FILES.get('imagen')
+            musical_publication.save()
+            messages.success(request, "Publicacion Musical actualizada correctamente !")
+            return HttpResponseRedirect('/musical_colections')
+
+# Function to delete a musical publication
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def delete_musical_publication(request, musical_publication_id):
+    musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
+    musical_publication.delete()
+    messages.success(request, "Publicacion Musical eliminada correctamente !")
+    return HttpResponseRedirect('/musical_colections')

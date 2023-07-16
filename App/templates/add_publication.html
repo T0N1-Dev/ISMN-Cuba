@@ -55,7 +55,7 @@
 
                     <div class="input-group input-group-sm mb-3">
                         <span class="input-group-text side-label">Fecha</span>
-                        <input type="date" class="form-control" maxlength="20" name="date_time" id="date_time" placeholder="Fecha de creación de la obra" required {% block Value-date_time %}{% endblock Value-date_time %}>
+                        <input type="date" class="form-control" maxlength="20" name="date_time" id="date_time" placeholder="Fecha de creación de la obra" required value="{% block Value-date_time %}{% endblock Value-date_time %}">
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
@@ -75,16 +75,16 @@
                     </div>
 
                     <div class="form-group mb-3">
-                      <textarea class="form-control text-sm" name="letter_contain" maxlength="1000" id="letter_contain" rows="4" placeholder="Letra de la cancion...">{% block Value-letter %}{% endblock Value-letter %}</textarea>
+                      <textarea class="form-control text-sm" name="letter_contain" maxlength="1000" id="letter_contain" rows="4" cols="6" placeholder="Letra de la cancion...">{% block Value-letter %}{% endblock Value-letter %}</textarea>
                     </div>
 
                     <div class="form-group mb-3">
-                      <textarea class="form-control text-sm" name="description" maxlength="1000" id="letter_contain" rows="4" placeholder="Descripcion de la obra es opcional...">{% block Value-description %}{% endblock Value-description %}</textarea>
+                      <textarea class="form-control text-sm" name="description" maxlength="1000" id="letter_contain" rows="3" cols="5" placeholder="Descripcion de la obra es opcional...">{% block Value-description %}{% endblock Value-description %}</textarea>
                     </div>
 
                     <div id="div_id_imagen" class="form-group">
                         <label for="id_imagen">Imagen</label>
-                        <div><input type="file" name="imagen" id="id_imagen" accept="image/*" class="clearable-file-input form-control-file"></div>
+                        <div><input type="file" name="imagen" id="id_imagen" accept="image/*" class="clearable-file-input form-control-file"></div>{% block Value-imagen %}{% endblock Value-imagen%}
                     </div>
 
                     <div class="d-grid gap-2 mt-3">
