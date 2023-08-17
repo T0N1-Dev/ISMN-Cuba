@@ -9,7 +9,8 @@ urlpatterns = [
     # Path to render the Homepage
     path('',views.frontend, name="frontend"),
     # Path Login/Logout
-    path('/login/', include('django.contrib.auth.urls'), name='login'),
+    path('login/', views.MyLoginView.as_view(), name='login'),
+    path('logout/', views.MyLogoutView.as_view(), name='logout'),
     # ===============
     # BACKEND SECTION
     # ===============
@@ -33,6 +34,10 @@ urlpatterns = [
     path('edit_musical_publication/', views.edit_musical_publication, name="edit_musical_publication"),
     # Path to delete a Musical_Publication
     path('delete_musical_publication/<str:musical_publication_id>', views.delete_musical_publication, name="delete_musical_publication"),
+
+    # ========================== SEND EMAIL =======================
+    # Path to send Solicitud ISMN
+    path('send_email_solicitud_ismn', views.send_email_solicitud_ismn, name="home"),
 ]
 
 if settings.DEBUG:

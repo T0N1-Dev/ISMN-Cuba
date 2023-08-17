@@ -3,9 +3,9 @@
     <br><br>
 
     <div class="d-flex justify-content-between">
-        <!-- 1) Column ADD Editor -->
+        <!-- 1) Column ADD Editor and Musical Publication -->
         <a href="{% url 'add_editor' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editor</a>
-
+        <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Publicacion Musical</a>
         <!-- 2) Column Get users -->
         <span>
             Welcome <strong><span class="text-primary">{{ user.get_username }}</span></strong>

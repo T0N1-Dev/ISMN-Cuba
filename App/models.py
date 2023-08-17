@@ -1,17 +1,28 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+# Prevent duplicated emails
+class Registered_Data(models.Model):
+    email = models.EmailField(max_length=40)
+    phone = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.email, self.phone
+
 class Editor(models.Model):
 
+    FEMENINO = 'F'
+    MASCULINO = 'M'
+
     GENDER = {
-        ('F','F'),
-        ('M', 'M'),
+        (FEMENINO,'Femenino'),
+        (MASCULINO, 'Masculino'),
     }
 
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=20)
-    email = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20, unique=True)
+    email = models.EmailField(max_length=100, unique=True)
     age = models.IntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)])
     gender = models.CharField(max_length=100, null=True, choices=GENDER)
     note = models.TextField(blank=True)
@@ -22,19 +33,25 @@ class Editor(models.Model):
 
 class Musical_Publication(models.Model):
 
+    BOLERO = 'Bolero'
+    POPULAR_BAILABLE = 'Popular Bailable'
+    MAMBO = 'Mambo'
+    CHACHACHA = 'ChaChaCha'
+    RUMBA = 'Rumba'
+    DANZON = 'Danzón'
     MUSICAL_GENDER = [
-        ("Bolero","Bolero"),
-        ("Popular Bailable","Popular Bailable"),
-        ("Mambo","Mambo"),
-        ("ChaChaCha","ChaChaCha"),
-        ("Rumba","Rumba"),
-        ("Danzón","Danzón"),
+        (BOLERO,"Bolero"),
+        (POPULAR_BAILABLE,"Popular Bailable"),
+        (MAMBO,"Mambo"),
+        (CHACHACHA,"ChaChaCha"),
+        (RUMBA,"Rumba"),
+        (DANZON,"Danzón"),
     ]
 
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     autor = models.CharField(max_length=100)
-    ismn = models.CharField(max_length=20)
+    ismn = models.CharField(max_length=20, unique=True)
     letter_contain = models.TextField()
     description = models.TextField(blank=True)
     imagen = models.ImageField(upload_to="publications", null=True, default="default.jpg")

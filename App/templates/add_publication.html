@@ -39,22 +39,22 @@
                     {% block Id-hidden %} {% endblock Id-hidden %}
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label">Título</span>
+                        <span class="input-group-text side-label-form">Título</span>
                         <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Título de la obra" required {% block Value-name %}{% endblock Value-name %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label">Autor</span>
+                        <span class="input-group-text side-label-form">Autor</span>
                         <input type="text" class="form-control" name="autor" id="autor" placeholder="Autor de la publicación" required {% block Value-autor %}{% endblock Value-autor %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label">ISMN</span>
+                        <span class="input-group-text side-label-form">ISMN</span>
                         <input type="text" class="form-control" maxlength="20" name="ismn" id="ismn" placeholder="International standart music number" required {% block Value-ismn %}{% endblock Value-ismn %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label">Fecha</span>
+                        <span class="input-group-text side-label-form">Fecha</span>
                         <input type="date" class="form-control" maxlength="20" name="date_time" id="date_time" placeholder="Fecha de creación de la obra" required value="{% block Value-date_time %}{% endblock Value-date_time %}">
                     </div>
 

@@ -39,27 +39,27 @@
                     {% block Id-hidden %} {% endblock Id-hidden %}
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label">Name</span>
+                        <span class="input-group-text side-label-form">Name</span>
                         <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Editor name" required {% block Value-name %}{% endblock Value-name %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label">Phone</span>
+                        <span class="input-group-text side-label-form">Phone</span>
                         <input type="text" class="form-control" name="phone" id="phone" placeholder="Editor phone" required {% block Value-phone %}{% endblock Value-phone %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label">Email</span>
+                        <span class="input-group-text side-label-form">Email</span>
                         <input type="email" class="form-control" maxlength="40" name="email" id="email" placeholder="Editor email" required {% block Value-email %}{% endblock Value-email %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label">Age</span>
+                        <span class="input-group-text side-label-form">Age</span>
                         <input type="text" class="form-control" name="age" id="age" maxlength="3" placeholder="Editor age" required {% block Value-age %}{% endblock Value-age %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <label class="input-group-text side-label">Gender</label>
+                        <label class="input-group-text side-label-form">Gender</label>
                         <select class="form-select" name="gender" id="gender" required>
                             {% block option %}
                                 <option value="" hidden>Select the gender</option>

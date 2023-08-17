@@ -16,6 +16,7 @@
 </head>
 <body>
     <div class="wrapper">
+        <center><div id="preloader"></div></center>
         <header>
             <nav class="navbar navbar-expand-ld navbar-dark bg-dark">
                 <div class="col-sm">
@@ -38,21 +39,9 @@
 
                             <div class="collapse navbar-collapse" id="navbarSupportedContent" style=" z-index: 999; position: fixed; background: #212529; right: 10px; top: 63px; padding: 10px;">
                               <ul class="navbar-nav me-auto mb-2 mb-lg-0 popover-left">
-                                  {% block nav-btn-list %}
-                                      {% if not request.user.is_authenticated %}
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Iniciar Sesion</a>
-                                        </li>
-                                      {% endif %}
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="{% url 'musical_colections' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Colecciones Digitales</a>
-                                    </li>
-                                  {% endblock nav-btn-list %}
-                                {% if request.user.is_authenticated and request.user.is_superuser %}
-                                    <li class="nav-item">
-                                      <a class="nav-link" href="{% url 'backend' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Lista de Editores</a>
-                                    </li>
-                                {% endif %}
+
+                                  {% block nav-btn-list %}{% endblock nav-btn-list %}
+
                                 {% if request.user.is_authenticated %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
@@ -61,15 +50,15 @@
                               </ul>
                             </div>
                         </div>
-{#                        <a href="{% url 'backend' %}" class="btn btn-outline-info border-light btn-sn" id="btn-nav">Login</a>#}
                     {% endblock nav-btn %}
                 </div>
-
             </nav>
         </header>
 
         <!--================ Block content {from other pages} denied here ================-->
         {% block content %} {% endblock content %}
+
+
     </div> <!-- END // wrapper -->
 
     <footer class="bg-dark text-center text-lg-start" id="footer" style="color: #ffffff;">
@@ -79,6 +68,24 @@
             <a href="#" target="_blank" style="color: #0dcaf0; text-decoration: none;">T0N1</a>
         </div>
     </footer>
+
+    <!-- Message from backend -->
+    {% for message in messages %}
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <!-- (success) -->
+        {% if message.tags == 'success' %}
+            <script>
+                var m = "{{ message }}";
+                swal("Perfect !", m, "success")
+            </script>
+        <!-- (error) -->
+        {% elif message.tags == 'error' %}
+            <script>
+                var m = "{{ message }}";
+                swal("Error !", m, "error")
+            </script>
+        {% endif %}
+    {% endfor %}
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -114,6 +121,29 @@
 
     <!-- Static JS -->
     <script src="{% static "js/script.js" %}"></script>
+
+    <!-- Typed JS Effect -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.10/typed.js" integrity="sha512-tQQXRDB2wEmuJGtFrmmoFYzNTq8StA1XJrfO0OQbbTxd9G0CwaTDL6/C1y805IlvBVrMwOqob1kf6r/2U5XXVg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Typed effect control -->
+    <script>
+        let typed = new Typed('#element', {
+            strings: [
+                'Internacional',
+                'Standart',
+                'Music',
+                'Number',
+                'ISMN',
+            ],
+            typeSpeed: 50,
+            backSpeed: 30,
+            loop: true,
+            smartBackspace: true,
+            showCursor: true,
+        });
+
+
+    </script>
 
     <!-- Pulse effect -->
     <script>

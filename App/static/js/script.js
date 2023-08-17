@@ -14,6 +14,7 @@ function validateAll() {
     var email = $("#email").val();
     var age = $("#age").val();
     var gender = $("#gender").val();
+    var address = $("#address").val();
 
     if (name == '') {
         swal("Opsss !", "Name field cannot be empty.", "error");
@@ -48,12 +49,18 @@ function validateAll() {
         swal("Opsss !", "Gender field cannot be empty.", "error");
         return false;
     }
+    else if (address == ''){
+        swal("Opss !", "La dirección está vacia.", "error")
+    }
+    else if (file == ''){
+        swal("Opss!", "Se ha olvidado la letra de la canción.", "error");
+    }
     else {
         return true;
     }
 }
 
-$("#btn-add").bind("click", validateAll);
+$("#btn-add, #btn-send").bind("click", validateAll);
 
 // 2) Script (Name field) only letter is allowed
 $(document).ready(function (){

@@ -16,87 +16,103 @@
 <!-- CONTENT PAGE -->
 {% block content %}
 
-    <div class="container">
+    <div class="container mt-4" style="width: 80%;">
 
-        <br><br>
+        <div class="justify-content-center align-items-center row">
 
-        <!-- Barra de búsqueda -->
-        <form>
-            <div class="input-group input-group-sm mb-3 mt-4">
-                <input name="q" type="text" class="form-control" placeholder="Search for..." value="{{ request.GET.q }}">
-                <button class="btn btn-secondary"><i class="fas fa-search"></i></button>
-                <a data-fancybox="gallery" href="{% url 'musical_colections' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
-            </div>
-        </form>
+            <h6 class="btn btn-dark" style="width: 100%; cursor: default;">
+                <strong>COLECCIONES MUSICALES</strong>
+            </h6>
 
+            <!-- Barra de búsqueda -->
+            <form>
+                <div class="input-group input-group-sm mb-3 mt-4">
+                    <input name="q" type="text" class="form-control" placeholder="Search for..." value="{{ request.GET.q }}">
+                    <button class="btn btn-secondary"><i class="fas fa-search"></i></button>
+                    <a data-fancybox="gallery" href="{% url 'musical_colections' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
+                </div>
+            </form>
 
-        <div class="musicales">
-            {% for p in publicaciones_musicales %}
-                <div class="musical">
-                    <div class="contenedor_musical">
-                        {% if p.imagen %}
-                            <div class="container_img">
-                                <img class="card-img" src="{{ p.imagen.url }}" alt="imagen musical">
-                                {% if request.user.is_superuser %}
-                                    <div class="container">
-                                        <a href="/musical_publication/{{ p.id }}" class="btn btn-primary" title="Edit Musical_Publication">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
-                                        <a class="btn btn-secondary " title="Delete Musical_Publication" data-bs-toggle="modal" data-bs-target="#deleteModal{{ p.pk }}">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
+            {% if request.user.is_superuser %}
+                <div class="d-flex justify-content-between">
+                    <!-- 1) Column ADD Musical Publication -->
+                    <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Publicacion Musical</a>
+                    <!-- 2) Column Get users -->
+                    <span>
+                        Welcome <strong><span class="text-primary">{{ user.get_username }}</span></strong>
+                    </span>
+                </div>
+            {% endif %}
+
+            <div class="shadow-lg card p-3 mt-3 musicales" style="background-color: rgba(0,0,0,0); overflow-y: auto; max-height: 700px">
+                <div class="row contenedor_musical">
+                    {% for p in publicaciones_musicales %}
+                        <div class="col-xl-3 col-sm-6 p-1 musical">
+                            <div class="card container_img" style="background-color: transparent;">
+                                <button class="btn btn-outline-dark btn-lg jobs">
+                                    {% if p.imagen %}
+                                        <img class="card-img" src="{{ p.imagen.url }}" alt="imagen musical">
+                                        {% if request.user.is_superuser %}
+                                            <div class="container">
+                                                <a href="/musical_publication/{{ p.id }}" class="btn btn-primary" title="Edit Musical_Publication">
+                                                    <i class="fas fa-pen"></i>
+                                                </a>
+                                                <a class="btn btn-secondary " title="Delete Musical_Publication" data-bs-toggle="modal" data-bs-target="#deleteModal{{ p.pk }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <img class="card-img" src="/media/default.jpg" alt="imagen musical">
+                                        {% if request.user.is_superuser %}
+                                            <div class="container">
+                                                <a href="/musical_publication/{{ p.id }}" class="btn btn-primary" title="Edit Musical_Publication">
+                                                    <i class="fas fa-pen"></i>
+                                                </a>
+                                                <a class="btn btn-secondary " title="Delete Musical_Publication" data-bs-toggle="modal" data-bs-target="#deleteModal{{ p.pk }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                    <h5 class="mt-2">{{ p.gender }}</h5>
+                                    <h2>{{ p.name | title }}</h2>
+                                    <h3>{{ p.autor | capfirst }}</h3>
+                                </button>
                             </div>
-                        {% else %}
-                            <img class="card-img" src="/media/album_default.jpg" alt="imagen musical">
-                            {% if request.user.is_superuser %}
-                                <div class="container">
-                                    <a href="/musical_publication/{{ p.id }}" class="btn btn-primary" title="Edit Musical_Publication">
-                                        <i class="fas fa-pen"></i>
-                                    </a>
-                                    <a class="btn btn-secondary " title="Delete Musical_Publication" data-bs-toggle="modal" data-bs-target="#deleteModal{{ p.pk }}">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </div>
-                            {% endif %}
-
-                        {% endif %}
-                        <div class="detalle text-left">
-                            <h5>{{ p.gender }}</h5>
-                            <h2>{{ p.name | title }}</h2>
-                            <h3>{{ p.autor | capfirst }}</h3>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Delete confirmation -->
-                <div class="modal fade" id="deleteModal{{ p.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar Publicacion Musical</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body text-center">
-                        <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
-                          <div class="text-center text-danger">
-                              <span>DO YOU WANT TO DELETE THIS MUSICAL PUBLICATION ???</span>
-                              <div class="text-dark mt-3 mb-2 "><strong>Musical Publication: {{ p.name }}</strong></div>
+                        <!-- Delete confirmation -->
+                        <div class="modal fade" id="deleteModal{{ p.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar Publicacion Musical</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body text-center">
+                                <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
+                                  <div class="text-center text-danger">
+                                      <span>DO YOU WANT TO DELETE THIS MUSICAL PUBLICATION ???</span>
+                                      <div class="text-dark mt-3 mb-2 "><strong>Musical Publication: {{ p.name }}</strong></div>
+                                  </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                <a href="/delete_musical_publication/{{ p.id }}" type="button" class="btn btn-outline-danger btn-sm">Delete</a>
+                              </div>
+                            </div>
                           </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                        <a href="/delete_musical_publication/{{ p.id }}" type="button" class="btn btn-outline-danger btn-sm">Delete</a>
-                      </div>
-                    </div>
-                  </div>
+                        </div>
+                    {% endfor %}
+
+                    {% if mensaje %}
+                        <h1 class="display-4 text-center mt-5 text-danger">{{ mensaje }}</h1>
+                    {% endif %}
+
                 </div>
-            {% endfor %}
+            </div>
         </div>
-        {% if mensaje %}
-            <h1 class="display-4 text-center mt-5 text-danger">{{ mensaje }}</h1>
-        {% endif %}
     </div>
 
 {% endblock content %}

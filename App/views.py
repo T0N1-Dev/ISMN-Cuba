@@ -1,16 +1,29 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from App.models import Editor, Musical_Publication
+from App.models import Editor, Musical_Publication, Registered_Data
 from django.views.decorators.cache import cache_control
-from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.contrib import messages # Return messages
+from django.http import HttpResponseRedirect # Redirect the page after submit
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.core.mail import EmailMultiAlternatives # Requered to send emails
+from django.template import loader # Render templates on email body
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import authenticate, login
 
 # ================= FRONTEND SECTION =================
+
+class MyLoginView(LoginView):
+    template_name = 'registration/login.html'
+    next_page = '/'
+
+
+class MyLogoutView(LogoutView):
+    next_page = '/'
+
 # Function to render the Home Page
 def frontend(request):
-    return render(request, "frontend.html")
+    return render(request, 'frontend.html')
 
 # ================= BACKEND SECTION =================
 # Function to render the Backend Page
@@ -36,22 +49,42 @@ def backend(request):
 @login_required(login_url = "login")
 def add_editor(request):
     if request.method == 'POST':
-        if request.POST.get('name') \
-                and request.POST.get('phone') \
-                and request.POST.get('email') \
-                and request.POST.get('age') \
-                and request.POST.get('gender') \
-                or request.POST.get('note'):
-            editor = Editor()
-            editor.name = request.POST.get('name')
-            editor.phone = request.POST.get('phone')
-            editor.email = request.POST.get('email')
-            editor.age = request.POST.get('age')
-            editor.gender = request.POST.get('gender')
-            editor.note = request.POST.get('note')
-            editor.save()
-            messages.success(request, "Editor added successfully !")
-            return HttpResponseRedirect('/backend')
+
+        # Check if email exist in BD
+        email = request.POST['email']
+        phone = request.POST['phone']
+        if Registered_Data.objects.filter(email=email).exists():
+            messages.error(request, "Correo electrónico ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/')
+        elif Registered_Data.objects.filter(phone=phone).exists():
+            messages.error(request, "Teléfono ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/')
+        # ===========================
+        else:
+            if request.POST.get('name') \
+                    and request.POST.get('phone') \
+                    and request.POST.get('email') \
+                    and request.POST.get('age') \
+                    and request.POST.get('gender') \
+                    or request.POST.get('note'):
+                editor = Editor()
+                editor.name = request.POST.get('name')
+                editor.phone = request.POST.get('phone')
+                editor.email = request.POST.get('email')
+                editor.age = request.POST.get('age')
+                editor.gender = request.POST.get('gender')
+                editor.note = request.POST.get('note')
+                editor.save()
+
+                # Register email inside BD
+                contact = Registered_Data()
+                contact.email = email
+                contact.phone = phone
+                contact.save()
+                # ========================
+
+                messages.success(request, "Editor added successfully !")
+                return HttpResponseRedirect('/backend')
     else:
         return render(request, "add.html")
 
@@ -173,3 +206,35 @@ def delete_musical_publication(request, musical_publication_id):
     musical_publication.delete()
     messages.success(request, "Publicacion Musical eliminada correctamente !")
     return HttpResponseRedirect('/musical_colections')
+
+# Function to send ISMN solicitud
+def send_email_solicitud_ismn(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        age = request.POST.get('age')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+        descripcion = request.POST.get('descripcion')
+
+        context = {
+            'name': name,
+            'age': age,
+            'email': email,
+            'phone': phone,
+            'address': address,
+            'descripcion': descripcion
+        }
+        message = loader.render_to_string('resume_form.html', context)
+        email = EmailMultiAlternatives(
+            "ISMN - Solicitud", message,
+            "Editores de Cuba",
+            ['antoniocruzglez24@gmail.com'],
+        )
+
+        email.content_subtype = 'html'
+        file = request.FILES['file']
+        email.attach(file.name, file.read(), file.content_type)
+        email.send()
+        messages.success(request, 'Solicitud ISMN enviada correctamente !')
+        return HttpResponseRedirect('/')
