@@ -9,7 +9,7 @@ class UserAdminConfig(admin.ModelAdmin):
 
 
 class EditorAdmin(admin.ModelAdmin):
-    list_display = ['gender', 'created_at']
+    list_display = ['gender']
     search_fields = ['gender']
     list_per_page = 8
 

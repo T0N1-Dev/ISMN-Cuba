@@ -17,7 +17,6 @@ class Registered_Data(models.Model):
 class CustomUserManager(BaseUserManager):
 
     def create_superuser(self, email, user_name, first_name, password, **other_fields):
-        other_fields.setdefault('is_admin', True)
         other_fields.setdefault('is_staff', True)
         other_fields.setdefault('is_superuser', True)
         other_fields.setdefault('is_active', True)
@@ -52,8 +51,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_login = models.DateTimeField(_('last login'), auto_now=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
-    is_specialist = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
@@ -65,7 +62,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 # ==========MODELS TO MY BUSINESS=========
-class Editor(models.Model, CustomUser):
+class Editor(models.Model):
     MASCULINO = 'M'
     FEMENINO = 'F'
 
@@ -73,13 +70,10 @@ class Editor(models.Model, CustomUser):
         (MASCULINO, 'Masculino'),
         (FEMENINO, 'Femenino'),
     }
-
     id = models.IntegerField(primary_key=True)
     age = models.IntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)])
     gender = models.CharField(max_length=100, null=True, choices=GENDER)
     note = models.TextField(blank=True)
-
-
 
 
 class Musical_Publication(models.Model):
