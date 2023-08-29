@@ -1,0 +1,23 @@
+{% extends 'add.html' %}
+
+<!-- Title on tab browser -->
+{% block title %} Usuario Registro {% endblock title %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-user"></i>&nbsp;&nbsp; Registro de Usuario
+{% endblock navbar-content %}
+
+{% block Action %} action="/register_user/" {% endblock Action %}
+
+<!--=============Include Modals=============-->
+{% include "modals/sendEmailTest.html" %}
+
+{% block Btn-content %}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sendemailtestModal">
+      <i class="fa fa-registered"></i>&nbsp;&nbsp;Registrarse
+    </button>
+{#    <a class="btn btn-primary" href="#" data-bs-toggle="modal" data-bs-target="#modal"><i class="fas fa-registered"></i>&nbsp;&nbsp;Registrarse</a>#}
+{% endblock Btn-content %}
+
+

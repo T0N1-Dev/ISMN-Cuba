@@ -6,9 +6,7 @@
 <!-- Time -->
 {% block time %}
     <div class="col-sm">
-        <center>
-            <span style="color: #89cff0" id="clock"></span>
-        </center>
+        <span style="color: #89cff0; align-content: center" id="clock"></span>
     </div>
 {% endblock time %}
 
@@ -35,4 +33,12 @@
         <span class="text-danger" >Access Denied</span>
     {% endif %}
 {% endblock content %}
+
+{% block Offcanvas %}
+    <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>
+    <hr>
+    <a href="#" class="btn btn-dark">
+        <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
+    </a>
+{% endblock Offcanvas %}
 

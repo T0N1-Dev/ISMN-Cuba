@@ -15,6 +15,7 @@ function validateAll() {
     var age = $("#age").val();
     var gender = $("#gender").val();
     var address = $("#address").val();
+    var file = $("#file").val();
 
     if (name == '') {
         swal("Opsss !", "Name field cannot be empty.", "error");
@@ -51,9 +52,11 @@ function validateAll() {
     }
     else if (address == ''){
         swal("Opss !", "La dirección está vacia.", "error")
+        return false;
     }
     else if (file == ''){
         swal("Opss!", "Se ha olvidado la letra de la canción.", "error");
+        return false;
     }
     else {
         return true;
@@ -154,3 +157,72 @@ $(document).ready(function (){
         }
     });
 });
+
+// 13) Clear the form if this was closed
+$("#sendemailtestModal").on('hidden.bs.modal', function (){
+    $("#sendemailtestModal form")[0].reset();
+})
+
+// 14)  Ajax Spinner
+jQuery(function($) {
+    $(document).ajaxSend(function (){
+        $("#bg-spinner").fadeIn(500);
+    });
+
+    $("#btn-send").click(function (){
+        $.ajax({
+            type: 'GET',
+            success: function (data) {
+                var element = document;
+                var html = element.outerHTML;
+                var data = { html: html };
+                var json = JSON.stringify(data)
+                var d = $.parseJSON(json);
+            }
+        }).done(function (){ // Una vez termine ajax correctamente elimina el spinner en 15s. Garan
+            setTimeout(function (){
+                $("#bg-spinner").fadeOut(500);
+            },40000);
+        });
+    });
+});
+
+// 15 Close modal (after 'send button is clicked')
+$("#btn-send").click(function (){
+
+    if (validateAll()) {
+        document.getElementById("bg-spinner").hidden = false;
+        document.getElementById('offcanvasRight').hidden = true;
+        $('.close-modal').modal('hide');
+    }
+    else {
+        // Oculta la spinner si hay campos vacios
+        document.getElementById("bg-spinner").hidden = true;
+    }
+})
+
+// 16 Toggle Password Visibility
+function toggleFunction(){
+    var p = document.getElementById("userPassword");
+    var i = document.getElementById("toggleIcon");
+    if (p.type === "password"){
+        p.type = "text";
+        i.classList.remove("fa-eye-slash");
+        i.classList.add("fa-eye");
+    }
+    else {
+        p.type = "password"
+        i.classList.remove("fa-eye");
+        i.classList.add("fa-eye-slash");
+    }
+}
+
+
+
+
+
+
+
+
+
+

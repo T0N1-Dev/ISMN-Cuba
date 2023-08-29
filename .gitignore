@@ -1,0 +1,10 @@
+# created by virtualenv automatically
+Lib
+htmlcov
+media
+Scripts
+.coverage
+Pipfile
+Pipfile.lock
+pyvenv.cfg
+App/migrations

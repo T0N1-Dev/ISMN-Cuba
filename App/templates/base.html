@@ -30,37 +30,31 @@
                 <!-- Time (denied here) -->
                 {% block time %}{% endblock time %}
 
-                <div class="col-sm">
-                    {% block nav-btn %}
-                        <div class="container">
-                            <button class="nav-btn navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                              <span class="navbar-toggler-icon"></span>
-                            </button>
-
-                            <div class="collapse navbar-collapse" id="navbarSupportedContent" style=" z-index: 999; position: fixed; background: #212529; right: 10px; top: 63px; padding: 10px;">
-                              <ul class="navbar-nav me-auto mb-2 mb-lg-0 popover-left">
-
-                                  {% block nav-btn-list %}{% endblock nav-btn-list %}
-
-                                {% if request.user.is_authenticated %}
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
-                                    </li>
-                                {% endif %}
-                              </ul>
-                            </div>
-                        </div>
-                    {% endblock nav-btn %}
-                </div>
+            <!-- Btn que activa el offcanvas -->
+            <a class="align-text-top" href="{% url 'frontend' %}" style="margin-right: 25px; font-size: 25px" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                <i class="text-light fas fa-bars"></i>
+            </a>
             </nav>
         </header>
 
         <!--================ Block content {from other pages} denied here ================-->
         {% block content %} {% endblock content %}
-
-
     </div> <!-- END // wrapper -->
 
+    <!-- Offcanvas (sidebar) -->
+    <div data-bs-theme="dark" class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasRightLabel">MENÚ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="d-grid gap-2">
+            {% block Offcanvas %}{% endblock Offcanvas %}
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
     <footer class="bg-dark text-center text-lg-start" id="footer" style="color: #ffffff;">
         <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
             Copyright &copy; {% now "Y" %} Todos los derechos reservados | Hecho con
@@ -87,7 +81,7 @@
         {% endif %}
     {% endfor %}
 
-    <!-- Modal -->
+    <!-- Modal for Logout Confirmation -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -97,10 +91,10 @@
           </div>
           <div class="modal-body text-center">
             <span class="text-danger"><i class="fas fa-sign-out-alt fa-3x mt-4"></i></span>
-              <div class="mt-4 mb-4 text-danger">Are you sure want to exit the system ?</div>
+              <div class="mt-4 mb-4 text-danger">¿Está seguro que desea salir del sistema?</div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
             <a href="{% url 'logout' %}" type="button" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
           </div>
         </div>
@@ -141,8 +135,6 @@
             smartBackspace: true,
             showCursor: true,
         });
-
-
     </script>
 
     <!-- Pulse effect -->

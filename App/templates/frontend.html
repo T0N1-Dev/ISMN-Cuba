@@ -1,31 +1,5 @@
 {% extends 'base.html' %}
 
-<!-- Navbar Frontend Content -->
-{% block nav-btn-list %}
-
-    <!-- Colecciones Digitales-->
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'musical_colections' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Colecciones Digitales</a>
-    </li>
-
-    {% if not request.user.is_authenticated %}
-        <!-- Login -->
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Iniciar Sesion</a>
-        </li>
-    {% elif not request.user.is_superuser %}
-        <!-- Enviar Solicitud ISMN -->
-        <li class="nav-item">
-            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#sendemailtestModal"><i class="fas fa-envelope"></i>&nbsp;&nbsp;Solicitud ISMN</a>
-        </li>
-    {% else %}
-        <!-- Acceso a Lista de Editores -->
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'backend' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Lista de Editores</a>
-        </li>
-    {% endif %}
-{% endblock nav-btn-list %}
-
 <!-- Page Content -->
 {% block content %}
 
@@ -34,7 +8,7 @@
     </div>
     <style>
     body {
-        background-image: url("/static/img/home.jpg");
+        background-image: url("../static/img/home.jpg");
         background-position: center 0px;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -42,6 +16,32 @@
     }
     </style>
 
+    <!-- Spinner Ajax (backend) -->
+    <div id="bg-spinner">
+        <div id="position-spinner">
+            <span id="spinner"></span>
+        </div>
+    </div>
+    <br><br><br><br>
+
     <!--================ Includes (modals) ================-->
     {% include 'modals/sendEmailTest.html' %}
 {% endblock content %}
+
+{% block Offcanvas %}
+    <a href="{% url 'musical_colections' %}" class="btn btn-dark text-white"><i class="fas fa-music"></i>&nbsp;&nbsp;Colecciones Musicales</a>
+    {% if request.user.is_authenticated %}
+        {% if request.user.is_superuser %}
+            <a class="btn btn-dark" href="{% url 'backend' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Lista de Editores</a>
+        {% else %}
+            <a class="btn btn-dark" id="btn-Solicitud-ISMN" href="#" data-bs-toggle="modal" data-bs-target="#sendemailtestModal"><i class="fas fa-envelope"></i>&nbsp;&nbsp;Solicitud ISMN</a>
+        {% endif %}
+        <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
+    {% else %}
+        <a class="btn btn-dark" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Iniciar Sesión</a>
+    {% endif %}
+    <hr>
+    <a href="#" class="btn btn-dark">
+        <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
+    </a>
+{% endblock Offcanvas %}

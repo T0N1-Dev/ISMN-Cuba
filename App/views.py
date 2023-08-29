@@ -2,17 +2,17 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from App.models import Editor, Musical_Publication, Registered_Data
 from django.views.decorators.cache import cache_control
-from django.contrib import messages # Return messages
-from django.http import HttpResponseRedirect # Redirect the page after submit
+from django.contrib import messages  # Return messages
+from django.http import HttpResponseRedirect  # Redirect the page after submit
 from django.db.models import Q
 from django.core.paginator import Paginator
-from django.core.mail import EmailMultiAlternatives # Requered to send emails
-from django.template import loader # Render templates on email body
+from django.core.mail import EmailMultiAlternatives  # Required to send emails
+from django.template import loader  # Render templates on email body
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import authenticate, login
 
-# ================= FRONTEND SECTION =================
 
+# ================= FRONTEND SECTION =================
 class MyLoginView(LoginView):
     template_name = 'registration/login.html'
     next_page = '/'
@@ -21,9 +21,19 @@ class MyLoginView(LoginView):
 class MyLogoutView(LogoutView):
     next_page = '/'
 
+
+# Registration Function
+def register_user(request):
+    if request.method == 'POST':
+        return render(request, 'frontend.html')
+    else:
+        return render(request, 'registration/register_user.html')
+
+
 # Function to render the Home Page
 def frontend(request):
     return render(request, 'frontend.html')
+
 
 # ================= BACKEND SECTION =================
 # Function to render the Backend Page
@@ -33,8 +43,10 @@ def backend(request):
     if 'q' in request.GET:
         q = request.GET['q']
         all_editor_list = Editor.objects.filter(
-            Q(name__icontains=q) | Q(email=q) | Q(gender=q) | Q(note=q)
+            Q(name__icontains=q) | Q(email__icontains=q) | Q(gender__icontains=q) | Q(note__icontains=q)
         ).order_by('-created_at')
+        if q.isnumeric():
+            all_editor_list = Editor.objects.filter(Q(age=q) | Q(phone__contains=q)).order_by('-created_at')
     else:
         all_editor_list = Editor.objects.all().order_by('-created_at')
 
@@ -43,6 +55,7 @@ def backend(request):
     all_editor = paginator.get_page(page)
 
     return render(request, 'backend.html', {"editores": all_editor})
+
 
 # Function to Add patient
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -62,6 +75,7 @@ def add_editor(request):
         # ===========================
         else:
             if request.POST.get('name') \
+                    and request.POST.get('password') \
                     and request.POST.get('phone') \
                     and request.POST.get('email') \
                     and request.POST.get('age') \
@@ -69,6 +83,7 @@ def add_editor(request):
                     or request.POST.get('note'):
                 editor = Editor()
                 editor.name = request.POST.get('name')
+                editor.password = request.POST.get('password')
                 editor.phone = request.POST.get('phone')
                 editor.email = request.POST.get('email')
                 editor.age = request.POST.get('age')
@@ -76,7 +91,7 @@ def add_editor(request):
                 editor.note = request.POST.get('note')
                 editor.save()
 
-                # Register email inside BD
+                # Register email and phone inside BD
                 contact = Registered_Data()
                 contact.email = email
                 contact.phone = phone
@@ -98,6 +113,7 @@ def delete_editor(request, editor_id):
     messages.success(request, "Editor removed succesfully !")
     return HttpResponseRedirect('/backend')
 
+
 # Function to access the patient individually
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
@@ -106,12 +122,13 @@ def editor(request, editor_id):
     if editor:
         return render(request, "edit.html", {"editor":editor})
 
+
 # Function to edit the patients
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def edit_editor(request):
     if request.method == "POST":
-        editor = Editor.objects.get(id = request.POST.get('id'))
+        editor = Editor.objects.get(id=request.POST.get('id'))
         if editor:
             editor.name = request.POST.get("name")
             editor.phone = request.POST.get("phone")
@@ -122,6 +139,7 @@ def edit_editor(request):
             editor.save()
             messages.success(request, "Editor upload successfully !")
             return HttpResponseRedirect('/backend')
+
 
 # Function to show musical collections
 def musical_colections_list(request):
@@ -142,6 +160,7 @@ def musical_colections_list(request):
         if not data['publicaciones_musicales']:
             data['mensaje'] = "No hay coincidencias"
     return render(request, 'colecciones-musicales.html', data)
+
 
 # Function to add a musical publication
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -171,6 +190,7 @@ def add_musical_publication(request):
     else:
         return render(request, "add_publication.html")
 
+
 # Function to access the musical_publication individually
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
@@ -178,6 +198,7 @@ def musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
     if musical_publication:
         return render(request, "edit_publication.html", {"musical_publication":musical_publication})
+
 
 # Function to edit the patients
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -198,6 +219,7 @@ def edit_musical_publication(request):
             messages.success(request, "Publicacion Musical actualizada correctamente !")
             return HttpResponseRedirect('/musical_colections')
 
+
 # Function to delete a musical publication
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
@@ -206,6 +228,7 @@ def delete_musical_publication(request, musical_publication_id):
     musical_publication.delete()
     messages.success(request, "Publicacion Musical eliminada correctamente !")
     return HttpResponseRedirect('/musical_colections')
+
 
 # Function to send ISMN solicitud
 def send_email_solicitud_ismn(request):
@@ -235,6 +258,9 @@ def send_email_solicitud_ismn(request):
         email.content_subtype = 'html'
         file = request.FILES['file']
         email.attach(file.name, file.read(), file.content_type)
-        email.send()
+        try:
+            email.send()
+        except TimeoutError:
+            messages.error(request, 'Error en la conexión. Intente más tarde.')
         messages.success(request, 'Solicitud ISMN enviada correctamente !')
         return HttpResponseRedirect('/')

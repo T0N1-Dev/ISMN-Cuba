@@ -120,6 +120,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
 # LOGIN
 LOGIN_REDIRECT_URL = 'backend'
 LOGOUT_REDIRECT_URL = 'frontend'
@@ -138,3 +139,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'antoniocruzglez24@gmail.com'
 EMAIL_HOST_PASSWORD = 'apcvjrfblpnpjokn'
 EMAIL_USE_TLS = True
+
+AUTH_USER_MODEL = 'App.CustomUser'
+
+

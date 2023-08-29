@@ -11,16 +11,9 @@
 <!-- Time -->
 {% block time %}
     <div class="col-sm">
-        <center>
-            <span style="color: #89cff0" id="clock"></span>
-        </center>
+        <span style="color: #89cff0; align-content: center" id="clock"></span>
     </div>
 {% endblock time %}
-
-<!-- Button on navbar -->
-{% block nav-btn %}
-    <a class="nav-btn btn btn-outline-danger border-light text-light btn-sn" id="btn-nav" data-bs-toggle="modal" data-bs-target="#exampleModal">Cerrar Sesión</a>
-{% endblock nav-btn %}
 
 <!-- PAGE CONTENT -->
 {% block content %}
@@ -28,7 +21,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card card-body border-dark mt-5">
-                    <span class="text-center"> {% block card-title %} <span class="text-primary"> FILL OUT THE FORM BELOW </span> {% endblock card-title %} </span>
+                    <span class="text-center"> {% block card-title %} <span class="text-primary"> INSERTE SUS DATOS </span> {% endblock card-title %} </span>
                 </div>
                 
                 <!-- Form -->
@@ -39,34 +32,40 @@
                     {% block Id-hidden %} {% endblock Id-hidden %}
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form">Name</span>
-                        <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Editor name" required {% block Value-name %}{% endblock Value-name %}>
+                        <span class="input-group-text side-label-form"><i class="fa fa-user"></i></span>
+                        <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Nombre" required {% block Value-name %}{% endblock Value-name %}>
+                    </div>
+
+                    <div class="input-group input-group-sm position-relative mb-3">
+                        <span class="input-group-text side-label-form"><i class="fa fa-lock"></i></span>
+                        <input type="password" class="form-control" name="password" placeholder="Contraseña" id="userPassword">
+                        <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form">Phone</span>
-                        <input type="text" class="form-control" name="phone" id="phone" placeholder="Editor phone" required {% block Value-phone %}{% endblock Value-phone %}>
+                        <span class="input-group-text side-label-form"><i class="fa fa-phone"></i></span>
+                        <input type="text" class="form-control" name="phone" id="phone" placeholder="Número de Teléfono" required {% block Value-phone %}{% endblock Value-phone %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form">Email</span>
+                        <span class="input-group-text side-label-form"><i class="fa fa-envelope"></i></span>
                         <input type="email" class="form-control" maxlength="40" name="email" id="email" placeholder="Editor email" required {% block Value-email %}{% endblock Value-email %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form">Age</span>
+                        <span class="input-group-text side-label-form"><i class="fa fa-user-circle"></i></span>
                         <input type="text" class="form-control" name="age" id="age" maxlength="3" placeholder="Editor age" required {% block Value-age %}{% endblock Value-age %}>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
-                        <label class="input-group-text side-label-form">Gender</label>
+                        <label class="input-group-text side-label-form"><i class="fa fa-building"></i></label>
                         <select class="form-select" name="gender" id="gender" required>
                             {% block option %}
                                 <option value="" hidden>Select the gender</option>
                             {% endblock %}
                             <option disabled></option>
-                            <option>M</option>
-                            <option>F</option>
+                            <option>I</option>
+                            <option>C</option>
                         </select>
                     </div>
 
@@ -77,9 +76,11 @@
                     <div class="d-grid gap-2 mt-3">
 
                         <!-- Add Button -->
-                        <button type="submit" class="btn btn-primary btn-sm" id="btn-add">
-                            {% block Btn-content %} <i class="fas fa-plus">&nbsp;&nbsp;</i>Add {% endblock Btn-content %}
-                        </button>
+                        {% block Btn-content %}
+                            <button type="submit" class="btn btn-primary btn-sm" id="btn-add">
+                                 <i class="fas fa-plus">&nbsp;&nbsp;</i>Add
+                            </button>
+                        {% endblock Btn-content %}
 
                         <!-- Reset button denied here -->
                         {% block Btn-reset %} {% endblock Btn-reset %}
@@ -92,3 +93,11 @@
         </div>
     </div>
 {% endblock content %}
+
+{% block Offcanvas %}
+    <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>
+    <hr>
+    <a href="#" class="btn btn-dark">
+        <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
+    </a>
+{% endblock Offcanvas %}
