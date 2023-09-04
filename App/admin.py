@@ -8,12 +8,6 @@ class UserAdminConfig(admin.ModelAdmin):
     list_per_page = 8
 
 
-class EditorAdmin(admin.ModelAdmin):
-    list_display = ['gender']
-    search_fields = ['gender']
-    list_per_page = 8
-
-
 class Musical_Publication_Admin(admin.ModelAdmin):
     list_display = ['name', 'autor', 'ismn', 'imagen', 'gender']
     search_fields = ['name', 'autor', 'ismn', 'gender']
@@ -22,6 +16,6 @@ class Musical_Publication_Admin(admin.ModelAdmin):
 
 admin.site.register(CustomUser, UserAdminConfig)
 admin.site.register(Registered_Data)
-admin.site.register(Editor, EditorAdmin)
+admin.site.register(Editor)
 admin.site.register(Musical_Publication, Musical_Publication_Admin)
 

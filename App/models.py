@@ -10,7 +10,7 @@ class Registered_Data(models.Model):
     phone = models.CharField(max_length=20)
 
     def __str__(self):
-        return self.email, self.phone
+        return f"email: {self.email} \n phone: {self.phone}"
 
 
 # ==========*MODELS TO CUSTOM USER*==========
@@ -51,6 +51,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_login = models.DateTimeField(_('last login'), auto_now=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    is_specialist = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
@@ -63,17 +64,30 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 # ==========MODELS TO MY BUSINESS=========
 class Editor(models.Model):
-    MASCULINO = 'M'
-    FEMENINO = 'F'
+    COMPANY = 'C'
+    INDEPENDENCY = 'I'
 
-    GENDER = {
-        (MASCULINO, 'Masculino'),
-        (FEMENINO, 'Femenino'),
+    TYPE = {
+        (COMPANY, 'Compañia'),
+        (INDEPENDENCY, 'Independiente'),
     }
     id = models.IntegerField(primary_key=True)
-    age = models.IntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)])
-    gender = models.CharField(max_length=100, null=True, choices=GENDER)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    age = models.PositiveSmallIntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)],
+                                           null=True, blank=True)
+    type = models.CharField(max_length=100, null=True, choices=TYPE)
     note = models.TextField(blank=True)
+    directions = models.CharField(max_length=150)
+    id_tribute = models.PositiveBigIntegerField()
+    state = models.BooleanField(default=True)
+
+
+class Editor_Prefijo(models.Model):
+    value = models.PositiveIntegerField()
+    lot = models.CharField(max_length=7)
+    editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
+    inferior_range = models.PositiveIntegerField()
+    superior_range = models.PositiveIntegerField()
 
 
 class Musical_Publication(models.Model):
@@ -96,10 +110,18 @@ class Musical_Publication(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     autor = models.CharField(max_length=100)
+    editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
     ismn = models.CharField(max_length=20, unique=True)
-    letter_contain = models.TextField()
+    letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)
     imagen = models.ImageField(upload_to="publications", null=True, default="default.jpg")
     date_time = models.DateField()
     gender = models.CharField(max_length=100, null=True, choices=MUSICAL_GENDER)
 
+
+class Musical_Publication_Prefijo(models.Model):
+    value = models.PositiveIntegerField()
+    lot = models.CharField(max_length=7)
+    musical_publication = models.OneToOneField(Musical_Publication, on_delete=models.CASCADE)
+    inferior_range = models.PositiveIntegerField()
+    superior_range = models.PositiveIntegerField()

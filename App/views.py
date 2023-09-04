@@ -67,10 +67,10 @@ def add_editor(request):
         email = request.POST['email']
         phone = request.POST['phone']
         if Registered_Data.objects.filter(email=email).exists():
-            messages.error(request, "Correo electrónico ya ha sido registrado en nuestra Base de Datos")
+            messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/')
         elif Registered_Data.objects.filter(phone=phone).exists():
-            messages.error(request, "Teléfono ya ha sido registrado en nuestra Base de Datos")
+            messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/')
         # ===========================
         else:
