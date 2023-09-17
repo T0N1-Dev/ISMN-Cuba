@@ -140,6 +140,4 @@ EMAIL_HOST_USER = 'antoniocruzglez24@gmail.com'
 EMAIL_HOST_PASSWORD = 'apcvjrfblpnpjokn'
 EMAIL_USE_TLS = True
 
-AUTH_USER_MODEL = 'App.CustomUser'
-
 

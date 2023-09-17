@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import User
 
 
 # Prevent duplicated emails
@@ -13,55 +12,6 @@ class Registered_Data(models.Model):
         return f"email: {self.email} \n phone: {self.phone}"
 
 
-# ==========*MODELS TO CUSTOM USER*==========
-class CustomUserManager(BaseUserManager):
-
-    def create_superuser(self, email, user_name, first_name, password, **other_fields):
-        other_fields.setdefault('is_staff', True)
-        other_fields.setdefault('is_superuser', True)
-        other_fields.setdefault('is_active', True)
-
-        if other_fields.get("is_staff") is not True:
-            raise ValueError('Superuser must be assigned to is_staff=True.')
-        if other_fields.get("is_superuser") is not True:
-            raise ValueError('Superuser must be assigned to is_superuser=True.')
-
-        return self.create_user(email, user_name, first_name, password, **other_fields)
-
-    def create_user(self, email, user_name, first_name, password, **other_fields):
-
-        if not email:
-            raise ValueError(_('You must provide an email address'))
-        email = self.normalize_email(email)
-        user = self.model(email=email, user_name=user_name,
-                          first_name=first_name, **other_fields)
-        user.set_password(password)
-        user.save()
-        return user
-
-
-class CustomUser(AbstractBaseUser, PermissionsMixin):
-
-    email = models.EmailField(_('email address'),  max_length=250, unique=True)
-    user_name = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=150, blank=True)
-    phone = models.CharField(max_length=20, unique=True)
-    image = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
-    date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
-    last_login = models.DateTimeField(_('last login'), auto_now=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
-    is_specialist = models.BooleanField(default=False)
-
-    objects = CustomUserManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ["user_name", "first_name"]
-
-    def __str__(self):
-        return self.user_name
-
-
 # ==========MODELS TO MY BUSINESS=========
 class Editor(models.Model):
     COMPANY = 'C'
@@ -71,11 +21,13 @@ class Editor(models.Model):
         (COMPANY, 'Compañia'),
         (INDEPENDENCY, 'Independiente'),
     }
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    phone = models.CharField(max_length=20)
     id = models.IntegerField(primary_key=True)
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     age = models.PositiveSmallIntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)],
                                            null=True, blank=True)
     type = models.CharField(max_length=100, null=True, choices=TYPE)
+    image_profile = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
     note = models.TextField(blank=True)
     directions = models.CharField(max_length=150)
     id_tribute = models.PositiveBigIntegerField()
@@ -85,9 +37,17 @@ class Editor(models.Model):
 class Editor_Prefijo(models.Model):
     value = models.PositiveIntegerField()
     lot = models.CharField(max_length=7)
-    editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
+    editor = models.ForeignKey(Editor, on_delete=models.CASCADE, null=True)
     inferior_range = models.PositiveIntegerField()
     superior_range = models.PositiveIntegerField()
+
+
+class Especialista(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20)
+    note = models.TextField(blank=True)
+    image_profile = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
+    directions = models.CharField(max_length=150)
 
 
 class Musical_Publication(models.Model):
