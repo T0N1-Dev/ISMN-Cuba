@@ -24,24 +24,32 @@
         <table class="table table-bordered table-sm mt-4" style="text-align: center; font-size: 14px;">
             <thead class="table-secondary">
                 <tr>
-                    <th style="width: 21%">Name</th>
-                    <th style="width: 15%">Phone</th>
-                    <th style="width: 21%">Email</th>
-                    <th style="width: 8%">Age</th>
-                    <th style="width: 7%">Gender</th>
-                    <th style="width: 10%">Registered</th>
-                    <th style="width: 10%" colspan="2">Action</th>
+                    <th style="width: 4%">ID</th>
+                    <th style="width: 10%">Tipo</th>
+                    <th style="width: 12%">Nombre</th>
+                    <th style="width: 15%">N&deg; de ID Tributaria</th>
+                    <th style="width: 21%">Prefijo</th>
+                    <th style="width: 8%">Estado</th>
+                    <th style="width: 21%">Dirección</th>
+                    <th style="width: 21%">Teléfono</th>
+                    <th style="width: 21%" colspan="2">Acciones</th>
                 </tr>
             </thead>
             <!-- DATA FROM BACKEND -->
             {% for editor in editores %}
             <tr id="chk_td">
-                <td>{{ editor.name }}</td>
+                <td>{{ editor.id }}</td>
+                <td>{{ editor.type }}</td>
+                <td>{{ editor.user.first_name }}</td>
+                <td>{{ editor.id_tribute }}</td>
+                <td>{{ editor.editor_prefijo.value }}</td>
+                {% if editor.user.is_active %}
+                    <td>Activo</td>
+                {% else %}
+                    <td>Inactivo</td>
+                {% endif %}
+                <td>{{ editor.directions }}</td>
                 <td>{{ editor.phone }}</td>
-                <td>{{ editor.email }}</td>
-                <td>{{ editor.age }}</td>
-                <td>{{ editor.gender }}</td>
-                <td>{{ editor.created_at | date:'m/d/Y (H:i)' }}</td>
                 <td>
                     <a href="/editor/{{ editor.id }}" class="btn btn-primary" title="Edit Editor">
                         <i class="fas fa-pen"></i>
@@ -59,19 +67,19 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Delete Editor</h1>
+                    <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar Editor</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body text-center">
                     <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                       <div class="text-center text-danger">
-                          <span>DO YOU WANT TO DELETE THIS EDITOR ???</span>
-                          <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ editor.name }}</strong></div>
+                          <span>ESTÁS SEGURO QUE DESEAS ELIMINAR AL EDITOR ???</span>
+                          <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ editor.user.first_name }} {{ editor.user.last_name }}</strong></div>
                       </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <a href="/delete_editor/{{ editor.id }}" type="button" class="btn btn-outline-danger btn-sm">Delete</a>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="/delete_editor/{{ editor.id }}" type="button" class="btn btn-outline-danger btn-sm">Eliminar</a>
                   </div>
                 </div>
               </div>

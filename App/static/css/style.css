@@ -116,9 +116,12 @@ body {
     margin: auto;
 }
 
-/* Label with  icon (left side of inputs) */
-.side-label {
+/* Label with icon or text (left side of inputs) */
+.side-label{
     width: 45px;
+}
+.side-label-form  {
+    width: 55px;
 }
 /* Button inside the modals popup */
 .btn-cancel, .btn-send {

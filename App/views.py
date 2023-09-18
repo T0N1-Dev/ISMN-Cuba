@@ -43,16 +43,19 @@ def backend(request):
     if 'q' in request.GET:
         q = request.GET['q']
         all_editor_list = Editor.objects.filter(
-            Q(name__icontains=q) | Q(email__icontains=q) | Q(gender__icontains=q) | Q(note__icontains=q)
-        ).order_by('-created_at')
+            Q(user__username__icontains=q) | Q(user__email__icontains=q) | Q(directions__icontains=q) |
+            Q(note__icontains=q) | Q(user__first_name__icontains=q)
+        ).order_by('-user__date_joined')
         if q.isnumeric():
-            all_editor_list = Editor.objects.filter(Q(age=q) | Q(phone__contains=q)).order_by('-created_at')
+            all_editor_list = Editor.objects.filter(Q(age=q) | Q(phone__contains=q) |
+                                                    Q(id_tribute=q)).order_by('-user__date_joined')
     else:
-        all_editor_list = Editor.objects.all().order_by('-created_at')
+        all_editor_list = Editor.objects.all().order_by('-user__date_joined')
 
     paginator = Paginator(all_editor_list, 4)
     page = request.GET.get('page')
     all_editor = paginator.get_page(page)
+
 
     return render(request, 'backend.html', {"editores": all_editor})
 

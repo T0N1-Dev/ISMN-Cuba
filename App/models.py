@@ -14,8 +14,8 @@ class Registered_Data(models.Model):
 
 # ==========MODELS TO MY BUSINESS=========
 class Editor(models.Model):
-    COMPANY = 'C'
-    INDEPENDENCY = 'I'
+    COMPANY = 'Compañía'
+    INDEPENDENCY = 'Independiente'
 
     TYPE = {
         (COMPANY, 'Compañia'),
@@ -70,7 +70,7 @@ class Musical_Publication(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     autor = models.CharField(max_length=100)
-    editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
+    editor = models.ForeignKey(Editor, on_delete=models.CASCADE, null=True, blank=True)
     ismn = models.CharField(max_length=20, unique=True)
     letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)
