@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
-from django.db.models import Max
 
 
 # Prevent duplicated emails
@@ -31,13 +30,13 @@ class Rango_Prefijo(models.Model):
 
     rango_inferior = models.PositiveSmallIntegerField()
     rango_superior = models.PositiveSmallIntegerField()
-    tipo = models.CharField(choices=TYPE)
+    tipo = models.CharField(max_length=20, choices=TYPE, unique=True)
 
     class Meta:
         verbose_name_plural = "rangos"
 
     def __str__(self):
-        return self.tipo
+        return f'{self.tipo}'
 
 
 class Prefijo(models.Model):
@@ -51,11 +50,14 @@ class Prefijo(models.Model):
 
     value = models.PositiveSmallIntegerField(unique=True)
     lote = models.CharField(max_length=7)
-    tipo = models.CharField(choices=TYPE)
+    tipo = models.CharField(max_length=20, choices=TYPE)
     rango = models.ForeignKey(Rango_Prefijo, on_delete=models.PROTECT)
 
     class Meta:
         verbose_name_plural = "prefijos"
+
+    def __str__(self):
+        return f'{self.value}'
 
 
 # Modelos que representan a los actores del sistema
