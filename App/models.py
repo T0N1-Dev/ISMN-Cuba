@@ -48,7 +48,7 @@ class Prefijo(models.Model):
         (PUBLICACION_MUSICAL_PREFIJO, "Publicacion Musical")
     }
 
-    value = models.PositiveSmallIntegerField(unique=True)
+    value = models.PositiveSmallIntegerField()
     lote = models.CharField(max_length=7)
     tipo = models.CharField(max_length=20, choices=TYPE)
     rango = models.ForeignKey(Rango_Prefijo, on_delete=models.PROTECT)
@@ -74,7 +74,7 @@ class Editor(models.Model):
     id = models.IntegerField(primary_key=True)
     age = models.PositiveSmallIntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)],
                                            null=True, blank=True)
-    prefijo = models.ForeignKey(Prefijo, on_delete=models.PROTECT)
+    prefijo = models.ForeignKey(Prefijo, on_delete=models.PROTECT, unique=True)
     type = models.CharField(max_length=100, null=True, choices=TYPE)
     image_profile = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
     note = models.TextField(blank=True)
@@ -125,7 +125,7 @@ class Musical_Publication(models.Model):
     name = models.CharField(max_length=50)
     autor = models.CharField(max_length=100)
     editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True, blank=True)
-    prefijo = models.OneToOneField(Prefijo, on_delete=models.PROTECT)
+    prefijo = models.OneToOneField(Prefijo, on_delete=models.PROTECT, unique=True)
     ismn = models.CharField(max_length=20, unique=True)
     letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)

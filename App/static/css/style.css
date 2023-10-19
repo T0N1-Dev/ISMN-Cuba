@@ -76,7 +76,7 @@ body {
 # EDITORS (add.html)
  -------------------------------*/
 .side-label-form {
-    width: 40px;
+    width: 45px;
 }
 
 /*i {*/
@@ -116,12 +116,16 @@ body {
     margin: auto;
 }
 
+#loginForm {
+        max-width: 500px;
+    }
+
 /* Label with icon or text (left side of inputs) */
 .side-label{
     width: 45px;
 }
 .side-label-form  {
-    width: 55px;
+    width: 45px;
 }
 /* Button inside the modals popup */
 .btn-cancel, .btn-send {
@@ -204,9 +208,12 @@ body {
 # RESPONSIVE MODEL
  -------------------------------*/
 /* Resolution for Tablets */
-@media (max-width: 1024px) {
+@media screen and (max-width: 1024px) {
     #footer {
         font-size: 15px;
+    }
+    #loginForm {
+        max-width: 400px;
     }
 }
 
@@ -221,6 +228,9 @@ body {
     #navbar-content {
         font-size: 16px;
         margin-left: 25px;
+    }
+    #loginForm {
+        max-width: 300px;
     }
 }
 

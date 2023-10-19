@@ -78,7 +78,7 @@
                     <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                       <div class="text-center text-danger">
                           <span>ESTÁS SEGURO QUE DESEAS ELIMINAR AL EDITOR ???</span>
-                          <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ editor.user.first_name }} {{ editor.user.last_name }}</strong></div>
+                          <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ editor.user.get_full_name }} </strong></div>
                       </div>
                   </div>
                   <div class="modal-footer">

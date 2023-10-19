@@ -15,7 +15,7 @@
 
 <!-- Page content -->
 {% block content %}
-    <div class="container mt-5">
+    <div class="container mt-5" id="loginForm">
         <div class="card p-3 border-dark">
             <a class="btn btn-outline-dark mt-3"><i class="fa fa-lock"></i>&nbsp;&nbsp; RESTRICTED ACCESS</a>
             <form method="POST" autocomplete="off" novalidate>
@@ -30,8 +30,13 @@
                     <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
                 </div>
                 <input class="btn btn-primary btn-sm mt-4 mb-3" type="submit" value="Enter">
-                <a href="{% url 'register_user' %}">Registrarse</a>
+
             </form>
+        </div>
+
+        <div class="card mt-3 p-2 border-dark">
+            <label for="register">Si no posee una cuenta puede: &nbsp;<a id="register" href="{% url 'register_user' %}">Registrarse</a></label>
+
         </div>
 
         <!-- Message from backend -->
@@ -42,9 +47,9 @@
             </script>
         {% endif %}
 
-        <center id="sing-in">
+        <div id="sing-in" style="text-align: center;">
             <i class="text-primary mt-4 fas fa-sign-in-alt fa-8x blink_ne"></i>
-        </center>
+        </div>
     </div> <!-- END // container -->
 {% endblock content %}
 

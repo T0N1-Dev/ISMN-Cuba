@@ -28,7 +28,7 @@
                 </div>
             </form>
 
-            {% if request.user.is_superuser %}
+            {% if request.user.especialista %}
                 <div class="d-flex justify-content-between">
                     <!-- 1) Column ADD Musical Publication -->
                     <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Publicacion Musical</a>
@@ -47,7 +47,7 @@
                                 <button class="btn btn-outline-dark btn-lg jobs">
                                     {% if p.imagen %}
                                         <img class="card-img" src="{{ p.imagen.url }}" alt="imagen musical">
-                                        {% if request.user.is_superuser %}
+                                        {% if request.user.especialista %}
                                             <div class="container">
                                                 <a href="/musical_publication/{{ p.id }}" class="btn btn-primary" title="Edit Musical_Publication">
                                                     <i class="fas fa-pen"></i>
@@ -59,7 +59,7 @@
                                         {% endif %}
                                     {% else %}
                                         <img class="card-img" src="/media/default.jpg" alt="imagen musical">
-                                        {% if request.user.is_superuser %}
+                                        {% if request.user.especialista %}
                                             <div class="container">
                                                 <a href="/musical_publication/{{ p.id }}" class="btn btn-primary" title="Edit Musical_Publication">
                                                     <i class="fas fa-pen"></i>
@@ -88,13 +88,13 @@
                               <div class="modal-body text-center">
                                 <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                                   <div class="text-center text-danger">
-                                      <span>DO YOU WANT TO DELETE THIS MUSICAL PUBLICATION ???</span>
+                                      <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA PUBLICACIÓN ???</span>
                                       <div class="text-dark mt-3 mb-2 "><strong>Musical Publication: {{ p.name }}</strong></div>
                                   </div>
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                <a href="/delete_musical_publication/{{ p.id }}" type="button" class="btn btn-outline-danger btn-sm">Delete</a>
+                                <a href="/delete_musical_publication/{{ p.id }}" type="button" class="btn btn-outline-danger btn-sm">Eliminar</a>
                               </div>
                             </div>
                           </div>

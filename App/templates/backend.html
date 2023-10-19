@@ -15,27 +15,21 @@
     <i class="fas fa-users"></i>&nbsp;&nbsp;Editores
 {% endblock navbar-content %}
 
-<!-- List button on navbar -->
-{% block nav-btn-list %}
-    <li class="nav-item">
-        <a href="{% url 'frontend' %}" class="nav-link" ><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
-    </li>
-{% endblock nav-btn-list %}
 
 <!-- CONTENT PAGE -->
 
 {% block content %}
-    {% if request.user.is_superuser %}
-        <!-- Si inicia sesión el admin -->
+    {% if request.user.especialista %}
+        <!-- Si inicia sesión el especialista -->
         {% include 'editores-list.html' %}
     {% else %}
-        <!-- Si inicia sesión un user -->
         <span class="text-danger" >Access Denied</span>
     {% endif %}
 {% endblock content %}
 
 {% block Offcanvas %}
     <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>
+    <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
     <hr>
     <a href="#" class="btn btn-dark">
         <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
