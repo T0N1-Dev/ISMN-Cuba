@@ -13,9 +13,9 @@ function validateAll() {
     var phone = $("#phone").val();
     var email = $("#email").val();
     var age = $("#age").val();
-    var gender = $("#gender").val();
     var address = $("#address").val();
     var file = $("#file").val();
+    var idTribute = $("#idTribute").val();
 
     if (name == '') {
         swal("Opsss !", "Name field cannot be empty.", "error");
@@ -46,16 +46,16 @@ function validateAll() {
         $("#age").val("");
         return false;
     }
-    else if (gender == '') {
-        swal("Opsss !", "Gender field cannot be empty.", "error");
-        return false;
-    }
     else if (address == ''){
         swal("Opss !", "La dirección está vacia.", "error")
         return false;
     }
     else if (file == ''){
         swal("Opss!", "Se ha olvidado la letra de la canción.", "error");
+        return false;
+    }
+    else if (idTribute == ''){
+        swal("Opss!", "Se ha olvidado el número de identificación tributaria.", "error");
         return false;
     }
     else {
@@ -99,8 +99,15 @@ $(document).ready(function (){
     });
 });
 
-// 5) Script to allow only numbers in AGE
+// 5) Script to allow only numbers in AGE and ID Tribute
+
 $("#age").keyup(function () {
+    if(!/^[0-9]*$/.test(this.value)) {
+        this.value = this.value.split(/[^0-9]/).join('');
+    }
+});
+
+$("#idTribute").keyup(function () {
     if(!/^[0-9]*$/.test(this.value)) {
         this.value = this.value.split(/[^0-9]/).join('');
     }
@@ -217,12 +224,14 @@ function toggleFunction(){
     }
 }
 
+// Function to activate an age field editor
+$("#editorType").change( (e) => {
 
-
-
-
-
-
-
-
-
+    if (e.target.value === 'Independiente'){
+        $('#age').removeAttr('disabled');
+    }
+    else {
+        $('#age').val('');
+        $('#age').attr('disabled', 'disabled');
+    }
+})

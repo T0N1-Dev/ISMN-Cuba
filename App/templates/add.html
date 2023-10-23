@@ -24,68 +24,96 @@
 
         <!-- Column #1 -->
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-12">
 
                 <!-- Form -->
-                <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST" enctype="multipart/form-data" class="card p-3 border-dark mt-3" style="height: 450px; overflow-y: auto">
+                <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST" enctype="multipart/form-data" class="card p-3 border-dark mt-3" id="register-form" style="height: 450px; overflow-y: auto">
                     {% csrf_token %}
 
                     <!-- Input ID denied here -->
                     {% block Id-hidden %} {% endblock Id-hidden %}
 
-                    <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-user"></i></span>
-                        <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Nombre" required {% block Value-name %}{% endblock Value-name %}>
-                    </div>
-
-                    <div class="input-group input-group-sm position-relative mb-3">
-                        <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-lock"></i></span>
-                        <input type="password" class="form-control" name="password" placeholder="Contraseña" id="userPassword">
-                        <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
-                    </div>
-
-                    <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-phone"></i></span>
-                        <input type="text" class="form-control" name="phone" id="phone" placeholder="Número de teléfono" required {% block Value-phone %}{% endblock Value-phone %}>
-                    </div>
-
-                    <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-envelope"></i></span>
-                        <input type="email" class="form-control" maxlength="40" name="email" id="email" placeholder="Correo electrónico" required {% block Value-email %}{% endblock Value-email %}>
-                    </div>
-
-                    <div class="card card-body d-flex mb-3 border-gray">
-                        <label for="editorTypetitle" class="text-center mb-2">
-                            <i class="fa fa-building" id="editorTypetitle"></i>&nbsp;Tipo de Editor
-                        </label>
-                        <div class="d-flex justify-content-around">
-                            <span><input type="radio" name="editorType">&nbsp;Independiente</span>
-                            <span><input type="radio" name="editorType">&nbsp;Compañia</span>
+                    <div class="row" id="register-form">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-user"></i></span>
+                                <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Nombre" required {% block Value-name %}{% endblock Value-name %}>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-lock"></i></span>
+                                <input type="password" class="form-control" name="password" placeholder="Contraseña" id="userPassword">
+                                <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
+                            </div>
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-phone"></i></span>
+                                <input type="text" class="form-control" name="phone" id="phone" placeholder="Número de teléfono" required {% block Value-phone %}{% endblock Value-phone %}>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-envelope"></i></span>
+                                <input type="email" class="form-control" maxlength="40" name="email" id="email" placeholder="Correo electrónico" required {% block Value-email %}{% endblock Value-email %}>
+                            </div>
+                        </div>
+                    </div>
 
-{#                    <div class="input-group">#}
-{#                        <div class="input-group input-group-sm mb-3">#}
-{#                            <label class="input-group-text side-label-form"><i class="fa fa-random"></i></label>#}
-{#                            <select class="form-select form-control" name="prefijoType" id="prefijoType" required>#}
-{#                                {% block option %}#}
-{#                                    <option value="" hidden>Tipo de prefijo</option>#}
-{#                                {% endblock %}#}
-{#                                <option disabled></option>#}
-{#                                <option>Independiente</option>#}
-{#                                <option>Compañia</option>#}
-{#                            </select>#}
-{#                        </div>#}
-{#                    </div>#}
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group">
+                                <div class="input-group input-group-sm mb-3">
+                                    <label class="input-group-text side-label-form justify-content-center"><i class="fa fa-building"></i></label>
+                                    <select class="form-select form-control" name="editorType" id="editorType" required>
+                                        {% block option %}
+                                            <option value="" hidden>Tipo de Editor</option>
+                                        {% endblock %}
+                                        <option disabled></option>
+                                        <option value="Independiente" title="Seleccione esta opcion si usted es un Editor independiente">Independiente</option>
+                                        <option value="Compañia" title="Seleccione esta opcion si usted representa a una compañia o Editorial">Compañia</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
-{#                    <div class="input-group input-group-sm mb-3">#}
-{#                        <span class="input-group-text side-label-form"><i class="fa fa-barcode"></i></span>#}
-{#                        <input type="text" class="form-control" name="prefijo" id="prefijo" maxlength="6" placeholder="Prefijo" required {% block Value-prefijo %}{% endblock Value-prefijo %}>#}
-{#                    </div>#}
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-universal-access"></i></span>
+                                <input type="text" class="form-control" name="age" id="age" placeholder="Edad" disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-map-marker-alt"></i></span>
+                                <input type="text" class="form-control" name="address" id="address" placeholder="Dirección">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-credit-card"></i></span>
+                                <input type="text" class="form-control" name="idTribute" id="idTribute" placeholder="ID Tributaria">
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="form-group mb-3">
                       <textarea class="form-control text-sm" name="note" maxlength="1000" id="note" rows="4" placeholder="Description is optional...">{% block Value-description %}{% endblock Value-description %}</textarea>
+                    </div>
+
+                    <hr style="height: 2px;">
+                    <div class="mb-3">
+                        <div class="mb-3" style="font-size: 14px;"><i class="fa fa-cloud-upload-alt"></i>&nbsp;&nbsp; Sube una foto a tu perfil</div>
+                        <input type="file" class="form-control form-control-sm" name="imagenProfile" accept="image/png, image/jpeg, image/jpg">
+                        <div class="form-text" style="font-size: 12px;">* Extensiones permitidas: jpg - png - jpeg</div>
                     </div>
 
                     <div class="d-grid gap-2 mt-3">
@@ -105,6 +133,7 @@
                     </div>
                 </form>
             </div>
+        </div>
         </div>
         <div class="row">
             <div class="col-lg-6">

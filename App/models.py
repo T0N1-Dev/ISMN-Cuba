@@ -74,7 +74,7 @@ class Editor(models.Model):
     id = models.IntegerField(primary_key=True)
     age = models.PositiveSmallIntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)],
                                            null=True, blank=True)
-    prefijo = models.ForeignKey(Prefijo, on_delete=models.PROTECT, unique=True)
+    prefijo = models.ForeignKey(Prefijo, on_delete=models.PROTECT, unique=True, blank=True)
     type = models.CharField(max_length=100, null=True, choices=TYPE)
     image_profile = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
     note = models.TextField(blank=True)

@@ -22,11 +22,11 @@
                 {% csrf_token %}
                 <div class="input-group mb-3 mt-5">
                     <span class="input-group-text"><i class="fa fa-user-alt"></i></span>
-                    <input type="text" class="form-control" name="username" placeholder="Username">
+                    <input type="text" class="form-control" name="username" maxlength="30" placeholder="Username">
                 </div>
                 <div class="input-group mb-3 mt-3 position-relative">
                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                    <input type="password" class="form-control" name="password" placeholder="Password" id="userPassword">
+                    <input type="password" class="form-control" name="password" placeholder="Password" id="userPassword" maxlength="30">
                     <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
                 </div>
                 <input class="btn btn-primary btn-sm mt-4 mb-3" type="submit" value="Enter">
