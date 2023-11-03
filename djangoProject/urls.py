@@ -16,7 +16,8 @@ urlpatterns = [
     # BACKEND SECTION
     # ===============
     # Path to access the backend page
-    path('backend/', views.backend, name="backend"),
+    path('backend/', views.backend_editores, name="backend_editores"),
+    path('backend_publicaciones', views.backend_publicaciones, name="backend_publicaciones"),
     # Path to add an editor
     path('add_editor/', views.add_editor, name="add_editor"),
     # Path to delete an editor
@@ -36,7 +37,11 @@ urlpatterns = [
     # Path to delete a Musical_Publication
     path('delete_musical_publication/<str:musical_publication_id>', views.delete_musical_publication, name="delete_musical_publication"),
 
-    # ========================== SEND EMAIL =======================
+    # ========================== EXPORT DOCUMENTS ==========================
+    # Path to export a single musical publication
+    path('export_musical_publication/<str:musical_publication_id>', views.export_musical_publication, name="export_publication"),
+
+    # ========================== SEND EMAIL ==========================
     # Path to send Solicitud ISMN
     path('send_email_solicitud_ismn', views.send_email_solicitud_ismn, name="home"),
 ]

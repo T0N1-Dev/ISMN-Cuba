@@ -14,11 +14,20 @@
 {% include "modals/sendEmailTest.html" %}
 
 {% block Btn-content %}
-    <button type="submit" class="btn btn-primary btn-sm" data-bs-toggle="modal">
+    <button type="submit" class="btn btn-primary btn-sm" id="btn-add" data-bs-toggle="modal">
       <i class="fa fa-registered"></i>&nbsp;&nbsp;Registrarse
     </button>
 
 {#    <a class="btn btn-primary" href="#" data-bs-toggle="modal" data-bs-target="#modal"><i class="fas fa-registered"></i>&nbsp;&nbsp;Registrarse</a>#}
 {% endblock Btn-content %}
+
+{% block Offcanvas %}
+    <a href="{% url 'musical_colections' %}" class="btn btn-dark text-white"><i class="fas fa-music"></i>&nbsp;&nbsp;Colecciones Musicales</a>
+    <a class="btn btn-dark" href="{% url 'login' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>
+    <hr>
+    <a href="#" class="btn btn-dark">
+        <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
+    </a>
+{% endblock %}
 
 

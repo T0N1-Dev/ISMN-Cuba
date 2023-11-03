@@ -1,0 +1,164 @@
+{% extends 'backend.html' %}
+
+{% block title %} Publicaciones {% endblock title %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-music"></i>&nbsp;&nbsp;Publicaciones Musicales
+{% endblock navbar-content %}
+
+{% block btn-add %}
+    <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Publicación</a>
+{% endblock btn-add %}
+
+{% block title-table %}
+    <th style="width: 4%">ID</th>
+    <th style="width: 12%">Nombre</th>
+    <th style="width: 15%">Autor</th>
+    <th style="width: 15%">Editor</th>
+    <th style="width: 21%">ISMN</th>
+    <th style="width: 21%">Fecha</th>
+    <th style="width: 21%">Género</th>
+    <th style="width: 21%" colspan="3">Acciones</th>
+{% endblock title-table %}
+
+{% block for-data-table %}
+{% for publicacion in publicaciones %}
+    <tr id="chk_td">
+        <td>{{ publicacion.id }}</td>
+        <td>{{ publicacion.name }}</td>
+        <td>{{ publicacion.autor }}</td>
+        <td>{{ publicacion.editor }}</td>
+        <td>{{ publicacion.ismn }}</td>
+        <td>{{ publicacion.date_time }}</td>
+        <td>{{ publicacion.gender }}</td>
+        <td>
+            <a href="/musical_publication/{{ publicacion.id }}" class="btn btn-sm btn-primary" title="Editar Publicacion">
+                <i class="fas fa-pen"></i>
+            </a>
+        </td>
+        <td>
+            <a class="btn btn-sm btn-info" title="Más Información" data-bs-toggle="modal" data-bs-target="#infoModal{{ publicacion.pk }}">
+                <i class="fas fa-info-circle"></i>
+            </a>
+        </td>
+        <td>
+            <a class="btn btn-sm btn-secondary" title="Eliminar Publicacion" data-bs-toggle="modal" data-bs-target="#deleteModal{{ publicacion.pk }}">
+                <i class="fas fa-trash"></i>
+            </a>
+        </td>
+    </tr>
+
+    <!-- Delete confirmation -->
+    <div class="modal fade" id="deleteModal{{ publicacion.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar Publicación</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
+              <div class="text-center text-danger">
+                  <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA PUBLICACIÓN ???</span>
+                  <div class="text-dark mt-3 mb-2 "><strong>Publicación: {{ publicacion.name }} </strong></div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+            <a href="/delete_editor/{{ publicacion.id }}" type="button" class="btn btn-outline-danger btn-sm">Eliminar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Publication Info - MODAL -->
+    <div class="modal fade" id="infoModal{{ publicacion.pk }}" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="infoModalLabel"><i class="fas fa-info"></i>&nbsp;&nbsp;Información de la Publicación.</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <h4 class="display-6 mb-3">{{ publicacion }}</h4>
+              <div class="container_img mb-4" style="background-color: transparent;">
+                  <img class="card-img img_detail" src="{{ publicacion.imagen.url }}" alt="imagen musical">
+              </div>
+              <div class="container-fluid" style="font-size: large; text-align: left">
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Título:</strong> &nbsp;&nbsp;{{ publicacion.name }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Autor:</strong> &nbsp;&nbsp;{{ publicacion.autor }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Editor:</strong> &nbsp;&nbsp;{{ publicacion.editor }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>ISMN:</strong> &nbsp;&nbsp;{{ publicacion.ismn }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Prefijo:</strong> &nbsp;&nbsp;{{ publicacion.prefijo }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Género Musical:</strong> &nbsp;&nbsp;{{ publicacion.gender }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Letra:</strong> &nbsp;&nbsp;<a href="/media/{{ publicacion.letra }}">{{ publicacion.letra_base_name }}</a>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Descripción:</strong> &nbsp;&nbsp;{{ publicacion.description }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Imagen:</strong> &nbsp;&nbsp;<a href="/media/{{ publicacion.imagen }}">{{ publicacion.image_base_name }}</a>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Fecha de creación:</strong> &nbsp;&nbsp;{{ publicacion.date_time }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Fecha de publicación:</strong> &nbsp;&nbsp;{{ publicacion.created_at }}
+                    </div>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="fas fa-cross"></i>&nbsp;&nbsp;Cancelar</button>
+            <a href="export_musical_publication/{{ publicacion.id }}" aria-label="Close" type="button" class="btn btn-outline-info btn-sm"><i class="fas fa-file-export"></i>&nbsp;&nbsp;Exportar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endfor %}
+{% endblock %}

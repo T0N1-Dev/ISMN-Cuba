@@ -9,41 +9,54 @@ function validateEmail(email){
 
 function validateAll() {
 
-    var name = $("#name").val();
+    var username = $("#username").val();
+    var password = $("#userPassword").val();
     var phone = $("#phone").val();
     var email = $("#email").val();
+    var editor_type = $("#editorType").val();
     var age = $("#age").val();
+    var first_name = $('#first_name').val();
+    var last_name = $('#last_name').val();
     var address = $("#address").val();
     var file = $("#file").val();
     var idTribute = $("#idTribute").val();
 
-    if (name == '') {
-        swal("Opsss !", "Name field cannot be empty.", "error");
+
+
+    if (username == '') {
+        swal("Opsss !", "Inserte su nombre de usuario.", "error");
         return false;
     }
-    else if (name.split(' ').length < 2) {
-        swal("Opsss !", "The LAST name is required", "info");
+    else if (password == '') {
+        swal("Opsss !", "Inserte una contraseña.", "error");
         return false;
     }
     else if (phone == '') {
-        swal("Opsss !", "Phone field cannot be empty.", "error");
+        swal("Opsss !", "Inserte su número de teléfono.", "error");
         return false;
     }
     else if (email == '') {
-        swal("Opsss !", "Email field cannot be empty.", "error");
+        swal("Opsss !", "Inserte su dirección de correo electrónico.", "error");
+        return false;
+    }
+    else if (editor_type == '') {
+        swal("Opsss !", "Seleccione un tipo de Editor.", "error");
         return false;
     }
     else if (!(validateEmail(email))) {
-        swal("Opsss !", "Put a valid email address.", "error");
+        swal("Opsss !", "Inserte un correo válido.", "error");
         return false;
     }
-    else if (age == '') {
-        swal("Opsss !", "Age field cannot be empty.", "error");
+    else if (editor_type == 'Independiente' && age == '') {
+        swal("Opsss !", "El campo 'Edad' está vacío.", "error");
         return false;
     }
-    else if (age > 120) {
-        swal("Denied !", "The maxinum value is 120 years.", "error");
-        $("#age").val("");
+    else if (first_name == ''){
+        swal("Opss !", "Inserte su nombre.", "error")
+        return false;
+    }
+    else if (editor_type == 'Independiente' && last_name == ''){
+        swal("Opss !", "Inserte su apellido.", "error")
         return false;
     }
     else if (address == ''){
@@ -69,25 +82,31 @@ $("#btn-add, #btn-send").bind("click", validateAll);
 $(document).ready(function (){
 
     // Only letter
-    jQuery('input[name="name').keyup(function () {
+    jQuery('input[name="username').keyup(function () {
         var letter = jQuery(this).val();
         var allow = letter.replace(/[^a-zA-Z _]/g, '');
         jQuery(this).val(allow);
     });
 
-    //prevent starting with space and not more than one space in the input
+    //prevent to write space in the input
     $('input').on("keypress", function(e) {
-        // Not starting with space
-        if (e.which === 32 && ! this.value.length)
+
+        // Not space at start
+        if (e.which === 32 && !$(this).val())
             e.preventDefault();
-        // Not more tha two spaces continues
-        if (e.which === 32 && this.value[this.value.length-1] === ' ')
+        // Not two space consecutive
+        else if(e.key == ' ' && e.target.value[e.target.value.length - 1] == ' ')
+            e.preventDefault();
+    });
+
+    $('#userPassword').on("keypress", (e) => {
+        if (e.which === 32)
             e.preventDefault();
     });
 });
 
 // 3) Script to put First Letter capitalized
-$("#name, #autor").keyup(function () {
+$("#username, #autor, #first_name, #last_name, #address, #note").keyup(function () {
     var txt = $(this).val();
     $(this).val(txt.replace(/^(.)|\s(.)/g, function ($1){return $1.toUpperCase( );}));
 });
@@ -100,18 +119,12 @@ $(document).ready(function (){
 });
 
 // 5) Script to allow only numbers in AGE and ID Tribute
-
-$("#age").keyup(function () {
+$("#age, #idTribute").keyup(function () {
     if(!/^[0-9]*$/.test(this.value)) {
         this.value = this.value.split(/[^0-9]/).join('');
     }
 });
 
-$("#idTribute").keyup(function () {
-    if(!/^[0-9]*$/.test(this.value)) {
-        this.value = this.value.split(/[^0-9]/).join('');
-    }
-});
 
 // 6) Phone mask
 $(document).ready(function (){
@@ -143,15 +156,20 @@ $("#age").on("input", function() {
 // 10) Time running at real time
 setInterval(function (){
     var date = new Date();
+    let hour = date.getHours()
+    if (hour > 12)
+        hour = hour-12 // Eliminar horario militar
+    let minutes = date.getMinutes()
+    let seconds = date.getSeconds()
     $("#clock").html(
-        (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds()
+        ((hour < 10 ? '0' : hour) + hour + ":" + (minutes < 10 ? '0' : '') + minutes + ":" + (seconds < 10 ? '0' : '') + seconds)
     );
 }, 500);
 
 // 11) If not there editors, show a message
 var verify = $("#chk_td").length;
 if (verify == 0) {
-    $("#no-data").text("No editors found");
+    $("#no-data").text("No se ha encontrado");
 }
 
 // 12) ISMN mask
@@ -186,7 +204,7 @@ jQuery(function($) {
                 var json = JSON.stringify(data)
                 var d = $.parseJSON(json);
             }
-        }).done(function (){ // Una vez termine ajax correctamente elimina el spinner en 15s. Garan
+        }).done(function (){ // Una vez termine ajax correctamente elimina el spinner en 15s.
             setTimeout(function (){
                 $("#bg-spinner").fadeOut(500);
             },40000);
@@ -227,11 +245,17 @@ function toggleFunction(){
 // Function to activate an age field editor
 $("#editorType").change( (e) => {
 
+    const age = $('#age')
+    const last_name = $('#last_name')
+
     if (e.target.value === 'Independiente'){
-        $('#age').removeAttr('disabled');
+        age.removeAttr('disabled');
+        last_name.removeAttr('disabled')
     }
     else {
-        $('#age').val('');
-        $('#age').attr('disabled', 'disabled');
+        age.val('');
+        last_name.val('');
+        age.attr('disabled', 'disabled');
+        last_name.attr('disabled', 'disabled');
     }
 })

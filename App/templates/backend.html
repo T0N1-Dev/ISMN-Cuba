@@ -21,13 +21,157 @@
 {% block content %}
     {% if request.user.especialista %}
         <!-- Si inicia sesión el especialista -->
-        {% include 'editores-list.html' %}
+        <div class="container">
+
+            <br><br>
+
+            <div class="d-flex justify-content-between">
+                <!-- 1) Column ADD Editor and Musical Publication -->
+                {% block btn-add %}
+                    <a href="{% url 'add_editor' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editor</a>
+                {% endblock %}
+                <!-- 2) Column Get users -->
+                <span>
+                    Bienvenido <strong><span class="text-primary">{{ user.get_username }}</span></strong>
+                </span>
+            </div>
+
+            <form>
+                <div class="input-group input-group-sm mb-3 mt-4">
+                    <input name="q" type="text" class="form-control" placeholder="Search for..." value="{{ request.GET.q }}">
+                    <button class="btn btn-secondary"><i class="fas fa-search"></i></button>
+                    <a href="{% url 'backend_editores' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
+                </div>
+            </form>
+
+            <div style="text-align: center;">
+                <table class="table table-bordered table-sm mt-4" style="text-align: center; font-size: 14px;">
+                    <thead class="table-secondary">
+                        <tr>
+                            {% block title-table %}
+                                <th style="width: 4%">ID</th>
+                                <th style="width: 10%">Tipo</th>
+                                <th style="width: 12%">Nombre</th>
+                                <th style="width: 15%">N&deg; de ID Tributaria</th>
+                                <th style="width: 7%">Prefijo</th>
+                                <th style="width: 8%">Estado</th>
+                                <th style="width: 27%">Dirección</th>
+                                <th style="width: 10%">Teléfono</th>
+                                <th  colspan="2">Acciones</th>
+                            {% endblock title-table %}
+                        </tr>
+                    </thead>
+                    <!-- DATA FROM BACKEND -->
+                    {% block for-data-table %}
+                        {% for editor in editores %}
+                            <tr id="chk_td">
+                                <td>{{ editor.id }}</td>
+                                {% if editor.type  == 'I' %}
+                                    <td>Independiente</td>
+                                {% else %}
+                                    <td>Empresa</td>
+                                {% endif %}
+                                <td>{{ editor.user }}</td>
+                                <td>{{ editor.id_tribute }}</td>
+                                <td>{{ editor.prefijo }}</td>
+                                {% if editor.user.is_active %}
+                                    <td>Activo</td>
+                                {% else %}
+                                    <td>Inactivo</td>
+                                {% endif %}
+                                <td>{{ editor.directions }}</td>
+                                <td>{{ editor.phone }}</td>
+                                <td>
+                                    <a href="/editor/{{ editor.id }}" class="btn btn-sm btn-primary " title="Edit Editor">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-secondary" title="Delete Editor" data-bs-toggle="modal" data-bs-target="#deleteModal{{ editor.pk }}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <!-- Delete confirmation -->
+                            <div class="modal fade" id="deleteModal{{ editor.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar Editor</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body text-center">
+                                    <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
+                                      <div class="text-center text-danger">
+                                          <span>ESTÁS SEGURO QUE DESEAS ELIMINAR AL EDITOR ???</span>
+                                          <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ editor.user.get_full_name }} </strong></div>
+                                      </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                                    <a href="/delete_editor/{{ editor.id }}" type="button" class="btn btn-outline-danger btn-sm">Eliminar</a>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        {% endfor %}
+                    {% endblock for-data-table %}
+                </table>
+            </div>
+
+            <!-- PAGINATION -->
+            <nav class="mt-4" aria-label="Page navigation example">
+                {% if editores.has_other_pages %}
+                    <ul class="pagination justify-content-left">
+                    {% if editores.has_previous %}
+                        <a href="?page=1" class="btn btn-outline-primary mb-4" style="width: 60px; border-radius: 1px; border: 1px solid #d3d3d3">First</a>
+                        <li class="page-item"><a class="page-link" href="?page={{ editores.previous_page_number }}"><i class="fas fa-angle-double-left"></i></a></li>
+                    {% else %}
+                        <li class="page-item disabled"></li>
+                    {% endif %}
+
+                    {% for i in editores.paginator.page_range %}
+                        {% if editores.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}<span class="sr-only"></span></span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if editores.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ editores.next_page_number }}"><i class="fas fa-angle-double-right"></i></a></li>
+                        <a href="?page={{ editores.paginator.num_pages }}" class="btn btn-outline-primary mb-4" style="width: 60px; border-radius: 1px; border: 1px solid #d3d3d3; border-left: none;">Last</a>
+                    {% else %}
+                        <li class="page-item disabled"></li>
+                    {% endif %}
+                    </ul>
+                {% endif %}
+            </nav>
+
+            <!-- Messages from backend -->
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+                    <script>
+                        var n = "{{ message }}"
+                        swal("Perfect !", n, "success")
+                    </script>
+                {% endif %}
+            {% endfor %}
+
+            <!-- If there no editors, show the message -->
+            <span class="text-danger" id="no-data"></span>
+        </div> <!-- END // container -->
+
     {% else %}
         <span class="text-danger" >Access Denied</span>
     {% endif %}
 {% endblock content %}
 
 {% block Offcanvas %}
+    <a class="btn btn-dark" href="#"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
+    <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Publicaciones Musicales</a>
     <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>
     <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
     <hr>

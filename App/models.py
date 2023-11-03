@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
+import os
 
 
 # Prevent duplicated emails
@@ -74,7 +75,7 @@ class Editor(models.Model):
     id = models.IntegerField(primary_key=True)
     age = models.PositiveSmallIntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)],
                                            null=True, blank=True)
-    prefijo = models.ForeignKey(Prefijo, on_delete=models.PROTECT, unique=True, blank=True)
+    prefijo = models.ForeignKey(Prefijo, on_delete=models.PROTECT)
     type = models.CharField(max_length=100, null=True, choices=TYPE)
     image_profile = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
     note = models.TextField(blank=True)
@@ -105,32 +106,33 @@ class Especialista(models.Model):
 
 # Modelo que representa a cada publicación musical
 class Musical_Publication(models.Model):
-    BOLERO_GENDER = 'B'
-    POPULAR_BAILABLE_GENDER = 'PB'
-    MAMBO_GENDER = 'MB'
-    CHACHACHA_GENDER = 'CHCHCH'
-    RUMBA_GENDER = 'RB'
-    DANZON_GENDER = 'DZ'
+    BOLERO_GENDER = 'Bolero'
+    POPULAR_BAILABLE_GENDER = 'Popular Bailable'
+    MAMBO_GENDER = 'Mambo'
+    CHACHACHA_GENDER = 'Chachacha'
+    RUMBA_GENDER = 'Rumba'
+    DANZON_GENDER = 'Danzón'
 
     MUSICAL_GENDER = [
-        (BOLERO_GENDER, "Bolero"),
-        (POPULAR_BAILABLE_GENDER, "Popular Bailable"),
-        (MAMBO_GENDER, "Mambo"),
-        (CHACHACHA_GENDER, "ChaChaCha"),
-        (RUMBA_GENDER, "Rumba"),
-        (DANZON_GENDER, "Danzón"),
+        (BOLERO_GENDER, "BL"),
+        (POPULAR_BAILABLE_GENDER, "PB"),
+        (MAMBO_GENDER, "MB"),
+        (CHACHACHA_GENDER, "CH"),
+        (RUMBA_GENDER, "RB"),
+        (DANZON_GENDER, "DZ"),
     ]
 
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     autor = models.CharField(max_length=100)
     editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True, blank=True)
-    prefijo = models.OneToOneField(Prefijo, on_delete=models.PROTECT, unique=True)
+    prefijo = models.OneToOneField(Prefijo, on_delete=models.PROTECT)
     ismn = models.CharField(max_length=20, unique=True)
     letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)
     imagen = models.ImageField(upload_to="publications", null=True, default="default.jpg")
     date_time = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
     gender = models.CharField(max_length=100, null=True, choices=MUSICAL_GENDER)
 
     class Meta:
@@ -138,3 +140,41 @@ class Musical_Publication(models.Model):
 
     def __str__(self):
         return self.name
+
+    def letra_base_name(self):
+        rute = self.letra.path
+        return os.path.basename(rute)
+
+    def image_base_name(self):
+        rute = self.imagen.path
+        return os.path.basename(rute)
+
+
+# Solicitudes
+class Solicitud(models.Model):
+
+    EDITOR_ADD_SOLIC = 'EADDS'
+    ISMN_ADD_SOLIC = 'ISMNADDS'
+
+    SOLICITUD_TYPE = {
+        (EDITOR_ADD_SOLIC, "Solicitud-Inscripción"),
+        (ISMN_ADD_SOLIC, "Solicitud-ISMN")
+    }
+
+    PENDIENTE = 'PEND'
+    ATENDIDO = 'ATEND'
+
+    ESTATUS = {
+        (PENDIENTE, "Pendiente"),
+        (ATENDIDO, "Atendido")
+    }
+
+    editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
+    asunto = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=50, choices=SOLICITUD_TYPE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, choices=ESTATUS)
+
+
+    class Meta:
+        verbose_name_plural = 'solicitudes'

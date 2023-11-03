@@ -120,6 +120,13 @@ body {
         max-width: 500px;
     }
 
+.img_detail {
+  margin-left: auto;
+  margin-right: auto;
+  width: 60%;
+  border-radius: 5%;
+}
+
 /* Label with icon or text (left side of inputs) */
 .side-label{
     width: 45px;

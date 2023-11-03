@@ -9,7 +9,9 @@ from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
 from django.template import loader  # Render templates on email body
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth import authenticate, login
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
 
 
 # ================= FRONTEND SECTION =================
@@ -38,8 +40,8 @@ def frontend(request):
 # ================= BACKEND SECTION =================
 # Function to render the Backend Page
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@login_required(login_url = "login")
-def backend(request):
+@login_required(login_url="login")
+def backend_editores(request):
     if 'q' in request.GET:
         q = request.GET['q']
         all_editor_list = Editor.objects.filter(
@@ -56,8 +58,26 @@ def backend(request):
     page = request.GET.get('page')
     all_editor = paginator.get_page(page)
 
-
     return render(request, 'backend.html', {"editores": all_editor})
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def backend_publicaciones(request):
+    if 'q' in request.GET:
+        q = request.GET['q']
+        all_publication_list = Musical_Publication.objects.filter(
+            Q(name__icontains=q) | Q(autor__icontains=q) | Q(editor__user__username__icontains=q) |
+            Q(gender__icontains=q) | Q(ismn__icontains=q)
+        ).order_by('-created_at')
+    else:
+        all_publication_list = Musical_Publication.objects.all().order_by('-created_at')
+
+    paginator = Paginator(all_publication_list, 4)
+    page = request.GET.get('page')
+    all_publication = paginator.get_page(page)
+
+    return render(request, 'publications-list.html', {"publicaciones": all_publication})
 
 
 # Function to Add patient
@@ -267,3 +287,17 @@ def send_email_solicitud_ismn(request):
             messages.error(request, 'Error en la conexión. Intente más tarde.')
         messages.success(request, 'Solicitud ISMN enviada correctamente !')
         return HttpResponseRedirect('/')
+
+
+def export_musical_publication(request, musical_publication_id):
+    publication = Musical_Publication.objects.get(id=musical_publication_id)
+    buffer = io.BytesIO()
+
+    p = canvas.Canvas(buffer)
+    p.drawString(200, 500, "Hello World. This is a Musical Publication: "+publication.name)
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f"{publication.name}.pdf")
+
+

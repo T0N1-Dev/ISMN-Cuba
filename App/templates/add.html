@@ -37,14 +37,14 @@
                         <div class="col-6">
                             <div class="input-group input-group-sm mb-3">
                                 <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-user"></i></span>
-                                <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Nombre" required {% block Value-name %}{% endblock Value-name %}>
+                                <input type="text" class="form-control" maxlength="40" name="username" id="username" placeholder="Nombre de Usuario" required {% block Value-username %}{% endblock Value-username %}>
                             </div>
                         </div>
                         
                         <div class="col-6">
                             <div class="input-group input-group-sm position-relative mb-3">
                                 <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-lock"></i></span>
-                                <input type="password" class="form-control" name="password" placeholder="Contraseña" id="userPassword">
+                                <input type="password" class="form-control" name="password" placeholder="Contraseña" id="userPassword" required>
                                 <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
                             </div>
                         </div>
@@ -71,7 +71,7 @@
                                 <div class="input-group input-group-sm mb-3">
                                     <label class="input-group-text side-label-form justify-content-center"><i class="fa fa-building"></i></label>
                                     <select class="form-select form-control" name="editorType" id="editorType" required>
-                                        {% block option %}
+                                        {% block editorTypeOption %}
                                             <option value="" hidden>Tipo de Editor</option>
                                         {% endblock %}
                                         <option disabled></option>
@@ -85,7 +85,22 @@
                         <div class="col-6">
                             <div class="input-group input-group-sm position-relative mb-3">
                                 <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-universal-access"></i></span>
-                                <input type="text" class="form-control" name="age" id="age" placeholder="Edad" disabled>
+                                <input type="text" class="form-control" name="age" id="age" placeholder="Edad" disabled required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-address-book"></i></span>
+                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Nombre">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-address-book"></i></span>
+                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Apellido" disabled>
                             </div>
                         </div>
                     </div>
@@ -101,6 +116,26 @@
                             <div class="input-group input-group-sm position-relative mb-3">
                                 <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-credit-card"></i></span>
                                 <input type="text" class="form-control" name="idTribute" id="idTribute" placeholder="ID Tributaria">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group">
+                                <div class="input-group input-group-sm mb-3">
+                                    <label class="input-group-text side-label-form justify-content-center"><i class="fa fa-list"></i></label>
+                                    <select class="form-select form-control" name="editorPrefijo" id="editorPrefijo" required>
+                                        {% block editorPrefijoOption %}
+                                            <option value="" hidden>Número de publicaciones por año</option>
+                                        {% endblock %}
+                                        <option disabled></option>
+                                        <option value="inferior" title="Seleccione esta opcion si usted publica menos de 100 publicaciones por año">0 - 99</option>
+                                        <option value="medio_inferior" title="Seleccione esta opcion si usted publica entre 100 y 999 publicaciones por año ">100 - 999</option>
+                                        <option value="medio" title="Seleccione esta opcion si usted publica entre 1000 y 9999 publicaciones por año ">1000 - 9999</option>
+                                        <option value="superior" title="Seleccione esta opcion si usted publica más de 10000 publicaciones por año ">10000 - ...</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -129,7 +164,7 @@
                         {% block Btn-reset %} {% endblock Btn-reset %}
 
                         <!-- Back Button -->
-                        <a href="{% url 'backend' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
+                        <a href="{% url 'backend_editores' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
                     </div>
                 </form>
             </div>

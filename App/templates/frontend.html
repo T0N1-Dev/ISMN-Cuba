@@ -32,7 +32,7 @@
     <a href="{% url 'musical_colections' %}" class="btn btn-dark text-white"><i class="fas fa-music"></i>&nbsp;&nbsp;Colecciones Musicales</a>
     {% if request.user.is_authenticated %}
         {% if request.user.especialista %}
-            <a class="btn btn-dark" href="{% url 'backend' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Lista de Editores</a>
+            <a class="btn btn-dark" href="{% url 'backend_editores' %}"><i class="fas fa-hdd"></i>&nbsp;&nbsp;Lista de Editores</a>
         {% elif request.user.editor %}
             <a class="btn btn-dark" id="btn-Solicitud-ISMN" href="#" data-bs-toggle="modal" data-bs-target="#sendemailtestModal"><i class="fas fa-envelope"></i>&nbsp;&nbsp;Solicitud ISMN</a>
         {% endif %}
