@@ -18,7 +18,7 @@
 </head>
 <body>
     <div class="wrapper">
-        <center><div id="preloader"></div></center>
+        <div style="text-align: center;" id="preloader"></div>
         <header>
             <nav class="navbar navbar-expand-ld navbar-dark bg-dark">
                 <div class="col-sm">
@@ -61,7 +61,7 @@
         <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
             Copyright &copy; {% now "Y" %} Todos los derechos reservados | Agencia Cubana del ISBN |
             Cámara Cubana del Libro | Hecho con
-            <i class="text-danger fas fa-heart blink_ne" style="font-size: 15px"></i> por
+            <i class="text-danger fas fa-heart fa-beat" style="font-size: 15px"></i> por
             <a href="https://cloudhq.net/s/5e75f8db3646f2" target="_blank" style="color: #0dcaf0; text-decoration: none;">T0N1</a>
         </div>
     </footer>
@@ -83,6 +83,7 @@
             </script>
         {% endif %}
     {% endfor %}
+
 
     <!-- Modal for Logout Confirmation -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -141,11 +142,5 @@
         });
     </script>
 
-    <!-- Pulse effect -->
-    <script>
-        (function blink(){
-            $('.blink_ne').fadeOut(700).fadeIn(700, blink);
-        })();
-    </script>
 </body>
 </html>
