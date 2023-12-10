@@ -1,6 +1,8 @@
 from datetime import datetime
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from reportlab.lib.colors import Color
+
 from App.models import Editor, Musical_Publication, Registered_Data
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
@@ -19,7 +21,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4
 
@@ -301,16 +303,31 @@ def send_email_solicitud_ismn(request):
 def export_musical_publication(request, musical_publication_id):
     # Tomar la Info. de la Publicación a exportar
     publication = Musical_Publication.objects.get(id=musical_publication_id)
-    # Crear el Canva
+
+    # Crear el temporal para el pdf
     buffer = io.BytesIO()
+
     # Importar las fuentes externas
     pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
     pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
+    pdfmetrics.registerFont(TTFont('Karla-Font', 'fonts/Karla-VariableFont_wght.ttf'))
+    pdfmetrics.registerFont(TTFont('Karla-Italic', 'fonts/Karla-Italic-VariableFont_wght.ttf'))
 
     PAGE_WIDTH, PAGE_HEIGHT = A4
-    pageinfo = f"{publication.name}"
+    data = [['AUTOR', publication.autor],
+            ['NOMBRE', publication.name],
+            ['GÉNERO', publication.gender],
+            ['EDITOR', publication.editor],
+            ['ISMN', publication.ismn],
+            ['PREFIJO', publication.prefijo],
+            ['FECHA DE PUBLICACIÓN', publication.created_at.date()],
+            ['FECHA DE REALIZACIÓN', publication.date_time],
+            ['LETRA DE LA CANCIÓN', publication.letra.url],
+            ['DESCRIPCIÓN', publication.description],
+            ['IMAGEN', publication.imagen.url],
+            ]
 
-    def myFirstPage(canvas, doc):
+    def myPage(canvas, doc):
         canvas.saveState()
         # Color de Fondo
         canvas.setFillColorRGB(0.94, 0.94, 0.94)
@@ -318,65 +335,64 @@ def export_musical_publication(request, musical_publication_id):
         # Barra de encabezado
         canvas.setFillColorRGB(0.21, 0.25, 0.33)
         # Imprimir el Logo de la empresa
-        canvas.drawImage('media/logo.jpg', 250, 685, 80, 110)
+        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH-80)/2, 685, 80, 110)
         canvas.rect(0, 810, 700, 50, stroke=0, fill=1)
         # Crear encabezado del reporte
         publication_info_textobject = canvas.beginText()
-        publication_info_textobject.setTextOrigin(175, 652)
+        texto_encabezado = 'INFORMACIÓN DE LA PUBLICACIÓN'
+        width_texto_encabezado = canvas.stringWidth(texto_encabezado, 'RobotoCondensed-Bold', 15)
+        origin_start = PAGE_WIDTH / 2 - width_texto_encabezado / 2
+        publication_info_textobject.setTextOrigin(origin_start, 660)
         publication_info_textobject.setFont('RobotoCondensed-Bold', 15)
         publication_info_textobject.setFillColorRGB(0.21, 0.25, 0.33)
         publication_info_textobject.setCharSpace(0.4)
-        publication_info_textobject.textLine('INFORMACIÓN DE LA PUBLICACIÓN')
-        # Centrando el titulo de la publicacion
+        publication_info_textobject.textLine(texto_encabezado)
+        # Titulo de la publicacion
         width_title_publicaction = canvas.stringWidth(publication.name, 'RobotoSlab', 30)
         origin_start = PAGE_WIDTH/2 - width_title_publicaction/2
-        publication_info_textobject.setTextOrigin(origin_start, 615)
+        publication_info_textobject.setTextOrigin(origin_start, 626)
         publication_info_textobject.setFont('RobotoSlab', 30)
         publication_info_textobject.setFillColorRGB(0.49, 0.30, 0.34)
         publication_info_textobject.textLine(publication.name)
         canvas.drawText(publication_info_textobject)
         # Raya separadora
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
-        canvas.rect(50, 590, 500, 4, stroke=0, fill=1)
+        canvas.rect(50, 600, 500, 4, stroke=0, fill=1)
         # Content
         publication_detail = canvas.beginText()
         publication_detail.setTextOrigin(50, 560)
         publication_detail.setFont('RobotoCondensed-Bold', 11)
         publication_detail.setCharSpace(0.25)
         publication_detail.setFillColorRGB(0.21, 0.25, 0.33)
-        publication_detail.textLine('DETALLE DE LA PUBLICACIÓN')
+        publication_detail.textLine('DETALLES Y AUTRÍA')
         canvas.drawText(publication_detail)
+        # Primera Tabla - Autoria
+        table_autoria = Table(data[:4], colWidths=[100, 400])
+        table_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                  ('FONT', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
+                                  ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
+                                  ('GRID', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
+                                  ])
+        table_autoria.setStyle(table_style)
+        table_autoria.wrapOn(canvas, 50, 475)
+        table_autoria.drawOn(canvas, 50, 475)
+        # Segunda Tabla - Descripcion
+        # Encabezado
+        publication_detail.setTextOrigin(50, 445)
+        publication_detail.textLine('DESCRIPCIÓN DE LA OBRA')
+        canvas.drawText(publication_detail)
+        # Tabla
+        table_description = Table(data[4:-1], colWidths=[130, 370])
+        table_description.setStyle(table_style)
+        table_description.wrapOn(canvas, 50, 287)
+        table_description.drawOn(canvas, 50, 287)
         # Footer
         canvas.setFont('Times-Roman', 9)
-        canvas.drawString(inch, 0.75 * inch, "Primera Página / %s" % datetime.today())
+        canvas.drawString(inch, 0.75 * inch, f"{datetime.today().date()}")
         canvas.restoreState()
 
-    def myLaterPages(canvas, doc):
-        canvas.saveState()
-        # Color de Fondo
-        canvas.setFillColorRGB(0.94, 0.94, 0.94)
-        canvas.rect(0, 0, 600, 900, fill=1)
-        # Footer
-        canvas.setFont('Times-Roman', 9)
-        canvas.setFillColorRGB(0.21, 0.25, 0.33)
-        canvas.drawString(inch, 0.75 * inch, 'Página %d / %s' % (doc.page, datetime.today()))
-        canvas.restoreState()
-
-    styles = getSampleStyleSheet()
-    Story = [Spacer(1, 3*inch)]
-    style = styles["Normal"]
-
-    for i in range(10):
-        bogustext = (f'<b>{request.user.username}</b> This is Paragraph number %s. ' % i) * 20
-        paragraph = Paragraph(bogustext, style)
-        Story.append(paragraph)
-        Story.append(Spacer(1, 0.2*inch))
-
+    story = [Paragraph('')]
     doc = SimpleDocTemplate(buffer)
-    doc.build(Story, onFirstPage=myFirstPage, onLaterPages=myLaterPages)
-
-
-    # p.showPage()
-    # p.save()
+    doc.build(story, onFirstPage=myPage)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"{publication.name}.pdf")
