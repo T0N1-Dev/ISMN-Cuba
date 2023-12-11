@@ -314,16 +314,16 @@ def export_musical_publication(request, musical_publication_id):
     pdfmetrics.registerFont(TTFont('Karla-Italic', 'fonts/Karla-Italic-VariableFont_wght.ttf'))
 
     PAGE_WIDTH, PAGE_HEIGHT = A4
+    letra = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.letra.url}" color="blue">{publication.letra.name[21:]}</a></u>')
     data = [['AUTOR', publication.autor],
             ['NOMBRE', publication.name],
             ['GÉNERO', publication.gender],
             ['EDITOR', publication.editor],
-            ['ISMN', publication.ismn],
-            ['PREFIJO', publication.prefijo],
-            ['FECHA DE PUBLICACIÓN', publication.created_at.date()],
-            ['FECHA DE REALIZACIÓN', publication.date_time],
-            ['LETRA DE LA CANCIÓN', publication.letra.url],
-            ['DESCRIPCIÓN', publication.description],
+            ['LETRA DE LA CANCIÓN', letra],
+            ['ISMN', publication.ismn, f'DESCRIPCIÓN \n {publication.description}'],
+            ['PREFIJO', publication.prefijo, '', ''],
+            ['FECHA DE PUBLICACIÓN', publication.created_at.date(), ''],
+            ['FECHA DE REALIZACIÓN', publication.date_time, '', ''],
             ['IMAGEN', publication.imagen.url],
             ]
 
@@ -341,7 +341,7 @@ def export_musical_publication(request, musical_publication_id):
         publication_info_textobject = canvas.beginText()
         texto_encabezado = 'INFORMACIÓN DE LA PUBLICACIÓN'
         width_texto_encabezado = canvas.stringWidth(texto_encabezado, 'RobotoCondensed-Bold', 15)
-        origin_start = PAGE_WIDTH / 2 - width_texto_encabezado / 2
+        origin_start = (PAGE_WIDTH - width_texto_encabezado) / 2
         publication_info_textobject.setTextOrigin(origin_start, 660)
         publication_info_textobject.setFont('RobotoCondensed-Bold', 15)
         publication_info_textobject.setFillColorRGB(0.21, 0.25, 0.33)
@@ -366,26 +366,49 @@ def export_musical_publication(request, musical_publication_id):
         publication_detail.setFillColorRGB(0.21, 0.25, 0.33)
         publication_detail.textLine('DETALLES Y AUTRÍA')
         canvas.drawText(publication_detail)
-        # Primera Tabla - Autoria
+        # **--Primera Tabla - Autoria--**
         table_autoria = Table(data[:4], colWidths=[100, 400])
-        table_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                                  ('FONT', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
-                                  ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
-                                  ('GRID', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
-                                  ])
-        table_autoria.setStyle(table_style)
+        table_autoria_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                          ('FONT', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
+                                          ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
+                                          ('LINEBEFORE', (1, 0), (1, -1), 0, colors.Color(1, 0, 0, alpha=0)),
+                                          ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
+                                          ('LINEABOVE', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34))
+                                          ])
+        table_autoria.setStyle(table_autoria_style)
         table_autoria.wrapOn(canvas, 50, 475)
         table_autoria.drawOn(canvas, 50, 475)
-        # Segunda Tabla - Descripcion
+        # **--Segunda Tabla - Descripcion--**
         # Encabezado
-        publication_detail.setTextOrigin(50, 445)
+        publication_detail.setTextOrigin(50, 448)
         publication_detail.textLine('DESCRIPCIÓN DE LA OBRA')
         canvas.drawText(publication_detail)
         # Tabla
-        table_description = Table(data[4:-1], colWidths=[130, 370])
-        table_description.setStyle(table_style)
-        table_description.wrapOn(canvas, 50, 287)
-        table_description.drawOn(canvas, 50, 287)
+        table_description_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                              ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                              ('FONT', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
+                                              ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
+                                              ('LINEBEFORE', (1, 0), (1, -1), 0, colors.Color(1, 0, 0, alpha=0)),
+                                              ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
+                                              ('BOX', (0, 1), (1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
+                                              ('LINEABOVE', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
+                                              ('SPAN', (1, 0), (2, 0)),
+                                              ('SPAN', (1, 0), (3, 0)),
+                                              ('SPAN', (2, 1), (3, 1)),
+                                              ('SPAN', (2, 1), (2, 2)),
+                                              ('SPAN', (2, 1), (3, 2)),
+                                              ('SPAN', (2, 1), (2, 3)),
+                                              ('SPAN', (2, 1), (3, 3)),
+                                              ('SPAN', (2, 1), (2, 4)),
+                                              ('SPAN', (2, 1), (3, 4)),
+                                              ('LEADING', (0, 0), (-1, -1), 17),
+                                              ('WORDWRAP', (0, 0), (-1, -1))
+
+                                              ])
+        table_description = Table(data[4:-1], colWidths=[120, 100, 150, 130], )
+        table_description.setStyle(table_description_style)
+        w, h = table_description.wrapOn(canvas, 50, 275)
+        table_description.drawOn(canvas, 50, 435-h)
         # Footer
         canvas.setFont('Times-Roman', 9)
         canvas.drawString(inch, 0.75 * inch, f"{datetime.today().date()}")
