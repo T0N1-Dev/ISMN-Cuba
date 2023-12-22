@@ -1,9 +1,10 @@
 from datetime import datetime
+from PIL import Image as PILImage, ImageDraw
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from reportlab.lib.colors import Color
+from pathlib import Path
 
-from App.models import Editor, Musical_Publication, Registered_Data
+from App.models import Editor, Musical_Publication, Registered_Data, Especialista
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
 from django.http import HttpResponseRedirect  # Redirect the page after submit
@@ -17,13 +18,12 @@ from django.http import FileResponse
 # REPORTLAB
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
+from reportlab.platypus import Table, TableStyle, Image, Frame
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, letter
 
 
 # ================= FRONTEND SECTION =================
@@ -310,21 +310,36 @@ def export_musical_publication(request, musical_publication_id):
     # Importar las fuentes externas
     pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
     pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
-    pdfmetrics.registerFont(TTFont('Karla-Font', 'fonts/Karla-VariableFont_wght.ttf'))
-    pdfmetrics.registerFont(TTFont('Karla-Italic', 'fonts/Karla-Italic-VariableFont_wght.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto-Italic', 'fonts/RobotoCondensed-Italic.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto', 'fonts/RobotoCondensed-Regular.ttf'))
 
     PAGE_WIDTH, PAGE_HEIGHT = A4
-    letra = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.letra.url}" color="blue">{publication.letra.name[21:]}</a></u>')
+    style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")
+    style_description = ParagraphStyle(name='description_style', rightIndent=15, leading=15, fontName="Roboto")
+    letra = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.letra.url}" '
+                      f'color="blue">http://127.0.0.1:8000/{publication.letra.url}</a></u>', style_letra)
+    if publication.description:
+        descripcion = Paragraph(f'<font name="RobotoCondensed-Bold" '
+                                f'color={colors.Color(0.21, 0.25, 0.33)}>DESCRIPCIÓN</font>'
+                                f'<br/><font color={colors.Color(0.21, 0.25, 0.33)}>{publication.description}</font>',
+                                style_description)
+    else:
+        descripcion = Paragraph(f'<font name="RobotoCondensed-Bold" '
+                                f'color={colors.Color(0.21, 0.25, 0.33)}>DESCRIPCIÓN</font>'
+                                f'<br/>'
+                                f'<font name="Roboto-Italic" size=8 color={colors.Color(0.49, 0.30, 0.34)}>'
+                                f'(Descripción opcional de la obra, breve historia de su realización y datos adicionales)</font>',
+                                style_description)
     data = [['AUTOR', publication.autor],
             ['NOMBRE', publication.name],
             ['GÉNERO', publication.gender],
             ['EDITOR', publication.editor],
-            ['LETRA DE LA CANCIÓN', letra],
-            ['ISMN', publication.ismn, f'DESCRIPCIÓN \n {publication.description}'],
-            ['PREFIJO', publication.prefijo, '', ''],
+            ['LETRA DE LA CANCIÓN', letra, ''],
+            ['ISMN', publication.ismn, descripcion],
+            ['PREFIJO', publication.prefijo, ''],
             ['FECHA DE PUBLICACIÓN', publication.created_at.date(), ''],
-            ['FECHA DE REALIZACIÓN', publication.date_time, '', ''],
-            ['IMAGEN', publication.imagen.url],
+            ['FECHA DE REALIZACIÓN', publication.date_time, ''],
+            ['DERECHOS DE AUTOR', 'EN VENTA', '']
             ]
 
     def myPage(canvas, doc):
@@ -334,22 +349,22 @@ def export_musical_publication(request, musical_publication_id):
         canvas.rect(0, 0, 600, 900, fill=1)
         # Barra de encabezado
         canvas.setFillColorRGB(0.21, 0.25, 0.33)
+        canvas.rect(0, 810, 600, 50, stroke=0, fill=1)
         # Imprimir el Logo de la empresa
-        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH-80)/2, 685, 80, 110)
-        canvas.rect(0, 810, 700, 50, stroke=0, fill=1)
+        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH - 80) / 2, 685, 80, 110)
         # Crear encabezado del reporte
         publication_info_textobject = canvas.beginText()
         texto_encabezado = 'INFORMACIÓN DE LA PUBLICACIÓN'
         width_texto_encabezado = canvas.stringWidth(texto_encabezado, 'RobotoCondensed-Bold', 15)
         origin_start = (PAGE_WIDTH - width_texto_encabezado) / 2
-        publication_info_textobject.setTextOrigin(origin_start, 660)
+        publication_info_textobject.setTextOrigin(origin_start, 665)
         publication_info_textobject.setFont('RobotoCondensed-Bold', 15)
         publication_info_textobject.setFillColorRGB(0.21, 0.25, 0.33)
         publication_info_textobject.setCharSpace(0.4)
         publication_info_textobject.textLine(texto_encabezado)
         # Titulo de la publicacion
         width_title_publicaction = canvas.stringWidth(publication.name, 'RobotoSlab', 30)
-        origin_start = PAGE_WIDTH/2 - width_title_publicaction/2
+        origin_start = PAGE_WIDTH / 2 - width_title_publicaction / 2
         publication_info_textobject.setTextOrigin(origin_start, 626)
         publication_info_textobject.setFont('RobotoSlab', 30)
         publication_info_textobject.setFillColorRGB(0.49, 0.30, 0.34)
@@ -364,12 +379,13 @@ def export_musical_publication(request, musical_publication_id):
         publication_detail.setFont('RobotoCondensed-Bold', 11)
         publication_detail.setCharSpace(0.25)
         publication_detail.setFillColorRGB(0.21, 0.25, 0.33)
-        publication_detail.textLine('DETALLES Y AUTRÍA')
+        publication_detail.textLine('DETALLES Y AUTORÍA')
         canvas.drawText(publication_detail)
         # **--Primera Tabla - Autoria--**
         table_autoria = Table(data[:4], colWidths=[100, 400])
         table_autoria_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                                           ('FONT', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
+                                          ('FONT', (1, 0), (1, -1), 'Roboto'),
                                           ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
                                           ('LINEBEFORE', (1, 0), (1, -1), 0, colors.Color(1, 0, 0, alpha=0)),
                                           ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
@@ -383,35 +399,158 @@ def export_musical_publication(request, musical_publication_id):
         publication_detail.setTextOrigin(50, 448)
         publication_detail.textLine('DESCRIPCIÓN DE LA OBRA')
         canvas.drawText(publication_detail)
-        # Tabla
+        # Tabla Descripción
         table_description_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                                              ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                              ('VALIGN', (0, -1), (1, -1), 'TOP'),
+                                              ('VALIGN', (-1, 1), (-1, 1), 'TOP'),
+                                              ('TOPPADDING', (-1, 1), (-1, 1), 5),
+                                              ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
+                                              ('FONT', (0, 0), (-1, -1), 'Roboto'),
                                               ('FONT', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
+                                              ('FONT', (1, 5), (1, 5), 'RobotoCondensed-Bold'),
                                               ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
                                               ('LINEBEFORE', (1, 0), (1, -1), 0, colors.Color(1, 0, 0, alpha=0)),
+                                              ('LINEBEFORE', (1, 5), (1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
                                               ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
                                               ('BOX', (0, 1), (1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
                                               ('LINEABOVE', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
                                               ('SPAN', (1, 0), (2, 0)),
-                                              ('SPAN', (1, 0), (3, 0)),
-                                              ('SPAN', (2, 1), (3, 1)),
-                                              ('SPAN', (2, 1), (2, 2)),
-                                              ('SPAN', (2, 1), (3, 2)),
-                                              ('SPAN', (2, 1), (2, 3)),
-                                              ('SPAN', (2, 1), (3, 3)),
-                                              ('SPAN', (2, 1), (2, 4)),
-                                              ('SPAN', (2, 1), (3, 4)),
-                                              ('LEADING', (0, 0), (-1, -1), 17),
-                                              ('WORDWRAP', (0, 0), (-1, -1))
-
+                                              ('SPAN', (2, 1), (2, -1))
                                               ])
-        table_description = Table(data[4:-1], colWidths=[120, 100, 150, 130], )
+
+        table_description = Table(data[4:], colWidths=[120, 120, 260], rowHeights=[None,None,None,None,None,70])
         table_description.setStyle(table_description_style)
         w, h = table_description.wrapOn(canvas, 50, 275)
-        table_description.drawOn(canvas, 50, 435-h)
+        x_coord_table_description = 50
+        y_coord_table_description = 435 - h
+        table_description.drawOn(canvas, x_coord_table_description, y_coord_table_description)
+        # CheckBoxes
+        x_checkbox = 57
+        y_checkbox = y_coord_table_description + 30
+        canvas.acroForm.checkbox(x=x_checkbox, y=y_checkbox, size=12, fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
+                                 borderColor=colors.Color(0.49, 0.30, 0.34), borderWidth=0.5)
+        canvas.acroForm.checkbox(x=x_checkbox, y=y_checkbox-16, size=12, fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
+                                 borderColor=colors.Color(0.49, 0.30, 0.34, alpha=0.1), borderWidth=0.5)
+        canvas.acroForm.checkbox(x=x_checkbox+120, y=y_checkbox, size=12, fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
+                                 borderColor=colors.Color(0.49, 0.30, 0.34), borderWidth=0.5)
+        canvas.acroForm.checkbox(x=x_checkbox+120, y=y_checkbox-16, size=12, fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
+                                 borderColor=colors.Color(0.49, 0.30, 0.34, alpha=0.1), borderWidth=0.5)
+        options = canvas.beginText()
+        # Opciones 'privado y publico' de "Derechos de Autor"
+        # Publico
+        options.setTextOrigin(x_checkbox+15, y_checkbox+3)
+        options.setFont('Roboto', 10)
+        options.textLine('público')
+        canvas.drawText(options)
+        # Privado
+        options.setTextOrigin(x_checkbox+15, y_checkbox-12)
+        options.textLine('privado')
+        canvas.drawText(options)
+        # Opciones si y no de 'EN VENTA'
+        # Si
+        options.setTextOrigin(x_checkbox+135, y_checkbox+3)
+        options.textLine('si')
+        canvas.drawText(options)
+        # No
+        options.setTextOrigin(x_checkbox+135, y_checkbox-12)
+        options.textLine('no')
+        canvas.drawText(options)
+
+        # Cover de la publicacion
+        def redondear_imagen(imagen, radio):
+            # Crear una máscara redonda del mismo tamaño que la imagen
+            mascara = PILImage.new("L", imagen.size, 0)
+            dibujo = ImageDraw.Draw(mascara)
+            dibujo.ellipse((0, 0, imagen.width, imagen.height), fill=255)
+
+            # Crear una nueva imagen con fondo transparente
+            imagen_redonda = PILImage.new("RGBA", imagen.size, (0, 0, 0, 0))
+
+            # Pegar la imagen original en la nueva imagen usando la máscara
+            imagen_redonda.paste(imagen, mask=mascara)
+
+            # Crear una nueva máscara redonda con un borde transparente
+            borde = PILImage.new("L", imagen.size, 0)
+            dibujo_borde = ImageDraw.Draw(borde)
+            dibujo_borde.ellipse(
+                (radio, radio, imagen.width - radio, imagen.height - radio), fill=255
+            )
+
+            # Pegar la imagen redonda en una nueva imagen con el borde
+            imagen_final = PILImage.new("RGBA", imagen.size, (0, 0, 0, 0))
+            imagen_final.paste(imagen_redonda, mask=borde)
+
+            return imagen_final
+
+        # Abrir la imagen original
+        imagen_original = PILImage.open(publication.imagen.path)
+
+        # Radio del borde redondeado
+        radio_borde = 5
+
+        # Redondear la imagen
+        imagen_redondeada = redondear_imagen(imagen_original, radio_borde)
+
+        # Guardar la imagen redondeada
+        imagen_redondeada.save(f"App/static/img/imagen_redondeada.png")
+
+        cover = Image("App/static/img/imagen_redondeada.png", width=150, height=120)
+        w, h = cover.wrapOn(canvas, 350, 120)
+        cover.drawOn(canvas, 350, y_coord_table_description-h-20)
+
+        # Text url from cover
+        cover_style = ParagraphStyle(name='style', fontName="Roboto")
+        cover_url = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.imagen.url}" '
+                          f'color="blue">Mostrar Imagen</a></u>', cover_style)
+        w = canvas.stringWidth('Mostrar Imagen', 'Roboto', 10)
+        cover_url.wrapOn(canvas, 88, 12)
+        cover_url.drawOn(canvas, 424-w/2, 110)
+
+        # Texto Informativo
+        text_info_style = ParagraphStyle(name='text_info_style')
+        text_info = Paragraph(f'<font name="Roboto-Italic" size=8 color={colors.Color(0.49, 0.30, 0.34)}>'
+                                f'El reciente documento que muestra los datos principales de la publicación musical '
+                              f'emerge como una herramienta esencial para el equipo y las partes interesadas. '
+                              f'Al encapsular la inspiración artística, la partitura, descripción y '
+                              f'datos biográficos, sirve como guía integral para comprender y comunicar '
+                              f'el proyecto de publicación. Este recurso clave garantiza un impacto positivo en todos '
+                              f'los aspectos de la iniciativa musical, y se espera compartir más detalles en el futuro.</font>',
+                                text_info_style)
+        w, h = text_info.wrapOn(canvas, 200, 200)
+        y_coord_text_info = y_coord_table_description - h - 20
+        text_info.drawOn(canvas, 50, y_coord_text_info)
+
+        # Tabla de Reportado por:
+        # Datos
+        if request.user.especialista:
+            departamento = 'Informatica - CCL'
+        else:
+            departamento = '-'
+        data_table_report_by = [
+            ['REPORTADO POR:', ''],
+            ['Nombre:', request.user.first_name],
+            ['Fecha:', datetime.today().date()],
+            ['Departamento:', departamento]
+        ]
+        report_by_style = TableStyle(
+            [('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+             ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+             ('FONTNAME', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
+             ('FONTNAME', (1, 0), (1, -1), 'Roboto'),
+             ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
+             ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34))]
+        )
+        table_report_by = Table(data_table_report_by, colWidths=[100, 140], style=report_by_style)
+        w, h = table_report_by.wrapOn(canvas, 400, 200)
+        table_report_by.drawOn(canvas, 50, y_coord_text_info - h - 15)
+
         # Footer
-        canvas.setFont('Times-Roman', 9)
-        canvas.drawString(inch, 0.75 * inch, f"{datetime.today().date()}")
+        # Raya separadora
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(50, 50, 500, 4, stroke=0, fill=1)
+        # Barra final
+        canvas.setFillColorRGB(0.21, 0.25, 0.33)
+        canvas.rect(0, 0, 600, 10, stroke=0, fill=1)
         canvas.restoreState()
 
     story = [Paragraph('')]
@@ -419,3 +558,134 @@ def export_musical_publication(request, musical_publication_id):
     doc.build(story, onFirstPage=myPage)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"{publication.name}.pdf")
+
+
+def crear_listas():
+    lista_imagenes, lista_titulos, lista_descripciones = [], [], []
+    imagenes_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Ficcion Aventura')
+    descripcion_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Ficcion Aventura\Descripciones.txt')
+    lista_descripciones = open(descripcion_root, encoding='utf-8').readlines()
+    for img in Path(imagenes_root).glob("*.jpg"):
+        lista_imagenes.append(str(img))
+        lista_titulos.append(img.stem)
+    return lista_imagenes, lista_titulos, lista_descripciones
+
+
+def export_catalogo_peliculas(request, musical_publication_id):
+    pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
+    pdfmetrics.registerFont(TTFont('Action', 'fonts/28DaysLater.ttf'))
+    PAGE_WIDTH, PAGE_HEIGHT = letter
+    buffer = io.BytesIO()
+    img_list, title_list, description_list = crear_listas()
+    titulo_catalogo = 'Ciencia y Ficcion'
+
+    def myFirstPage(canvas, doc):
+        canvas.saveState()
+
+        def draw(x, y, counter):
+            if y < PAGE_HEIGHT:
+                if x < PAGE_WIDTH:
+                    canvas.drawImage(img_list[counter], x, y, 100, 120)
+                    counter += 1
+                    x += 100
+                    draw(x, y, counter)
+                else:
+                    y += 120
+                    x = 0
+                    draw(x, y, counter)
+            else:
+                return
+
+        draw(0, 0, 0)
+
+        font_size = 90
+        style_title1 = ParagraphStyle(name='style_title1', fontName='Action', fontSize=font_size,
+                                      textColor=colors.red)
+        title = Paragraph(titulo_catalogo, style_title1)
+        canvas.rotate(45)
+        canvas.setFillColorRGB(1, 1, 1)
+        title.wrap(PAGE_WIDTH, PAGE_HEIGHT)
+        canvas.rect(265, 205, 6.8 * font_size, -0.9 * font_size, stroke=0, fill=1)
+        title.drawOn(canvas, 270, 200)
+        canvas.rotate(-45)
+        # Logo Film
+        logo_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Accion\Accion\logo_film.png')
+        logo = Image(logo_root, 150, 150)
+        logo.drawOn(canvas, PAGE_WIDTH-180, 10)
+        canvas.restoreState()
+
+    def myLaterPage(canvas, doc):
+        canvas.saveState()
+        canvas.drawString(inch, 0.75 * inch, "Page %s" % (doc.page - 1))
+        canvas.restoreState()
+
+    def build_doc(pbuffer):
+        # Datos para conformar el documento
+        doc = SimpleDocTemplate(pbuffer)
+        story = [Spacer(0, 8 * inch)]
+        # Datos para la tabla
+        datas = []
+        counter = 0
+        fila_title = 0
+        fila1_imagen = 0
+        fila2_imagen = 1
+        fila3_imagen = 2
+        fila4_imagen = 3
+        fila1_description = 1
+        fila2_description = 2
+        fila3_description = 3
+        style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('INNERGRID', (1, 0), (1, -1), 1, colors.black),
+                            ('BOX', (1, 0), (1, -1), 1, colors.black)
+                            ])
+        style_title = ParagraphStyle(name='style_title', fontName='RobotoCondensed-Bold',
+                                     fontSize=14, alignment=1)
+        style_description = ParagraphStyle(name='style_descrption', fontName='Helvetica-Bold',
+                                           fontSize=12, alignment=4)
+
+        # For para llenar los datos de la tabla
+        for img in img_list:
+            title = Paragraph(title_list[counter].upper(), style_title)
+            descripcion = Paragraph(description_list[counter], style_description)
+            # Matriz de Datos para la tabla
+            datas.append([Image(img, 150, 155), title])
+            datas.append(['', descripcion])
+            datas.append(['', ''])
+            datas.append(['', ''])
+            counter += 1
+            # Style Table
+            # Title
+            style.add('VALIGN', (1, fila_title), (1, fila_title), 'MIDDLE')
+            style.add('BACKGROUND', (1, fila_title), (1, fila_title), colors.lightsteelblue)
+            # Imagen
+            style.add('VALIGN', (0, fila1_imagen), (0, fila1_imagen), 'TOP')
+            style.add('SPAN', (0, fila1_imagen), (0, fila2_imagen))
+            style.add('SPAN', (0, fila1_imagen), (0, fila3_imagen))
+            style.add('SPAN', (0, fila1_imagen), (0, fila4_imagen))
+            style.add('TOPPADDING', (0, fila1_imagen), (0, fila1_imagen), 0)
+
+            # Description
+            style.add('SPAN', (1, fila1_description), (1, fila2_description))
+            style.add('SPAN', (1, fila1_description), (1, fila3_description))
+            style.add('VALIGN', (1, fila1_description), (1, fila1_description), 'TOP')
+            style.add('ALIGN', (1, fila1_description), (1, fila1_description), 'LEFT')
+            style.add('LEADING', (1, fila1_description), (1, fila1_description), 17)
+            # Siguientes filas de la tabla
+            fila_title += 4
+            fila1_imagen += 4
+            fila2_imagen += 4
+            fila3_imagen += 4
+            fila4_imagen += 4
+            fila1_description += 4
+            fila2_description += 4
+            fila3_description += 4
+
+        # TABLE
+        table = Table(datas, colWidths=(170, 335))
+        table.setStyle(style)
+        story.append(table)
+        doc.build(story, onFirstPage=myFirstPage, onLaterPages=myLaterPage)
+
+    build_doc(buffer)
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f"CATÁLOGO_DE_PELICULAS_{titulo_catalogo}.pdf")
