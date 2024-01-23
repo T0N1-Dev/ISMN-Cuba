@@ -5,15 +5,26 @@
 
 <!-- Time -->
 {% block time %}
-    <div class="col-sm">
-        <span style="color: #89cff0; align-content: center" id="clock"></span>
-    </div>
+    <span style="color: #89cff0; margin-left: 480px" id="clock"></span>
 {% endblock time %}
 
 <!-- Navbar content -->
 {% block navbar-content %}
+    <!--Title-->
     <i class="fas fa-users"></i>&nbsp;&nbsp;Editores
 {% endblock navbar-content %}
+
+{% block notifications %}
+    <!--Notification Button-->
+    <div class="col-sm">
+        <a class="text-light" id="btn-nav" href="#">
+            <i class="fas fa-bell"></i><span class="pending">5</span>
+        </a>
+        <a class="text-light" id="btn-nav" href="#">
+            <i class="fas fa-envelope"></i><span class="total">7</span>
+        </a>
+    </div>
+{% endblock notifications %}
 
 
 <!-- CONTENT PAGE -->

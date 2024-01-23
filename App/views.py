@@ -1,3 +1,6 @@
+import re
+import time
+import timeit
 from datetime import datetime
 from PIL import Image as PILImage, ImageDraw
 from django.shortcuts import render
@@ -304,6 +307,19 @@ def export_musical_publication(request, musical_publication_id):
     # Tomar la Info. de la Publicación a exportar
     publication = Musical_Publication.objects.get(id=musical_publication_id)
 
+    def verificar_saludo(email):
+        patron_everywhere = re.compile(r'hola', re.IGNORECASE)
+        patron_begin = re.compile(r'^hola', re.IGNORECASE)
+        print(patron_begin)
+        if patron_begin.search(email):
+            return 'Saludaste al comienzo. Muy Bien!'
+        elif patron_everywhere.search(email):
+            return 'No Saludaste al comienzo'
+        else:
+            return 'No has saludado maleducado'
+
+    v = verificar_saludo('Dame la merienda')
+    print(v)
     # Crear el temporal para el pdf
     buffer = io.BytesIO()
 
@@ -382,14 +398,14 @@ def export_musical_publication(request, musical_publication_id):
         publication_detail.textLine('DETALLES Y AUTORÍA')
         canvas.drawText(publication_detail)
         # **--Primera Tabla - Autoria--**
-        table_autoria = Table(data[:4], colWidths=[100, 400])
+        table_autoria = Table(data[:4], colWidths=[50, 400])
         table_autoria_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                                           ('FONT', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
                                           ('FONT', (1, 0), (1, -1), 'Roboto'),
                                           ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
                                           ('LINEBEFORE', (1, 0), (1, -1), 0, colors.Color(1, 0, 0, alpha=0)),
-                                          ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
-                                          ('LINEABOVE', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34))
+                                          # ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
+                                          # ('LINEABOVE', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34))
                                           ])
         table_autoria.setStyle(table_autoria_style)
         table_autoria.wrapOn(canvas, 50, 475)
@@ -418,7 +434,7 @@ def export_musical_publication(request, musical_publication_id):
                                               ('SPAN', (2, 1), (2, -1))
                                               ])
 
-        table_description = Table(data[4:], colWidths=[120, 120, 260], rowHeights=[None,None,None,None,None,70])
+        table_description = Table(data[4:], colWidths=[120, 120, 260], rowHeights=[None, None, None, None, None, 70])
         table_description.setStyle(table_description_style)
         w, h = table_description.wrapOn(canvas, 50, 275)
         x_coord_table_description = 50
@@ -427,32 +443,36 @@ def export_musical_publication(request, musical_publication_id):
         # CheckBoxes
         x_checkbox = 57
         y_checkbox = y_coord_table_description + 30
-        canvas.acroForm.checkbox(x=x_checkbox, y=y_checkbox, size=12, fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
+        canvas.acroForm.checkbox(x=x_checkbox, y=y_checkbox, size=12,
+                                 fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
                                  borderColor=colors.Color(0.49, 0.30, 0.34), borderWidth=0.5)
-        canvas.acroForm.checkbox(x=x_checkbox, y=y_checkbox-16, size=12, fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
+        canvas.acroForm.checkbox(x=x_checkbox, y=y_checkbox - 16, size=12,
+                                 fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
                                  borderColor=colors.Color(0.49, 0.30, 0.34, alpha=0.1), borderWidth=0.5)
-        canvas.acroForm.checkbox(x=x_checkbox+120, y=y_checkbox, size=12, fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
+        canvas.acroForm.checkbox(x=x_checkbox + 120, y=y_checkbox, size=12,
+                                 fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
                                  borderColor=colors.Color(0.49, 0.30, 0.34), borderWidth=0.5)
-        canvas.acroForm.checkbox(x=x_checkbox+120, y=y_checkbox-16, size=12, fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
+        canvas.acroForm.checkbox(x=x_checkbox + 120, y=y_checkbox - 16, size=12,
+                                 fillColor=colors.Color(0.94, 0.94, 0.94, alpha=0.1),
                                  borderColor=colors.Color(0.49, 0.30, 0.34, alpha=0.1), borderWidth=0.5)
         options = canvas.beginText()
         # Opciones 'privado y publico' de "Derechos de Autor"
         # Publico
-        options.setTextOrigin(x_checkbox+15, y_checkbox+3)
+        options.setTextOrigin(x_checkbox + 15, y_checkbox + 3)
         options.setFont('Roboto', 10)
         options.textLine('público')
         canvas.drawText(options)
         # Privado
-        options.setTextOrigin(x_checkbox+15, y_checkbox-12)
+        options.setTextOrigin(x_checkbox + 15, y_checkbox - 12)
         options.textLine('privado')
         canvas.drawText(options)
         # Opciones si y no de 'EN VENTA'
         # Si
-        options.setTextOrigin(x_checkbox+135, y_checkbox+3)
+        options.setTextOrigin(x_checkbox + 135, y_checkbox + 3)
         options.textLine('si')
         canvas.drawText(options)
         # No
-        options.setTextOrigin(x_checkbox+135, y_checkbox-12)
+        options.setTextOrigin(x_checkbox + 135, y_checkbox - 12)
         options.textLine('no')
         canvas.drawText(options)
 
@@ -496,26 +516,26 @@ def export_musical_publication(request, musical_publication_id):
 
         cover = Image("App/static/img/imagen_redondeada.png", width=150, height=120)
         w, h = cover.wrapOn(canvas, 350, 120)
-        cover.drawOn(canvas, 350, y_coord_table_description-h-20)
+        cover.drawOn(canvas, 350, y_coord_table_description - h - 20)
 
         # Text url from cover
         cover_style = ParagraphStyle(name='style', fontName="Roboto")
         cover_url = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.imagen.url}" '
-                          f'color="blue">Mostrar Imagen</a></u>', cover_style)
+                              f'color="blue">Mostrar Imagen</a></u>', cover_style)
         w = canvas.stringWidth('Mostrar Imagen', 'Roboto', 10)
         cover_url.wrapOn(canvas, 88, 12)
-        cover_url.drawOn(canvas, 424-w/2, 110)
+        cover_url.drawOn(canvas, 424 - w / 2, 110)
 
         # Texto Informativo
         text_info_style = ParagraphStyle(name='text_info_style')
         text_info = Paragraph(f'<font name="Roboto-Italic" size=8 color={colors.Color(0.49, 0.30, 0.34)}>'
-                                f'El reciente documento que muestra los datos principales de la publicación musical '
+                              f'El reciente documento que muestra los datos principales de la publicación musical '
                               f'emerge como una herramienta esencial para el equipo y las partes interesadas. '
                               f'Al encapsular la inspiración artística, la partitura, descripción y '
                               f'datos biográficos, sirve como guía integral para comprender y comunicar '
                               f'el proyecto de publicación. Este recurso clave garantiza un impacto positivo en todos '
                               f'los aspectos de la iniciativa musical, y se espera compartir más detalles en el futuro.</font>',
-                                text_info_style)
+                              text_info_style)
         w, h = text_info.wrapOn(canvas, 200, 200)
         y_coord_text_info = y_coord_table_description - h - 20
         text_info.drawOn(canvas, 50, y_coord_text_info)
@@ -562,27 +582,28 @@ def export_musical_publication(request, musical_publication_id):
 
 def crear_listas():
     lista_imagenes, lista_titulos, lista_descripciones = [], [], []
-    imagenes_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Ficcion Aventura')
-    descripcion_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Ficcion Aventura\Descripciones.txt')
+    imagenes_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Animados')
+    descripcion_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Animados\Descripciones.txt')
     lista_descripciones = open(descripcion_root, encoding='utf-8').readlines()
     for img in Path(imagenes_root).glob("*.jpg"):
         lista_imagenes.append(str(img))
         lista_titulos.append(img.stem)
+
     return lista_imagenes, lista_titulos, lista_descripciones
 
 
 def export_catalogo_peliculas(request, musical_publication_id):
     pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
-    pdfmetrics.registerFont(TTFont('Action', 'fonts/28DaysLater.ttf'))
+    pdfmetrics.registerFont(TTFont('Action', 'fonts/Super_Sedan.ttf'))
     PAGE_WIDTH, PAGE_HEIGHT = letter
     buffer = io.BytesIO()
     img_list, title_list, description_list = crear_listas()
-    titulo_catalogo = 'Ciencia y Ficcion'
+    titulo_catalogo = 'Animados'
 
     def myFirstPage(canvas, doc):
         canvas.saveState()
 
-        def draw(x, y, counter):
+        def draw(x=0, y=0, counter=0):
             if y < PAGE_HEIGHT:
                 if x < PAGE_WIDTH:
                     canvas.drawImage(img_list[counter], x, y, 100, 120)
@@ -596,22 +617,18 @@ def export_catalogo_peliculas(request, musical_publication_id):
             else:
                 return
 
-        draw(0, 0, 0)
+        draw()
 
         font_size = 90
         style_title1 = ParagraphStyle(name='style_title1', fontName='Action', fontSize=font_size,
                                       textColor=colors.red)
         title = Paragraph(titulo_catalogo, style_title1)
+        w_title, h_title = title.wrapOn(canvas, PAGE_WIDTH, PAGE_HEIGHT)
         canvas.rotate(45)
         canvas.setFillColorRGB(1, 1, 1)
-        title.wrap(PAGE_WIDTH, PAGE_HEIGHT)
-        canvas.rect(265, 205, 6.8 * font_size, -0.9 * font_size, stroke=0, fill=1)
+        canvas.rect(260, 200, w_title - 65, -90, stroke=0, fill=1)
         title.drawOn(canvas, 270, 200)
         canvas.rotate(-45)
-        # Logo Film
-        logo_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Accion\Accion\logo_film.png')
-        logo = Image(logo_root, 150, 150)
-        logo.drawOn(canvas, PAGE_WIDTH-180, 10)
         canvas.restoreState()
 
     def myLaterPage(canvas, doc):
