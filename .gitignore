@@ -2,6 +2,7 @@
 .idea
 Lib
 htmlcov
+node_modules
 media
 Scripts
 .coverage
