@@ -10,3 +10,4 @@ Pipfile
 Pipfile.lock
 pyvenv.cfg
 App/migrations
+db.sqlite3
