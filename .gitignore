@@ -1,13 +1,6 @@
 # created by virtualenv automatically
-.idea
-Lib
 htmlcov
-node_modules
-media
-Scripts
 .coverage
 Pipfile
 Pipfile.lock
 pyvenv.cfg
-App/migrations
-db.sqlite3
