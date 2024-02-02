@@ -157,7 +157,6 @@ $("#age").on("input", function() {
 setInterval(function (){
     var date = new Date();
     let hour = date.getHours()
-    console.log(typeof hour)
     if (hour > 12)
         hour -= 12 // Eliminar horario militar
     let minutes = date.getMinutes()
