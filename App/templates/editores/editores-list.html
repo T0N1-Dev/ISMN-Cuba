@@ -28,7 +28,6 @@
 
 
 <!-- CONTENT PAGE -->
-
 {% block content %}
     {% if request.user.especialista %}
         <!-- Si inicia sesión el especialista -->
@@ -166,7 +165,7 @@
                     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
                     <script>
                         var n = "{{ message }}"
-                        swal("Perfect !", n, "success")
+                        swal("Perfecto!", n, "success")
                     </script>
                 {% endif %}
             {% endfor %}
@@ -176,14 +175,14 @@
         </div> <!-- END // container -->
 
     {% else %}
-        <span class="text-danger" >Access Denied</span>
+        <span class="text-danger">Access Deneid!</span>
     {% endif %}
 {% endblock content %}
 
 {% block Offcanvas %}
     <a class="btn btn-dark" href="#"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
     <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Publicaciones Musicales</a>
-    <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>
+    <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
     <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
     <hr>
     <a href="#" class="btn btn-dark">

@@ -40,22 +40,25 @@ class Rango_Prefijo(models.Model):
         return f'{self.tipo}'
 
 
-class Prefijo(models.Model):
-    EDITOR_PREFIJO = 'E'
-    PUBLICACION_MUSICAL_PREFIJO = "PM"
-
-    TYPE = {
-        (EDITOR_PREFIJO, 'Editor'),
-        (PUBLICACION_MUSICAL_PREFIJO, "Publicacion Musical")
-    }
-
-    value = models.PositiveSmallIntegerField()
+class PrefijoEditor(models.Model):
+    value = models.PositiveSmallIntegerField(unique=True)
     lote = models.CharField(max_length=7)
-    tipo = models.CharField(max_length=20, choices=TYPE)
     rango = models.ForeignKey(Rango_Prefijo, on_delete=models.PROTECT)
 
     class Meta:
-        verbose_name_plural = "prefijos"
+        verbose_name_plural = "Editores Prefijos"
+
+    def __str__(self):
+        return f'{self.value}'
+
+
+class PrefijoPublicacion(models.Model):
+    value = models.PositiveSmallIntegerField(unique=True)
+    lote = models.CharField(max_length=7)
+    rango = models.ForeignKey(Rango_Prefijo, on_delete=models.PROTECT)
+
+    class Meta:
+        verbose_name_plural = "Publicaciones Prefijos"
 
     def __str__(self):
         return f'{self.value}'
@@ -63,8 +66,8 @@ class Prefijo(models.Model):
 
 # Modelos que representan a los actores del sistema
 class Editor(models.Model):
-    COMPANY_EDITOR = 'C'
-    EDITOR_INDEPENDIENTE = 'I'
+    COMPANY_EDITOR = 'Compañia'
+    EDITOR_INDEPENDIENTE = 'Independiente'
 
     TYPE = {
         (COMPANY_EDITOR, 'Compañia'),
@@ -72,10 +75,9 @@ class Editor(models.Model):
     }
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=20)
-    id = models.IntegerField(primary_key=True)
     age = models.PositiveSmallIntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)],
                                            null=True, blank=True)
-    prefijo = models.ForeignKey(Prefijo, on_delete=models.PROTECT)
+    prefijo = models.ForeignKey(PrefijoEditor, on_delete=models.PROTECT)
     type = models.CharField(max_length=100, null=True, choices=TYPE)
     image_profile = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
     note = models.TextField(blank=True)
@@ -122,11 +124,10 @@ class Musical_Publication(models.Model):
         (DANZON_GENDER, "DZ"),
     ]
 
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     autor = models.CharField(max_length=100)
     editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True, blank=True)
-    prefijo = models.OneToOneField(Prefijo, on_delete=models.PROTECT)
+    prefijo = models.OneToOneField(PrefijoPublicacion, on_delete=models.PROTECT)
     ismn = models.CharField(max_length=20, unique=True)
     letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)

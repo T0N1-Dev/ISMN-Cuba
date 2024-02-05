@@ -15,8 +15,8 @@ body {
  -------------------------------*/
 
 .navbar2 {
-    background: black;
     height: 7vh;
+    min-height: 30px;
     color: white;
     display: flex;
     flex-direction: row;
@@ -118,7 +118,7 @@ body {
 /*}*/
 
 /* --------------------------------------
-# BACKEND | EDITORS LIST (backend.html)
+# BACKEND | EDITORS LIST (editores-list.html)
  ---------------------------------------*/
 #no-data, #no-access {
     position: absolute;
