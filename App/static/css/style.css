@@ -13,8 +13,43 @@ body {
 /* -------------------------------
 # NAVBAR
  -------------------------------*/
-.nav-btn {
-    float: right;
+
+.navbar2 {
+    height: 7vh;
+    min-height: 30px;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.title {
+    margin-left: 20px;
+    font-size: 20px;
+    width: 35%;
+}
+
+.time {
+    display: flex;
+    justify-content: center;
+    width: 40%;
+}
+
+
+.notificaciones {
+    display: flex;
+    justify-content: right;
+    gap: 40px;
+    margin-right: 40px;
+    width: 20%;
+}
+
+.nav-button {
+    font-size: 25px;
+    width: 3%;
+    margin-right: 15px;
 }
 
 
@@ -60,8 +95,7 @@ body {
     width: 55px;
     height: 55px;
     z-index: 100;
-    animation: preloader 1.2s;
-    animation-fill-mode: forwards;
+    animation: preloader 1.2s forwards;
 }
 
 @keyframes preloader {
@@ -84,7 +118,7 @@ body {
 /*}*/
 
 /* --------------------------------------
-# BACKEND | EDITORS LIST (backend.html)
+# BACKEND | EDITORS LIST (editores-list.html)
  ---------------------------------------*/
 #no-data, #no-access {
     position: absolute;
@@ -211,6 +245,34 @@ body {
     color: #111;
     border: 1px solid #111;
 }
+
+/* -------------------------------
+# NOTIFICATION BUTTON
+ -------------------------------*/
+
+#btn-notif {
+    float: left;
+    font-size: 20px;
+}
+
+.total, .pending {
+    position: absolute;
+    border-radius: 50%;
+    font-size: 13px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    margin-left: -5px;
+}
+
+.total {
+    background-color: #0dcaf0;
+}
+
+.pending {
+    background-color: red;
+}
+
 /* -------------------------------
 # RESPONSIVE MODEL
  -------------------------------*/
@@ -239,35 +301,10 @@ body {
     #loginForm {
         max-width: 300px;
     }
+
+    .notificaciones {
+        margin-right: 25px;
+        gap: 20px;
+    }
 }
 
-/* -------------------------------
-# NOTIFICATION BUTTON
- -------------------------------*/
-
-#btn-nav {
-    float: right;
-    margin-right: 45px;
-    font-size: 20px;
-}
-
-.total, .pending {
-    position: absolute;
-    border-radius: 50%;
-    font-size: 13px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    margin-top: -32px;
-}
-
-.total {
-    margin-left: 14px;
-    background-color: #007bff;
-}
-
-.pending {
-    margin-left: 10px;
-    background-color: red;
-}

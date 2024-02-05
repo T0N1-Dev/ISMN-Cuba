@@ -82,10 +82,10 @@ $("#btn-add, #btn-send").bind("click", validateAll);
 $(document).ready(function (){
 
     // Only letter
-    jQuery('input[name="username').keyup(function () {
-        var letter = jQuery(this).val();
+    $('#first_name, #last_name').keyup(function () {
+        var letter = $(this).val();
         var allow = letter.replace(/[^a-zA-Z _]/g, '');
-        jQuery(this).val(allow);
+        $(this).val(allow);
     });
 
     //prevent to write space in the input
@@ -95,7 +95,7 @@ $(document).ready(function (){
         if (e.which === 32 && !$(this).val())
             e.preventDefault();
         // Not two space consecutive
-        else if(e.key == ' ' && e.target.value[e.target.value.length - 1] == ' ')
+        else if (e.key === ' ' && e.target.value[e.target.value.length - 1] === ' ')
             e.preventDefault();
     });
 
@@ -106,7 +106,7 @@ $(document).ready(function (){
 });
 
 // 3) Script to put First Letter capitalized
-$("#username, #autor, #first_name, #last_name, #address, #note").keyup(function () {
+$("#autor, #first_name, #last_name, #address, #note").keyup(function () {
     var txt = $(this).val();
     $(this).val(txt.replace(/^(.)|\s(.)/g, function ($1){return $1.toUpperCase( );}));
 });
@@ -157,7 +157,6 @@ $("#age").on("input", function() {
 setInterval(function (){
     var date = new Date();
     let hour = date.getHours()
-    console.log(typeof hour)
     if (hour > 12)
         hour -= 12 // Eliminar horario militar
     let minutes = date.getMinutes()

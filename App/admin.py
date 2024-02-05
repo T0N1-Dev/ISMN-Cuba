@@ -1,5 +1,6 @@
 from django.contrib import admin
-from App.models import Editor, Musical_Publication, Especialista, Registered_Data, Rango_Prefijo, Prefijo, Solicitud
+from App.models import (Editor, Musical_Publication, Especialista, Registered_Data, Rango_Prefijo, PrefijoEditor,
+                        PrefijoPublicacion, Solicitud)
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
@@ -37,6 +38,7 @@ admin.site.register(Editor, EditorAdmin)
 admin.site.register(Especialista)
 admin.site.register(Musical_Publication, Musical_Publication_Admin)
 admin.site.register(Rango_Prefijo)
-admin.site.register(Prefijo)
+admin.site.register(PrefijoEditor)
+admin.site.register(PrefijoPublicacion)
 admin.site.register(Solicitud)
 

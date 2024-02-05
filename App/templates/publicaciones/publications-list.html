@@ -1,4 +1,4 @@
-{% extends 'backend.html' %}
+{% extends 'editores/editores-list.html' %}
 
 {% block title %} Publicaciones {% endblock title %}
 
@@ -10,6 +10,18 @@
 {% block btn-add %}
     <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Publicación</a>
 {% endblock btn-add %}
+
+{% block Offcanvas %}
+    <a class="btn btn-dark" href="#"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
+    <a class="btn btn-dark" href="{% url 'backend_editores' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editores</a>
+    <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
+    <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i
+            class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
+    <hr>
+    <a href="#" class="btn btn-dark">
+        <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
+    </a>
+{% endblock Offcanvas %}
 
 {% block title-table %}
     <th style="width: 4%">ID</th>

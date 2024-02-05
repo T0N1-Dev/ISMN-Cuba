@@ -1,17 +1,16 @@
 import re
-import time
-import timeit
 from datetime import datetime
 from PIL import Image as PILImage, ImageDraw
+from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
 
-from App.models import Editor, Musical_Publication, Registered_Data, Especialista
+from App.models import Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion, Rango_Prefijo
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
 from django.http import HttpResponseRedirect  # Redirect the page after submit
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
 from django.template import loader  # Render templates on email body
@@ -29,7 +28,7 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4, letter
 
 
-# ================= FRONTEND SECTION =================
+# ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
 class MyLoginView(LoginView):
     template_name = 'registration/login.html'
     next_page = '/'
@@ -47,13 +46,54 @@ def register_user(request):
         return render(request, 'registration/register_user.html')
 
 
-# Function to render the Home Page
+# ================= SECCIÓN DE CREACIÓN DE RANGOS Y PREFIJOS =================
+def generate_prefijo(range, models):
+    value = 0
+    lote = '979-0'
+    if range == 'inferior':
+        max_inferior = models.objects.filter(rango__tipo='Inferior').aggregate(Max('value'))['value__max']
+        if max_inferior:
+            value = max_inferior + 1
+            return models.objects.create(value=value, lote=lote, rango=Rango_Prefijo.objects.get(tipo='Inferior'))
+        else:
+            return models.objects.create(value=1, lote=lote, rango=Rango_Prefijo.objects.get(tipo='Inferior'))
+    elif range == 'medio_inferior':
+        max_medio_inf = models.objects.filter(rango__tipo='Medio Inferior').aggregate(Max('value'))['value__max']
+        if max_medio_inf:
+            value = max_medio_inf + 1
+            return models.objects.create(value=value, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='Medio Inferior'))
+        else:
+            return models.objects.create(value=101, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='Medio Inferior'))
+    elif range == 'medio':
+        max_medio = models.objects.filter(rango__tipo='Medio').aggregate(Max('value'))['value__max']
+        if max_medio:
+            value = max_medio + 1
+            return models.objects.create(value=value, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='Medio'))
+        else:
+            return models.objects.create(value=1001, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='Medio'))
+    elif range == 'superior':
+        max_superior = models.objects.filter(rango__tipo='Superior').aggregate(Max('value'))['value__max']
+        if max_superior:
+            value = max_superior + 1
+            return models.objects.create(value=value, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='Superior'))
+        else:
+            return models.objects.create(value=10001, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='Superior'))
+
+
+# ================= SECCIÓN DEL USUARIO (EDITOR) =================
+# Function to render the Home Page for everybody
 def frontend(request):
     return render(request, 'frontend.html')
 
 
-# ================= BACKEND SECTION =================
-# Function to render the Backend Page
+# ================= SECCIÓN DEL USUARIO (ESPECIALISTA) =================
+# Function to render editor's list
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def backend_editores(request):
@@ -73,7 +113,7 @@ def backend_editores(request):
     page = request.GET.get('page')
     all_editor = paginator.get_page(page)
 
-    return render(request, 'backend.html', {"editores": all_editor})
+    return render(request, 'editores/editores-list.html', {"editores": all_editor})
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -92,10 +132,10 @@ def backend_publicaciones(request):
     page = request.GET.get('page')
     all_publication = paginator.get_page(page)
 
-    return render(request, 'publications-list.html', {"publicaciones": all_publication})
+    return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication})
 
 
-# Function to Add patient
+# Function to Add Editor
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def add_editor(request):
@@ -112,21 +152,34 @@ def add_editor(request):
             return HttpResponseRedirect('/')
         # ===========================
         else:
-            if request.POST.get('name') \
+            if request.POST.get('username') \
+                    and request.POST.get('first_name') \
                     and request.POST.get('password') \
                     and request.POST.get('phone') \
                     and request.POST.get('email') \
-                    and request.POST.get('age') \
-                    and request.POST.get('gender') \
-                    or request.POST.get('note'):
+                    and request.POST.get('editorType') \
+                    and request.POST.get('address') \
+                    and request.POST.get('idTribute') \
+                    and request.POST.get('editorPrefijo'):
                 editor = Editor()
-                editor.name = request.POST.get('name')
-                editor.password = request.POST.get('password')
+                user = User()
+                user.username = request.POST.get('username')
+                user.password = request.POST.get('password')
+                user.first_name = request.POST.get('first_name')
                 editor.phone = request.POST.get('phone')
-                editor.email = request.POST.get('email')
-                editor.age = request.POST.get('age')
-                editor.gender = request.POST.get('gender')
+                user.email = request.POST.get('email')
+                editor.directions = request.POST.get('address')
+                editor.type = request.POST.get('editorType')
+                if editor.type == 'Independiente':
+                    user.last_name = request.POST.get('last_name')
+                    editor.age = request.POST.get('age')
+                editor.directions = request.POST.get('address')
+                editor.id_tribute = request.POST.get('idTribute')
+                editor.user = user
+                editor.prefijo = generate_prefijo(request.POST.get('editorPrefijo'), PrefijoEditor)
                 editor.note = request.POST.get('note')
+                editor.image_profile = request.FILES.get('imagenProfile')
+                user.save()
                 editor.save()
 
                 # Register email and phone inside BD
@@ -139,29 +192,32 @@ def add_editor(request):
                 messages.success(request, "Editor added successfully !")
                 return HttpResponseRedirect('/backend')
     else:
-        return render(request, "add.html")
+        return render(request, "editores/add.html")
 
 
-# Function to delete patient
+# Function to delete Editor
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def delete_editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
+    register_data = Registered_Data.objects.get(phone=editor.phone)
+    register_data.delete()
+    editor.user.delete()
     editor.delete()
     messages.success(request, "Editor removed succesfully !")
     return HttpResponseRedirect('/backend')
 
 
-# Function to access the patient individually
+# Function to access the Editor individually
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
     if editor:
-        return render(request, "edit.html", {"editor": editor})
+        return render(request, "editores/edit.html", {"editor": editor})
 
 
-# Function to edit the patients
+# Function to edit the Editor
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def edit_editor(request):
@@ -225,7 +281,7 @@ def add_musical_publication(request):
             messages.success(request, "Publicación musical añadida correctamente !")
             return HttpResponseRedirect('/backend')
     else:
-        return render(request, "add_publication.html")
+        return render(request, "publicaciones/add_publication.html")
 
 
 # Function to access the musical_publication individually
@@ -234,7 +290,7 @@ def add_musical_publication(request):
 def musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
     if musical_publication:
-        return render(request, "edit_publication.html", {"musical_publication": musical_publication})
+        return render(request, "publicaciones/edit_publication.html", {"musical_publication": musical_publication})
 
 
 # Function to edit the patients
@@ -307,19 +363,6 @@ def export_musical_publication(request, musical_publication_id):
     # Tomar la Info. de la Publicación a exportar
     publication = Musical_Publication.objects.get(id=musical_publication_id)
 
-    def verificar_saludo(email):
-        patron_everywhere = re.compile(r'hola', re.IGNORECASE)
-        patron_begin = re.compile(r'^hola', re.IGNORECASE)
-        print(patron_begin)
-        if patron_begin.search(email):
-            return 'Saludaste al comienzo. Muy Bien!'
-        elif patron_everywhere.search(email):
-            return 'No Saludaste al comienzo'
-        else:
-            return 'No has saludado maleducado'
-
-    v = verificar_saludo('Dame la merienda')
-    print(v)
     # Crear el temporal para el pdf
     buffer = io.BytesIO()
 
