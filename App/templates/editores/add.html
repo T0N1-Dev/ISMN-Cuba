@@ -19,7 +19,8 @@
 {% block content %}
     <div class="container">
         <div class="card card-body border-dark mt-5">
-            <span class="text-center"> {% block card-title %} <span class="text-primary"> INSERTE SUS DATOS </span> {% endblock card-title %} </span>
+            <span class="text-center"> {% block card-title %}
+                <span class="text-primary"> INSERTE LOS DATOS DEL EDITOR </span> {% endblock card-title %} </span>
         </div>
 
         <!-- Column #1 -->
@@ -27,13 +28,14 @@
             <div class="col-lg-12">
 
                 <!-- Form -->
-                <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST" enctype="multipart/form-data" class="card p-3 border-dark mt-3" id="register-form" style="height: 450px; overflow-y: auto">
+                <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST"
+                                         enctype="multipart/form-data" class="card p-3 border-dark mt-3 form-register">
                     {% csrf_token %}
 
                     <!-- Input ID denied here -->
                     {% block Id-hidden %} {% endblock Id-hidden %}
 
-                    <div class="row" id="register-form">
+                    <div class="row">
                         <div class="col-6">
                             <div class="input-group input-group-sm mb-3">
                                 <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-user"></i></span>
@@ -134,16 +136,33 @@
                         <div class="col-12">
                             <div class="input-group">
                                 <div class="input-group input-group-sm mb-3">
-                                    <label class="input-group-text side-label-form justify-content-center"><i class="fa fa-list"></i></label>
+                                    <label class="input-group-text side-label-form justify-content-center"><i
+                                            class="fa fa-hashtag"></i></label>
                                     <select class="form-select form-control" name="editorPrefijo" id="editorPrefijo" required>
                                         {% block Value-publications_per_year %}
                                             <option value="" hidden>Número de publicaciones por año</option>
                                         {% endblock Value-publications_per_year %}
                                         <option disabled></option>
-                                        <option value="inferior" title="Seleccione esta opcion si usted publica menos de 100 publicaciones por año">0 - 99</option>
-                                        <option value="medio_inferior" title="Seleccione esta opcion si usted publica entre 100 y 999 publicaciones por año ">100 - 999</option>
-                                        <option value="medio" title="Seleccione esta opcion si usted publica entre 1000 y 9999 publicaciones por año ">1000 - 9999</option>
-                                        <option value="superior" title="Seleccione esta opcion si usted publica más de 10000 publicaciones por año ">10000 - ...</option>
+                                        <option value="p-menor"
+                                                title="Seleccione esta opcion si usted publica menos de 100 publicaciones por año">
+                                            0 - 99
+                                        </option>
+                                        <option value="p-inferior"
+                                                title="Seleccione esta opcion si usted publica entre 100 y 999 publicaciones por año ">
+                                            100 - 999
+                                        </option>
+                                        <option value="p-medio_inferior"
+                                                title="Seleccione esta opcion si usted publica entre 1000 y 9999 publicaciones por año ">
+                                            1000 - 9999
+                                        </option>
+                                        <option value="p-medio"
+                                                title="Seleccione esta opcion si usted publica entre 10000 y 99999 publicaciones por año ">
+                                            10000 - 99999
+                                        </option>
+                                        <option value="p-superior"
+                                                title="Seleccione esta opcion si usted publica más de 100000 de publicaciones por año ">
+                                            100000 - ...
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -151,7 +170,8 @@
                     </div>
 
                     <div class="form-group mb-3">
-                      <textarea class="form-control text-sm" name="note" maxlength="1000" id="note" rows="4" placeholder="Description is optional...">{% block Value-description %}{% endblock Value-description %}</textarea>
+                        <textarea class="form-control text-sm" name="note" maxlength="1000" rows="4"
+                                  placeholder="Description is optional...">{% block Value-description %}{% endblock Value-description %}</textarea>
                     </div>
 
                     <hr style="height: 2px;">
@@ -179,11 +199,6 @@
                 </form>
             </div>
         </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6">
-
-            </div>
         </div>
     </div>
 {% endblock content %}

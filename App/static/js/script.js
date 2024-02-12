@@ -20,55 +20,48 @@ function validateAll() {
     var address = $("#address").val();
     var file = $("#file").val();
     var idTribute = $("#idTribute").val();
+    var title = $("#title").val()
 
 
-
-    if (username == '') {
+    if (username === '') {
         swal("Opsss !", "Inserte su nombre de usuario.", "error");
         return false;
-    }
-    else if (password == '') {
+    } else if (password === '') {
         swal("Opsss !", "Inserte una contraseña.", "error");
         return false;
-    }
-    else if (phone == '') {
+    } else if (phone === '') {
         swal("Opsss !", "Inserte su número de teléfono.", "error");
         return false;
-    }
-    else if (email == '') {
+    } else if (email === '') {
         swal("Opsss !", "Inserte su dirección de correo electrónico.", "error");
         return false;
-    }
-    else if (editor_type == '') {
+    } else if (editor_type === '') {
         swal("Opsss !", "Seleccione un tipo de Editor.", "error");
         return false;
     }
     else if (!(validateEmail(email))) {
         swal("Opsss !", "Inserte un correo válido.", "error");
         return false;
-    }
-    else if (editor_type == 'Independiente' && age == '') {
+    } else if (editor_type === 'Independiente' && age === '') {
         swal("Opsss !", "El campo 'Edad' está vacío.", "error");
         return false;
-    }
-    else if (first_name == ''){
+    } else if (first_name === '') {
         swal("Opss !", "Inserte su nombre.", "error")
         return false;
-    }
-    else if (editor_type == 'Independiente' && last_name == ''){
+    } else if (editor_type === 'Independiente' && last_name === '') {
         swal("Opss !", "Inserte su apellido.", "error")
         return false;
-    }
-    else if (address == ''){
+    } else if (address === '') {
         swal("Opss !", "La dirección está vacia.", "error")
         return false;
-    }
-    else if (file == ''){
+    } else if (file === '') {
         swal("Opss!", "Se ha olvidado la letra de la canción.", "error");
         return false;
-    }
-    else if (idTribute == ''){
+    } else if (idTribute === '') {
         swal("Opss!", "Se ha olvidado el número de identificación tributaria.", "error");
+        return false;
+    } else if (title === '') {
+        swal("Opss!", "Se ha olvidado el título de la obra.", "error");
         return false;
     }
     else {
@@ -106,7 +99,7 @@ $(document).ready(function (){
 });
 
 // 3) Script to put First Letter capitalized
-$("#autor, #first_name, #last_name, #address, #note").keyup(function () {
+$("#autor, #first_name, #last_name, #address").keyup(function () {
     var txt = $(this).val();
     $(this).val(txt.replace(/^(.)|\s(.)/g, function ($1){return $1.toUpperCase( );}));
 });

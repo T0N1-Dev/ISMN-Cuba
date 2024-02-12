@@ -83,7 +83,11 @@
                                 {% endif %}
                                 <td>{{ editor.user }}</td>
                                 <td>{{ editor.id_tribute }}</td>
-                                <td>{{ editor.prefijo }}</td>
+                                {% if editor.prefijo.value < 10 %}
+                                    <td>0{{ editor.prefijo }}</td>
+                                {% else %}
+                                    <td>{{ editor.prefijo }}</td>
+                                {% endif %}
                                 {% if editor.user.is_active %}
                                     <td>Activo</td>
                                 {% else %}
@@ -115,7 +119,8 @@
                                     <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                                       <div class="text-center text-danger">
                                           <span>ESTÁS SEGURO QUE DESEAS ELIMINAR AL EDITOR ???</span>
-                                          <div class="text-dark mt-3 mb-2 "><strong>Editor: {{ editor.user.get_full_name }} </strong></div>
+                                          <div class="text-dark mt-3 mb-2 ">
+                                              <strong> {{ editor.user.get_full_name }} </strong></div>
                                       </div>
                                   </div>
                                   <div class="modal-footer">
@@ -170,7 +175,7 @@
                 {% endif %}
             {% endfor %}
 
-            <!-- If there no editors, show the message -->
+            <!-- If there is no editors, show the message -->
             <span class="text-danger" id="no-data"></span>
         </div> <!-- END // container -->
 
@@ -180,8 +185,9 @@
 {% endblock content %}
 
 {% block Offcanvas %}
-    <a class="btn btn-dark" href="#"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
-    <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Publicaciones Musicales</a>
+    <a class="btn btn-dark" href="#"><i class="fas fa-database"></i>&nbsp;&nbsp;Solicitudes</a>
+    <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-database"></i>&nbsp;&nbsp;Publicaciones
+        Musicales</a>
     <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
     <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
     <hr>

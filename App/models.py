@@ -17,16 +17,22 @@ class Registered_Data(models.Model):
 
 # Models to manage the prefix numbers
 class Rango_Prefijo(models.Model):
-    SUPERIOR = "Superior"
-    MEDIO = "Medio"
-    MEDIO_INFERIOR = "Medio Inferior"
-    INFERIOR = "Inferior"
+    # NOTAS
+    # Los Editores que publican más son los que se les asignan menores números en el prefijo y si publican menos
+    # tendrán un prefijo mayor. Más info en http://127.0.0.1:8000/ayuda
+
+    PUBLICADOR_SUPERIOR = "P-Superior"  # rango-inferior: 0 rango-superior: 99
+    PUBLICADOR_MEDIO = "P-Medio"  # rango-inferior: 100 rango-superior: 999
+    PUBLICADOR_MEDIO_INFERIOR = "P-Medio_Inferior"  # rango-inferior: 1000 rango-superior: 9999
+    PUBLICADOR_INFERIOR = "P-Inferior"  # rango-inferior: 10000 rango-superior: 99999
+    PUBLICADOR_MENOR = "P-Menor"  # rango-inferior: 100000 rango-superior: 999999
 
     TYPE = {
-        (SUPERIOR, "Superior"),
-        (MEDIO, "Medio"),
-        (MEDIO_INFERIOR, "Medio Inferior"),
-        (INFERIOR, "Inferior")
+        (PUBLICADOR_SUPERIOR, "P-Superior"),
+        (PUBLICADOR_MEDIO, "P-Medio"),
+        (PUBLICADOR_MEDIO_INFERIOR, "P-Medio_Inferior"),
+        (PUBLICADOR_INFERIOR, "P-Inferior"),
+        (PUBLICADOR_MENOR, "P-Menor")
     }
 
     rango_inferior = models.PositiveSmallIntegerField()
@@ -46,7 +52,7 @@ class PrefijoEditor(models.Model):
     rango = models.ForeignKey(Rango_Prefijo, on_delete=models.PROTECT)
 
     class Meta:
-        verbose_name_plural = "Editores Prefijos"
+        verbose_name_plural = "Prefijos_Editores"
 
     def __str__(self):
         return f'{self.value}'

@@ -10,7 +10,7 @@ from App.models import Editor, Musical_Publication, Registered_Data, PrefijoEdit
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
 from django.http import HttpResponseRedirect  # Redirect the page after submit
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
 from django.template import loader  # Render templates on email body
@@ -50,40 +50,49 @@ def register_user(request):
 def generate_prefijo(range, models):
     value = 0
     lote = '979-0'
-    if range == 'inferior':
-        max_inferior = models.objects.filter(rango__tipo='Inferior').aggregate(Max('value'))['value__max']
+    if range == 'p-menor':
+        max_menor = models.objects.filter(rango__tipo='P-Menor').aggregate(Max('value'))['value__max']
+        if max_menor:
+            value = max_menor + 1
+            return models.objects.create(value=value, lote=lote, rango=Rango_Prefijo.objects.get(tipo='P-Menor'))
+        else:
+            return models.objects.create(value=100001, lote=lote, rango=Rango_Prefijo.objects.get(tipo='P-Menor'))
+    elif range == 'p-inferior':
+        max_inferior = models.objects.filter(rango__tipo='P-Inferior').aggregate(Max('value'))['value__max']
         if max_inferior:
             value = max_inferior + 1
-            return models.objects.create(value=value, lote=lote, rango=Rango_Prefijo.objects.get(tipo='Inferior'))
+            return models.objects.create(value=value, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='P-Inferior'))
         else:
-            return models.objects.create(value=1, lote=lote, rango=Rango_Prefijo.objects.get(tipo='Inferior'))
-    elif range == 'medio_inferior':
-        max_medio_inf = models.objects.filter(rango__tipo='Medio Inferior').aggregate(Max('value'))['value__max']
+            return models.objects.create(value=10001, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='P-Inferior'))
+    elif range == 'p-medio_inferior':
+        max_medio_inf = models.objects.filter(rango__tipo='P-Medio_Inferior').aggregate(Max('value'))['value__max']
         if max_medio_inf:
             value = max_medio_inf + 1
             return models.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='Medio Inferior'))
+                                         rango=Rango_Prefijo.objects.get(tipo='P-Medio_Inferior'))
         else:
-            return models.objects.create(value=101, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='Medio Inferior'))
-    elif range == 'medio':
-        max_medio = models.objects.filter(rango__tipo='Medio').aggregate(Max('value'))['value__max']
+            return models.objects.create(value=1001, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='P-Medio_Inferior'))
+    elif range == 'p-medio':
+        max_medio = models.objects.filter(rango__tipo='P-Medio').aggregate(Max('value'))['value__max']
         if max_medio:
             value = max_medio + 1
             return models.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='Medio'))
+                                         rango=Rango_Prefijo.objects.get(tipo='P-Medio'))
         else:
-            return models.objects.create(value=1001, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='Medio'))
-    elif range == 'superior':
-        max_superior = models.objects.filter(rango__tipo='Superior').aggregate(Max('value'))['value__max']
+            return models.objects.create(value=101, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='P-Medio'))
+    elif range == 'p-superior':
+        max_superior = models.objects.filter(rango__tipo='P-Superior').aggregate(Max('value'))['value__max']
         if max_superior:
             value = max_superior + 1
             return models.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='Superior'))
+                                         rango=Rango_Prefijo.objects.get(tipo='P-Superior'))
         else:
-            return models.objects.create(value=10001, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='Superior'))
+            return models.objects.create(value=1, lote=lote,
+                                         rango=Rango_Prefijo.objects.get(tipo='P-Superior'))
 
 
 # ================= SECCIÓN DEL USUARIO (EDITOR) =================
@@ -189,7 +198,7 @@ def add_editor(request):
                 contact.save()
                 # ========================
 
-                messages.success(request, "Editor added successfully !")
+                messages.success(request, "Editor añadido correctamente !")
                 return HttpResponseRedirect('/backend')
     else:
         return render(request, "editores/add.html")
@@ -204,7 +213,7 @@ def delete_editor(request, editor_id):
     register_data.delete()
     editor.user.delete()
     editor.delete()
-    messages.success(request, "Editor removed succesfully !")
+    messages.success(request, "Editor eliminado correctamente !")
     return HttpResponseRedirect('/backend')
 
 
@@ -231,7 +240,7 @@ def edit_editor(request):
             editor.gender = request.POST.get("gender")
             editor.note = request.POST.get("note")
             editor.save()
-            messages.success(request, "Editor upload successfully !")
+            messages.success(request, "Editor editado correctamente !")
             return HttpResponseRedirect('/backend')
 
 
@@ -281,7 +290,9 @@ def add_musical_publication(request):
             messages.success(request, "Publicación musical añadida correctamente !")
             return HttpResponseRedirect('/backend')
     else:
-        return render(request, "publicaciones/add_publication.html")
+        editores = Editor.objects.annotate(Count('musical_publication'))
+        data = {'editores': editores}
+        return render(request, "publicaciones/add_publication.html", data)
 
 
 # Function to access the musical_publication individually

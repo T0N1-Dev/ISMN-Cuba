@@ -28,32 +28,85 @@
 <!-- PAGE CONTENT -->
 {% block content %}
     <div class="container">
+        <div class="card card-body border-dark mt-5">
+            <span class="text-center"> {% block card-title %}
+                <span class="text-primary"> INSERTE LOS DATOS DE LA PUBLICACIÓN </span> {% endblock card-title %} </span>
+        </div>
+
         <div class="row">
-            <div class="col-md-12">
-{#                <div class="card card-body border-dark mt-5">#}
-{#                    <span class="text-center"> {% block card-title %} <span class="text-primary"> FILL OUT THE FORM BELOW </span> {% endblock card-title %} </span>#}
-{#                </div>#}
+            <div class="col-lg-12">
 
                 <!-- Form -->
-                <form {% block Action %} {% endblock Action %} method="POST" enctype="multipart/form-data" class="card p-3 border-dark mt-3">
+                <form {% block Action %} action="/add_musical_publicaton/" {% endblock Action %} method="POST"
+                                         enctype="multipart/form-data" class="card p-3 border-dark mt-3 form-register">
                     {% csrf_token %}
 
                     <!-- Input ID denied here -->
                     {% block Id-hidden %} {% endblock Id-hidden %}
 
-                    <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form">Título</span>
-                        <input type="text" class="form-control" maxlength="40" name="name" id="name" placeholder="Título de la obra" required {% block Value-name %}{% endblock Value-name %}>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i
+                                        class="fas fa fa-heading"></i></span>
+                                <input type="text" class="form-control" maxlength="40" name="title" id="title"
+                                       placeholder="Título de la Obra" required
+                                        {% block Value-title %}{% endblock Value-title %}>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form">Autor</span>
-                        <input type="text" class="form-control" name="autor" id="autor" placeholder="Autor de la publicación" required {% block Value-autor %}{% endblock Value-autor %}>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i
+                                        class="fas fa fa-pen"></i></span>
+                                <input type="text" class="form-control" maxlength="40" name="autor" id="autor"
+                                       placeholder="Autor de la publicación" required
+                                        {% block Value-autor %}{% endblock Value-autor %}>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="input-group input-group-sm mb-3">
-                        <span class="input-group-text side-label-form">ISMN</span>
-                        <input type="text" class="form-control" maxlength="20" name="ismn" id="ismn" placeholder="International standart music number" required {% block Value-ismn %}{% endblock Value-ismn %}>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i
+                                        class="fas fa fa-user-edit"></i></span>
+                                <datalist id="editor">
+                                    {% for editor in editores %}
+                                        <option value="{{ editor }}"></option>
+                                    {% endfor %}
+                                </datalist>
+                                <input type="text" list="editor" class="form-control editor" maxlength="40"
+                                       name="editor"
+                                       placeholder="Editor de la publicación" required
+                                        {% block Value-editor %}{% endblock Value-editor %}>
+                            </div>
+                        </div>
+                        <div class="col-6" style="padding-left: 0">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i
+                                        class="fas fa fa-hashtag"></i></span>
+                                <input type="text" class="form-control" name="prefijo-editor" id="prefijo-editor"
+                                       title="Número de prefijo del editor" disabled
+                                        {% block Value-prefijo-editor %}{% endblock Value-prefijo-editor %}>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center">
+                                    <i class="fas fa fa-hashtag"></i>
+                                </span>
+                                <input type="text" class="form-control" name="prefijo-publicacion"
+                                       id="prefijo-publicacion"
+                                       title="Número de prefijo de la publicación" disabled
+                                        {% block Value-prefijo-publicacion %}{% endblock Value-prefijo-publicacion %}>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
@@ -107,4 +160,36 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Variables
+        const editor_input = document.querySelector('.editor');
+        const editor_prefijo_input = document.getElementById('prefijo-editor');
+        const publicacion_prefijo_input = document.getElementById('prefijo-publicacion');
+        let cant_public_editor;
+        let rango_prefijo_editor;
+        let cant_digitos_prefijo_editor;
+        let prefijo_publicacion;
+        let valor_prefijo_public;
+
+        function formatear_prefijo(valor, rango_prefijo_editor, cant_digitos_prefijo_editor) {
+            let cant_digitos_public = 8 - cant_digitos_prefijo_editor;
+            let zeros = cant_digitos_public - valor.length;
+            return '0'.repeat(zeros) + valor
+        }
+
+        editor_input.addEventListener('input', (e) => {
+            {% for editor in editores %}
+                if (e.target.value === "{{ editor }}") {
+                    editor_prefijo_input.value = "Prefijo del Editor: {{ editor.prefijo }}";
+                    cant_public_editor = {{ editor.musical_publication_set.count }};
+                    valor_prefijo_public = String(cant_public_editor + 1)
+                    rango_prefijo_editor = '{{ editor.prefijo.rango }}';
+                    cant_digitos_prefijo_editor = '{{ editor.prefijo.rango.rango_superior }}'.length
+                    prefijo_publicacion = formatear_prefijo(valor_prefijo_public, rango_prefijo_editor, cant_digitos_prefijo_editor);
+                    publicacion_prefijo_input.value = "Prefijo de la publicación: " + prefijo_publicacion;
+                }
+            {% endfor %}
+        })
+    </script>
 {% endblock content %}
