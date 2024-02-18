@@ -96,7 +96,8 @@
                                 <td>{{ editor.directions }}</td>
                                 <td>{{ editor.phone }}</td>
                                 <td>
-                                    <a href="/editor/{{ editor.id }}" class="btn btn-sm btn-primary " title="Edit Editor">
+                                    <a href="{% url 'editor' editor.id %}"
+                                       class="btn btn-sm btn-primary " title="Edit Editor">
                                         <i class="fas fa-pen"></i>
                                     </a>
                                 </td>

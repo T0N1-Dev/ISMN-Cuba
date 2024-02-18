@@ -166,15 +166,10 @@ if (verify == 0) {
 }
 
 // 12) ISMN mask
-$(document).ready(function (){
-    let ismn_init = "\\97\\9-0"
-    $('#ismn').inputmask({"mask": ismn_init + "-9999-9999-9"},
-        { "onincomplete": function () {
-        swal('Opsss !', 'ISMN incompleto. Revise', 'error');
-        return false;
-        }
-    });
-});
+// $(document).ready(function (){
+//     let ismn_init = "\\97\\9-0"
+//     $('#ismn').inputmask({"mask": ismn_init + "-9999-9999-9"});
+// });
 
 // 13) Clear the form if this was closed
 $("#sendemailtestModal").on('hidden.bs.modal', function (){
