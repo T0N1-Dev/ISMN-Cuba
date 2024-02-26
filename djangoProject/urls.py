@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from App import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -31,8 +31,8 @@ urlpatterns = [
     # Path to add a musical publication
     path('add_musical_publicaton/', views.add_musical_publication, name="add_musical_publicaction"),
     # Path to access the muscial publication individually
-    path('musical_publication/<str:musical_publication_id>', views.musical_publication, name="edit_musical_publication"),
-    # Path to edit the editor
+    path('musical_publication/<str:musical_publication_id>', views.musical_publication, name="musical_publication"),
+    # Path to edit the musical publication
     path('edit_musical_publication/', views.edit_musical_publication, name="edit_musical_publication"),
     # Path to delete a Musical_Publication
     path('delete_musical_publication/<str:musical_publication_id>', views.delete_musical_publication, name="delete_musical_publication"),

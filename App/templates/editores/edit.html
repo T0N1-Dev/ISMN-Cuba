@@ -24,13 +24,7 @@
 {% block Value-phone %} value = "{{ editor.phone }}" {% endblock Value-phone %}
 {% block Value-email %} value = "{{ editor.user.email }}" {% endblock Value-email %}
 {% block Editor-type %}
-    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
-    {% if editor.type == 'Independiente' %}
-        {{ 'Independiente' }}
-    {% endif %}
-    {% if editor.type == 'Compañia' %}
-        {{ 'Compañia' }}
-    {% endif %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ editor.type }}
 {% endblock Editor-type %}
 {% block Value-edad %} value = "{{ editor.age }}" {% endblock Value-edad %}
 {% block Value-nombre %} value = "{{ editor.user.first_name }}" {% endblock Value-nombre %}
@@ -45,9 +39,12 @@
 
 
 <!-- Extends ADD Button -->
-{% block Btn-content %} <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-hdd">&nbsp;&nbsp;</i> Save</button> {% endblock Btn-content %}
+{% block Btn-content %}
+    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-hdd">&nbsp;&nbsp;</i> Guardar
+    </button> {% endblock Btn-content %}
 
 <!-- Extends Reset Button -->
 {% block Btn-reset %}
-    <button type="reset" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i>&nbsp;&nbsp; Reset</button>
+    <button type="reset" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i>&nbsp;&nbsp; Restablecer
+    </button>
  {% endblock Btn-reset %}

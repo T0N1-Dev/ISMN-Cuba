@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 from PIL import Image as PILImage, ImageDraw
 from django.contrib.auth.models import User
@@ -6,7 +5,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
 
-from App.models import Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion, Rango_Prefijo
+from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
+                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
 from django.http import HttpResponseRedirect  # Redirect the page after submit
@@ -21,7 +21,7 @@ from django.http import FileResponse
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle, Image, Frame
+from reportlab.platypus import Table, TableStyle, Image
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
@@ -54,45 +54,46 @@ def generate_prefijo(range, models):
         max_menor = models.objects.filter(rango__tipo='P-Menor').aggregate(Max('value'))['value__max']
         if max_menor:
             value = max_menor + 1
-            return models.objects.create(value=value, lote=lote, rango=Rango_Prefijo.objects.get(tipo='P-Menor'))
+            return models.objects.create(value=value, lote=lote, rango=Rango_Prefijo_Editor.objects.get(tipo='P-Menor'))
         else:
-            return models.objects.create(value=100001, lote=lote, rango=Rango_Prefijo.objects.get(tipo='P-Menor'))
+            return models.objects.create(value=100001, lote=lote,
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Menor'))
     elif range == 'p-inferior':
         max_inferior = models.objects.filter(rango__tipo='P-Inferior').aggregate(Max('value'))['value__max']
         if max_inferior:
             value = max_inferior + 1
             return models.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='P-Inferior'))
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Inferior'))
         else:
             return models.objects.create(value=10001, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='P-Inferior'))
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Inferior'))
     elif range == 'p-medio_inferior':
         max_medio_inf = models.objects.filter(rango__tipo='P-Medio_Inferior').aggregate(Max('value'))['value__max']
         if max_medio_inf:
             value = max_medio_inf + 1
             return models.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='P-Medio_Inferior'))
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior'))
         else:
             return models.objects.create(value=1001, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='P-Medio_Inferior'))
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior'))
     elif range == 'p-medio':
         max_medio = models.objects.filter(rango__tipo='P-Medio').aggregate(Max('value'))['value__max']
         if max_medio:
             value = max_medio + 1
             return models.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='P-Medio'))
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio'))
         else:
             return models.objects.create(value=101, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='P-Medio'))
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio'))
     elif range == 'p-superior':
         max_superior = models.objects.filter(rango__tipo='P-Superior').aggregate(Max('value'))['value__max']
         if max_superior:
             value = max_superior + 1
             return models.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='P-Superior'))
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Superior'))
         else:
             return models.objects.create(value=1, lote=lote,
-                                         rango=Rango_Prefijo.objects.get(tipo='P-Superior'))
+                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Superior'))
 
 
 # ================= SECCIÓN DEL USUARIO (EDITOR) =================
@@ -155,10 +156,10 @@ def add_editor(request):
         phone = request.POST['phone']
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/backend')
         elif Registered_Data.objects.filter(phone=phone).exists():
             messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/backend')
         # ===========================
         else:
             if request.POST.get('username') \
@@ -209,9 +210,8 @@ def add_editor(request):
 @login_required(login_url="login")
 def delete_editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
-    register_data = Registered_Data.objects.get(phone=editor.phone)
-    register_data.delete()
-    editor.user.delete()
+    Registered_Data.objects.get(phone=editor.phone).delete()
+    User.objects.get(username=editor.user.username).delete()
     editor.delete()
     messages.success(request, "Editor eliminado correctamente !")
     return HttpResponseRedirect('/backend')
@@ -224,6 +224,8 @@ def editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
     if editor:
         return render(request, "editores/edit.html", {"editor": editor})
+    else:
+        return HttpResponseRedirect('/backend')
 
 
 # Function to edit the Editor
@@ -269,26 +271,50 @@ def musical_colections_list(request):
 @login_required(login_url="login")
 def add_musical_publication(request):
     if request.method == 'POST':
-        if request.POST.get('name') \
+        if request.POST.get('title') \
                 and request.POST.get('autor') \
+                and request.POST.get('editor') \
+                and request.POST.get('prefijo-publicacion') \
                 and request.POST.get('ismn') \
-                and request.POST.get('letter_contain') \
-                and request.POST.get('description') \
-                and request.POST.get('date_time') \
                 and request.POST.get('gender') \
-                or request.POST.get('imagen'):
+                and request.POST.get('date'):
             musical_publication = Musical_Publication()
-            musical_publication.name = request.POST.get('name')
+            editor = Editor.objects.get(user__first_name=request.POST.get('editor'))
+            prefijo_value = request.POST.get('prefijo-publicacion').rpartition(" ")[2]
+            if prefijo_value.__len__() == 2:
+                prefijo = PrefijoPublicacion.objects.create(value=prefijo_value, lote='979-0',
+                                                            rango=Rango_Prefijo_Publicacion.objects.get(tipo='P-Menor'))
+            elif prefijo_value.__len__() == 3:
+                prefijo = PrefijoPublicacion.objects.create(value=prefijo_value, lote='979-0',
+                                                            rango=Rango_Prefijo_Publicacion.objects.get(
+                                                                tipo='P-Inferior'))
+            elif prefijo_value.__len__() == 4:
+                prefijo = PrefijoPublicacion.objects.create(value=prefijo_value, lote='979-0',
+                                                            rango=Rango_Prefijo_Publicacion.objects.get(
+                                                                tipo='P-Media_Inferior'))
+            elif prefijo_value.__len__() == 5:
+                prefijo = PrefijoPublicacion.objects.create(value=prefijo_value, lote='979-0',
+                                                            rango=Rango_Prefijo_Publicacion.objects.get(tipo='P-Media'))
+            else:
+                prefijo = PrefijoPublicacion.objects.create(value=prefijo_value, lote='979-0',
+                                                            rango=Rango_Prefijo_Publicacion.objects.get(
+                                                                tipo='P-Superior'))
+            musical_publication.name = request.POST.get('title')
             musical_publication.autor = request.POST.get('autor')
+            musical_publication.editor = editor
+            musical_publication.prefijo = prefijo
             musical_publication.ismn = request.POST.get('ismn')
-            musical_publication.letter_contain = request.POST.get('letter_contain')
-            musical_publication.description = request.POST.get('description')
-            musical_publication.date_time = request.POST.get('date_time')
             musical_publication.gender = request.POST.get('gender')
-            musical_publication.imagen = request.FILES.get('imagen')
+            musical_publication.letra = request.FILES.get('publication_letter')
+            if request.FILES.get('publication_image'):
+                musical_publication.imagen = request.FILES.get('publication_image')
+            else:
+                pass
+            musical_publication.description = request.POST.get('note')
+            musical_publication.date_time = request.POST.get('date')
             musical_publication.save()
             messages.success(request, "Publicación musical añadida correctamente !")
-            return HttpResponseRedirect('/backend')
+            return HttpResponseRedirect('/backend_publicaciones')
     else:
         editores = Editor.objects.annotate(Count('musical_publication'))
         data = {'editores': editores}
@@ -300,8 +326,10 @@ def add_musical_publication(request):
 @login_required(login_url="login")
 def musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
+    editores = Editor.objects.all()
+    data = {"musical_publication": musical_publication, "editores": editores}
     if musical_publication:
-        return render(request, "publicaciones/edit_publication.html", {"musical_publication": musical_publication})
+        return render(request, "publicaciones/edit_publication.html", data)
 
 
 # Function to edit the patients
@@ -311,18 +339,17 @@ def edit_musical_publication(request):
     if request.method == "POST":
         musical_publication = Musical_Publication.objects.get(id=request.POST.get('id'))
         if musical_publication:
-            musical_publication.name = request.POST.get('name')
+            musical_publication.name = request.POST.get('title')
             musical_publication.autor = request.POST.get('autor')
             musical_publication.ismn = request.POST.get('ismn')
-            musical_publication.letter_contain = request.POST.get('letter_contain')
-            musical_publication.description = request.POST.get('description')
-            musical_publication.date_time = request.POST.get('date_time')
-            musical_publication.gender = request.POST.get('gender')
-            musical_publication.imagen = request.FILES.get('imagen')
-            musical_publication.save()
-            messages.success(request, "Publicacion Musical actualizada correctamente !")
+            # musical_publication.letter_contain = request.POST.get('letter_contain')
+            # musical_publication.description = request.POST.get('description')
+            # musical_publication.date_time = request.POST.get('date_time')
+            # musical_publication.gender = request.POST.get('gender')
+            # musical_publication.imagen = request.FILES.get('imagen')
+            # musical_publication.save()
+            # messages.success(request, "Publicacion Musical actualizada correctamente !")
             return HttpResponseRedirect('/musical_colections')
-
 
 # Function to delete a musical publication
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
