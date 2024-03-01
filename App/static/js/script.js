@@ -58,7 +58,7 @@ function validateAll() {
     } else if (address === '') {
         swal("Opss !", "La dirección está vacia.", "error")
         return false;
-    } else if (letra === '') {
+    } else if (letra === '' && document.querySelector('div.edicion') == null) {
         swal("Opss!", "Se ha olvidado la letra de la canción. Seleccione un archivo word, " +
             "pdf o txt donde tenga guardada la letra de la obra musical", "error");
         return false;
@@ -177,8 +177,8 @@ setInterval(function (){
 }, 500);
 
 // 11) If not there editors, show a message
-var verify = $("#chk_td").length;
-if (verify == 0) {
+let verify = $("#chk_td").length;
+if (verify === 0) {
     $("#no-data").text("No se ha encontrado");
 }
 
@@ -241,7 +241,8 @@ function toggleFunction(){
     }
 }
 
-// Function to activate an age field editor
+// 17 Function to activate an age field editor
+// To Add
 $("#editorType").change( (e) => {
 
     const age = $('#age')
@@ -256,5 +257,26 @@ $("#editorType").change( (e) => {
         last_name.val('');
         age.attr('disabled', 'disabled');
         last_name.attr('disabled', 'disabled');
+    }
+})
+
+// To Edit
+$(document).ready(function () {
+    let editor_type = document.getElementById('editorType')
+    const age = $('#age')
+    const last_name = $('#last_name')
+    if (editor_type.children[0].label === 'Independiente') {
+        age.removeAttr('disabled');
+        last_name.removeAttr('disabled');
+    } else {
+        $("#age").val("");
+    }
+})
+
+// 18 Prevent to change the editor's prefijo
+$('#editorPrefijo').mousedown((e) => {
+    if (e.target.baseURI.includes('/editor/')) {
+        e.preventDefault();
+        swal('Error', 'No es posible editar o cambiar los prefijos asignados a los editores', 'error');
     }
 })

@@ -44,7 +44,7 @@
     Cambiar letra de la publicación.
 {% endblock Title-Letter-Sub %}
 {% block Value-letter %}
-    <div class="mb-3">Actualmente:
+    <div class="mb-3 edicion">Actualmente:
         <a href="/media/{{ musical_publication.letra.name }}">{{ musical_publication.letra.name }}</a>
     </div>
 {% endblock Value-letter %}
@@ -56,4 +56,4 @@
 {% block Btn-reset %}
     <button type="reset" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i>&nbsp;&nbsp; Restablecer
     </button>
- {% endblock Btn-reset %}
+{% endblock Btn-reset %}

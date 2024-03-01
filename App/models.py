@@ -164,7 +164,7 @@ class Musical_Publication(models.Model):
     name = models.CharField(max_length=50)
     autor = models.CharField(max_length=100)
     editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True, blank=True)
-    prefijo = models.OneToOneField(PrefijoPublicacion, on_delete=models.PROTECT)
+    prefijo = models.OneToOneField(PrefijoPublicacion, on_delete=models.CASCADE)
     ismn = models.CharField(max_length=20, unique=True)
     letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)
