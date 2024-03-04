@@ -31,7 +31,6 @@
                 <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST"
                                          enctype="multipart/form-data" class="card p-3 border-dark mt-3 form-register">
                     {% csrf_token %}
-
                     <!-- Input ID denied here -->
                     {% block Id-hidden %} {% endblock Id-hidden %}
 
@@ -188,7 +187,7 @@
                         <!-- Add Button -->
                         {% block Btn-content %}
                             <button type="submit" class="btn btn-primary btn-sm" id="btn-add">
-                                 <i class="fas fa-plus">&nbsp;&nbsp;</i>Add
+                                <i class="fas fa-plus">&nbsp;&nbsp;</i>Añadir
                             </button>
                         {% endblock Btn-content %}
 

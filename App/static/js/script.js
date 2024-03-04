@@ -183,9 +183,9 @@ if (verify === 0) {
 }
 
 // 13) Clear the form if this was closed
-$("#sendemailtestModal").on('hidden.bs.modal', function (){
-    $("#sendemailtestModal form")[0].reset();
-})
+// $("#sendemailtestModal").on('hidden.bs.modal', function (){
+//     $("#sendemailtestModal form")[0].reset();
+// })
 
 // 14)  Ajax Spinner
 jQuery(function($) {
@@ -279,4 +279,9 @@ $('#editorPrefijo').mousedown((e) => {
         e.preventDefault();
         swal('Error', 'No es posible editar o cambiar los prefijos asignados a los editores', 'error');
     }
+})
+
+// 19 Boostrap's Spinner to sending email
+$('#send_email').click((e) => {
+    $("#bg-spinner").fadeIn(5000);
 })

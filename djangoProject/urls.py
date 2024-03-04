@@ -12,6 +12,7 @@ urlpatterns = [
     path('login/', views.MyLoginView.as_view(), name='login'),
     path('logout/', views.MyLogoutView.as_view(), name='logout'),
     path('register_user/', views.register_user, name='register_user'),
+    path('email_confirmation/', views.email_confirmation, name='email_confirmation'),
     # ===============
     # BACKEND SECTION
     # ===============
@@ -42,8 +43,8 @@ urlpatterns = [
     path('export_musical_publication/<str:musical_publication_id>', views.export_musical_publication, name="export_publication"),
 
     # ========================== SEND EMAIL ==========================
-    # Path to send Solicitud ISMN
-    path('send_email_solicitud_ismn', views.send_email_solicitud_ismn, name="home"),
+    # Path to send confirmation-code
+    path('send_email', views.send_email, name="home"),
 ]
 
 if settings.DEBUG:

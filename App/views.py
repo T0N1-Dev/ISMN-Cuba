@@ -1,4 +1,6 @@
 from datetime import datetime
+from random import randint
+
 from PIL import Image as PILImage, ImageDraw
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -6,10 +8,10 @@ from django.contrib.auth.decorators import login_required
 from pathlib import Path
 
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
-                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion)
+                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect  # Redirect the page after submit
+from django.http import HttpResponseRedirect, QueryDict  # Redirect the page after submit
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
@@ -38,14 +40,6 @@ class MyLogoutView(LogoutView):
     next_page = '/'
 
 
-# Registration Function
-def register_user(request):
-    if request.method == 'POST':
-        return render(request, 'frontend.html')
-    else:
-        return render(request, 'registration/register_user.html')
-
-
 # ================= SECCIÓN DE CREACIÓN DE RANGOS Y PREFIJOS =================
 def generate_prefijo_editor(range):
     value = 0
@@ -58,44 +52,44 @@ def generate_prefijo_editor(range):
                                                 rango=Rango_Prefijo_Editor.objects.get(tipo='P-Menor'))
         else:
             return PrefijoEditor.objects.create(value=100001, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Menor'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Menor'))
     elif range == 'p-inferior':
         max_inferior = PrefijoEditor.objects.filter(rango__tipo='P-Inferior').aggregate(Max('value'))['value__max']
         if max_inferior:
             value = max_inferior + 1
             return PrefijoEditor.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Inferior'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Inferior'))
         else:
             return PrefijoEditor.objects.create(value=10001, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Inferior'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Inferior'))
     elif range == 'p-medio_inferior':
         max_medio_inf = PrefijoEditor.objects.filter(rango__tipo='P-Medio_Inferior').aggregate(Max('value'))[
             'value__max']
         if max_medio_inf:
             value = max_medio_inf + 1
             return PrefijoEditor.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior'))
         else:
             return PrefijoEditor.objects.create(value=1001, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior'))
     elif range == 'p-medio':
         max_medio = PrefijoEditor.objects.filter(rango__tipo='P-Medio').aggregate(Max('value'))['value__max']
         if max_medio:
             value = max_medio + 1
             return PrefijoEditor.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio'))
         else:
             return PrefijoEditor.objects.create(value=101, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio'))
     elif range == 'p-superior':
         max_superior = PrefijoEditor.objects.filter(rango__tipo='P-Superior').aggregate(Max('value'))['value__max']
         if max_superior:
             value = max_superior + 1
             return PrefijoEditor.objects.create(value=value, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Superior'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Superior'))
         else:
             return PrefijoEditor.objects.create(value=1, lote=lote,
-                                         rango=Rango_Prefijo_Editor.objects.get(tipo='P-Superior'))
+                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Superior'))
 
 
 def generate_prefijo_publicacion(valor):
@@ -123,6 +117,45 @@ def generate_prefijo_publicacion(valor):
                                                         tipo='P-Superior'))
         return prefijo
 
+
+# Registration Function
+def register_user(request):
+    if request.method == 'POST':
+        # Check if email exists in BD
+        email = request.POST['email']
+        phone = request.POST['phone']
+        if Registered_Data.objects.filter(email=email).exists():
+            messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        elif Registered_Data.objects.filter(phone=phone).exists():
+            messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        # ===========================
+        else:
+            if request.POST.get('username') \
+                    and request.POST.get('first_name') \
+                    and request.POST.get('password') \
+                    and request.POST.get('phone') \
+                    and request.POST.get('email') \
+                    and request.POST.get('editorType') \
+                    and request.POST.get('address') \
+                    and request.POST.get('idTribute') \
+                    and request.POST.get('editorPrefijo'):
+                datos = request.POST.copy()
+                datos['imagenProfile'] = request.FILES
+                confirmation_code = send_email(request)
+                datos['code_confirmation'] = confirmation_code
+                return render(request, 'registration/email_confirmation.html', {'datos_inscripcion': datos})
+            else:
+                messages.error(request, "Complete todos los campos del formulario")
+                return HttpResponseRedirect('/register_user')
+    else:
+        return render(request, 'registration/register_user.html')
+
+
+def email_confirmation(request):
+    print(request.GET)
+    return render(request, '/')
 
 # ================= SECCIÓN DEL USUARIO (EDITOR) =================
 # Function to render the Home Page for everybody
@@ -393,39 +426,29 @@ def delete_musical_publication(request, musical_publication_id):
     return HttpResponseRedirect('/backend_publicaciones')
 
 
-# Function to send ISMN solicitud
-def send_email_solicitud_ismn(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        age = request.POST.get('age')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
-        address = request.POST.get('address')
-        descripcion = request.POST.get('descripcion')
+# Function to send Confirmation Code
+def generate_confirmation_code():
+    return randint(1000, 9999)
 
-        context = {
-            'name': name,
-            'age': age,
-            'email': email,
-            'phone': phone,
-            'address': address,
-            'descripcion': descripcion
-        }
-        message = loader.render_to_string('resume_form.html', context)
-        email = EmailMultiAlternatives(
-            "ISMN - Solicitud", message,
-            "Editores de Cuba",
-            ['antoniocruzglez24@gmail.com'],
-        )
 
-        email.content_subtype = 'html'
-        file = request.FILES['file']
-        email.attach(file.name, file.read(), file.content_type)
-        try:
-            email.send()
-        except TimeoutError:
-            messages.error(request, 'Error en la conexión. Intente más tarde.')
-        messages.success(request, 'Solicitud ISMN enviada correctamente !')
+def send_email(request):
+    confirmation_code = generate_confirmation_code()
+    context = {
+        'nombre': request.POST.get('first_name'),
+        'code': confirmation_code
+    }
+    message = loader.render_to_string('mail_confirmation_client.html', context)
+    email = EmailMultiAlternatives(
+        "Confirmación de Correo", message,
+        "CCL de Cuba",
+        [request.POST.get('email')],
+    )
+    email.content_subtype = 'html'
+    try:
+        email.send()
+        return confirmation_code
+    except TimeoutError:
+        messages.error('Error en la conexión. Intente más tarde.')
         return HttpResponseRedirect('/')
 
 

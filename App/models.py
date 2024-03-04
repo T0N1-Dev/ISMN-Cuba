@@ -36,8 +36,8 @@ class Rango_Prefijo_Editor(models.Model):
         (PUBLICADOR_MENOR, "P-Menor")
     }
 
-    rango_inferior = models.PositiveSmallIntegerField()
-    rango_superior = models.PositiveSmallIntegerField()
+    rango_inferior = models.PositiveIntegerField()
+    rango_superior = models.PositiveIntegerField()
     tipo = models.CharField(max_length=20, choices=TYPE, unique=True)
 
     class Meta:
@@ -67,7 +67,7 @@ class Rango_Prefijo_Publicacion(models.Model):
         (PUBLICACION_MENOR, "P-Menor")
     }
 
-    rango_superior = models.PositiveSmallIntegerField()
+    rango_superior = models.PositiveIntegerField()
     tipo = models.CharField(max_length=20, choices=TYPE, unique=True)
 
     class Meta:
@@ -78,7 +78,7 @@ class Rango_Prefijo_Publicacion(models.Model):
 
 
 class PrefijoEditor(models.Model):
-    value = models.PositiveSmallIntegerField(unique=True)
+    value = models.PositiveIntegerField(unique=True)
     lote = models.CharField(max_length=7)
     rango = models.ForeignKey(Rango_Prefijo_Editor, on_delete=models.PROTECT)
 
@@ -90,7 +90,7 @@ class PrefijoEditor(models.Model):
 
 
 class PrefijoPublicacion(models.Model):
-    value = models.PositiveSmallIntegerField()
+    value = models.PositiveIntegerField()
     lote = models.CharField(max_length=7)
     rango = models.ForeignKey(Rango_Prefijo_Publicacion, on_delete=models.PROTECT)
 
@@ -199,20 +199,19 @@ class Solicitud(models.Model):
         (ISMN_ADD_SOLIC, "Solicitud-ISMN")
     }
 
-    PENDIENTE = 'PEND'
-    ATENDIDO = 'ATEND'
+    PENDIENTE = 'P'
+    ATENDIDO = 'A'
 
     ESTATUS = {
         (PENDIENTE, "Pendiente"),
         (ATENDIDO, "Atendido")
     }
 
-    editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
-    asunto = models.CharField(max_length=100)
+    editor = models.ForeignKey(Editor, on_delete=models.CASCADE, null=True)
+    temporal = models.QuerySet()
     tipo = models.CharField(max_length=50, choices=SOLICITUD_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=ESTATUS)
-
 
     class Meta:
         verbose_name_plural = 'solicitudes'
