@@ -1,8 +1,12 @@
+import base64
+import json
 from datetime import datetime
 from random import randint
+from smtplib import SMTPServerDisconnected
 
 from PIL import Image as PILImage, ImageDraw
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
@@ -11,7 +15,7 @@ from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEdi
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect, QueryDict  # Redirect the page after submit
+from django.http import HttpResponseRedirect, QueryDict, HttpResponse  # Redirect the page after submit
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
@@ -29,6 +33,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4, letter
 
+# ================= VARIABLES TEMPORALES =================
+datos = QueryDict
 
 # ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
 class MyLoginView(LoginView):
@@ -142,10 +148,11 @@ def register_user(request):
                     and request.POST.get('idTribute') \
                     and request.POST.get('editorPrefijo'):
                 datos = request.POST.copy()
-                datos['imagenProfile'] = request.FILES
+                datos['imagenProfile'] = base64.b64encode(request.FILES['imagenProfile'].read())
                 confirmation_code = send_email(request)
                 datos['code_confirmation'] = confirmation_code
-                return render(request, 'registration/email_confirmation.html', {'datos_inscripcion': datos})
+                request.session['datos'] = datos
+                return render(request, 'registration/email_confirmation.html')
             else:
                 messages.error(request, "Complete todos los campos del formulario")
                 return HttpResponseRedirect('/register_user')
@@ -154,8 +161,23 @@ def register_user(request):
 
 
 def email_confirmation(request):
-    print(request.GET)
-    return render(request, '/')
+    if request.method == 'POST':
+        if request.POST.get('code') != str(request.session.get('datos')['code_confirmation']):
+            messages.error(request, 'Código incorrecto. Revise su correo electrónico')
+            return HttpResponseRedirect('/email_confirmation')
+        else:
+            solicitud = Solicitud()
+            solicitud.tipo = 'EADDS'
+            solicitud.status = 'P'
+            solicitud.temporal = request.session.get('datos')
+            solicitud.save()
+            # LINEA PARA TRANSFORMAR DE BASE64 A IMAGE
+            # PILImage.open(io.BytesIO(base64.b64decode(request.session.get('datos')['imagenProfile'])))
+            messages.success(request, 'Su solicitud se ha enviado correctamente, le notificaremos a su correo '
+                                      'cuando haya sido aceptada.')
+            return HttpResponseRedirect('/')
+    else:
+        return render(request, 'registration/email_confirmation.html')
 
 # ================= SECCIÓN DEL USUARIO (EDITOR) =================
 # Function to render the Home Page for everybody
@@ -447,7 +469,7 @@ def send_email(request):
     try:
         email.send()
         return confirmation_code
-    except TimeoutError:
+    except TimeoutError or SMTPServerDisconnected:
         messages.error('Error en la conexión. Intente más tarde.')
         return HttpResponseRedirect('/')
 

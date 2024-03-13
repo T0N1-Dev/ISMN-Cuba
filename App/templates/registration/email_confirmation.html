@@ -14,8 +14,8 @@
                 <span class="text-primary"> INSERTE SU CÓDIGO DE CONFIRMACIÓN </span></span>
         </div>
 
-        <form action="/" method="POST" class="p-3 mt-1">
-
+        <form action="/email_confirmation/" method="POST" class="p-3 mt-1">
+            {% csrf_token %}
             <section class="info-box">
                 <p class="lead mb-3" style="font-size: 20px">Se le ha enviado un código de confirmación a su
                     correo

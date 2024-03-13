@@ -18,7 +18,7 @@
 <!-- PAGE CONTENT -->
 {% block content %}
     <div class="container">
-        <div class="card card-body border-dark mt-5">
+        <div class="card card-body mt-5">
             <span class="text-center"> {% block card-title %}
                 <span class="text-primary"> INSERTE LOS DATOS DEL EDITOR </span> {% endblock card-title %} </span>
         </div>
@@ -29,7 +29,8 @@
 
                 <!-- Form -->
                 <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST"
-                                         enctype="multipart/form-data" class="card p-3 border-dark mt-3 form-register">
+                                                                                     enctype="multipart/form-data"
+                                                                                     class="card p-3 mt-3 form-register">
                     {% csrf_token %}
                     <!-- Input ID denied here -->
                     {% block Id-hidden %} {% endblock Id-hidden %}

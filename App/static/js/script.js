@@ -187,29 +187,6 @@ if (verify === 0) {
 //     $("#sendemailtestModal form")[0].reset();
 // })
 
-// 14)  Ajax Spinner
-jQuery(function($) {
-    $(document).ajaxSend(function (){
-        $("#bg-spinner").fadeIn(500);
-    });
-
-    $("#btn-send").click(function (){
-        $.ajax({
-            type: 'GET',
-            success: function (data) {
-                var element = document;
-                var html = element.outerHTML;
-                var data = { html: html };
-                var json = JSON.stringify(data)
-                var d = $.parseJSON(json);
-            }
-        }).done(function (){ // Una vez termine ajax correctamente elimina el spinner en 15s.
-            setTimeout(function (){
-                $("#bg-spinner").fadeOut(500);
-            },40000);
-        });
-    });
-});
 
 // 15 Close modal (after 'send button is clicked')
 $("#btn-send").click(function (){
@@ -282,6 +259,8 @@ $('#editorPrefijo').mousedown((e) => {
 })
 
 // 19 Boostrap's Spinner to sending email
-$('#send_email').click((e) => {
-    $("#bg-spinner").fadeIn(5000);
+$('#btn-add').click((e) => {
+    if (validateAll()) {
+        $("#preloader").css('animation', 'preloader_forever 1.2s forwards infinite');
+    }
 })
