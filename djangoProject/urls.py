@@ -19,6 +19,7 @@ urlpatterns = [
     # Path to access the backend page
     path('backend/', views.backend_editores, name="backend_editores"),
     path('backend_publicaciones', views.backend_publicaciones, name="backend_publicaciones"),
+    path('backend_solicitudes', views.backend_solicitudes, name="backend_solicitudes"),
     # Path to add an editor
     path('add_editor/', views.add_editor, name="add_editor"),
     # Path to delete an editor
@@ -37,6 +38,8 @@ urlpatterns = [
     path('edit_musical_publication/', views.edit_musical_publication, name="edit_musical_publication"),
     # Path to delete a Musical_Publication
     path('delete_musical_publication/<str:musical_publication_id>', views.delete_musical_publication, name="delete_musical_publication"),
+    # Path to delete a Solicitud
+    path('delete_solicitud/<str:solicitud_id>', views.delete_solicitud, name="delete_solicitud"),
 
     # ========================== EXPORT DOCUMENTS ==========================
     # Path to export a single musical publication

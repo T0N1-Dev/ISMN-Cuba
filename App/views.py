@@ -1,12 +1,10 @@
 import base64
-import json
 from datetime import datetime
 from random import randint
 from smtplib import SMTPServerDisconnected
 
 from PIL import Image as PILImage, ImageDraw
 from django.contrib.auth.models import User
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
@@ -15,7 +13,7 @@ from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEdi
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect, QueryDict, HttpResponse  # Redirect the page after submit
+from django.http import HttpResponseRedirect, QueryDict  # Redirect the page after submit
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
@@ -148,7 +146,12 @@ def register_user(request):
                     and request.POST.get('idTribute') \
                     and request.POST.get('editorPrefijo'):
                 datos = request.POST.copy()
-                datos['imagenProfile'] = base64.b64encode(request.FILES['imagenProfile'].read())
+                if request.FILES:
+                    # Convertir la imagen a base64 para poder serializarla a JSON en el request.session
+                    datos['imagenProfile'] = base64.b64encode(request.FILES['imagenProfile'].read())
+                    # Agregar la informacion inicial para que pueda ser leida por el "src" de <img> en el html
+                    imagen_extension = request.FILES['imagenProfile'].content_type
+                    datos['imagenProfile'] = f"data:{imagen_extension};base64," + datos['imagenProfile']
                 confirmation_code = send_email(request)
                 datos['code_confirmation'] = confirmation_code
                 request.session['datos'] = datos
@@ -167,8 +170,8 @@ def email_confirmation(request):
             return HttpResponseRedirect('/email_confirmation')
         else:
             solicitud = Solicitud()
-            solicitud.tipo = 'EADDS'
-            solicitud.status = 'P'
+            solicitud.tipo = 'Solicitud-Inscripción'
+            solicitud.status = 'Pendiente'
             solicitud.temporal = request.session.get('datos')
             solicitud.save()
             # LINEA PARA TRANSFORMAR DE BASE64 A IMAGE
@@ -186,7 +189,7 @@ def frontend(request):
 
 
 # ================= SECCIÓN DEL USUARIO (ESPECIALISTA) =================
-# Function to render editor's list
+# Function to render editor's lists
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def backend_editores(request):
@@ -209,6 +212,7 @@ def backend_editores(request):
     return render(request, 'editores/editores-list.html', {"editores": all_editor})
 
 
+# Function to render publication's lists
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def backend_publicaciones(request):
@@ -226,6 +230,25 @@ def backend_publicaciones(request):
     all_publication = paginator.get_page(page)
 
     return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication})
+
+
+# Function to render las listas de solicitudes
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def backend_solicitudes(request):
+    if 'q' in request.GET:
+        q = request.GET['q']
+        all_solicitudes_list = Solicitud.objects.filter(
+            Q(tipo__icontains=q) | Q(editor__user__username__icontains=q) |
+            Q(status__icontains=q)
+        ).order_by('-created_at')
+    else:
+        all_solicitudes_list = Solicitud.objects.all().order_by('-created_at')
+
+    paginator = Paginator(all_solicitudes_list, 4)
+    page = request.GET.get('page')
+    all_solicitudes = paginator.get_page(page)
+    return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes})
 
 
 # Function to Add Editor
@@ -446,6 +469,15 @@ def delete_musical_publication(request, musical_publication_id):
     musical_publication.delete()
     messages.success(request, "Publicacion Musical eliminada correctamente !")
     return HttpResponseRedirect('/backend_publicaciones')
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def delete_solicitud(request, solicitud_id):
+    solicitud = Solicitud.objects.get(id=solicitud_id)
+    solicitud.delete()
+    messages.success(request, "Solicitud eliminada correctamente !")
+    return HttpResponseRedirect('/backend_solicitudes')
 
 
 # Function to send Confirmation Code
@@ -864,3 +896,5 @@ def export_catalogo_peliculas(request, musical_publication_id):
     build_doc(buffer)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"CATÁLOGO_DE_PELICULAS_{titulo_catalogo}.pdf")
+
+

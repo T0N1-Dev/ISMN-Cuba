@@ -208,10 +208,13 @@ class Solicitud(models.Model):
     }
 
     editor = models.ForeignKey(Editor, on_delete=models.CASCADE, null=True)
-    temporal = models.QuerySet()
+    temporal = models.JSONField()
     tipo = models.CharField(max_length=50, choices=SOLICITUD_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=ESTATUS)
 
     class Meta:
         verbose_name_plural = 'solicitudes'
+
+    def __str__(self):
+        return self.tipo

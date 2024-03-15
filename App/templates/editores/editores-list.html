@@ -41,7 +41,7 @@
                 {% endblock %}
                 <!-- 2) Column Get users -->
                 <span>
-                    Bienvenido <strong><span class="text-primary">{{ user.get_username }}</span></strong>
+                    Bienvenido <strong><span class="text-primary">{{ user.get_username|capfirst }}</span></strong>
                 </span>
             </div>
 
@@ -185,7 +185,7 @@
 {% endblock content %}
 
 {% block Offcanvas %}
-    <a class="btn btn-dark" href="#"><i class="fas fa-database"></i>&nbsp;&nbsp;Solicitudes</a>
+    <a class="btn btn-dark" href="{% url 'backend_solicitudes' %}"><i class="fas fa-database"></i>&nbsp;&nbsp;Solicitudes</a>
     <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-database"></i>&nbsp;&nbsp;Publicaciones
         Musicales</a>
     <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
