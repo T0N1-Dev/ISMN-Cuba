@@ -20,6 +20,8 @@ urlpatterns = [
     path('backend/', views.backend_editores, name="backend_editores"),
     path('backend_publicaciones', views.backend_publicaciones, name="backend_publicaciones"),
     path('backend_solicitudes', views.backend_solicitudes, name="backend_solicitudes"),
+    # Path to accept an inscription application
+    path('accept_inscription/<str:solicitud_id>', views.accept_inscription, name="accept_inscription"),
     # Path to add an editor
     path('add_editor/', views.add_editor, name="add_editor"),
     # Path to delete an editor
@@ -47,7 +49,7 @@ urlpatterns = [
 
     # ========================== SEND EMAIL ==========================
     # Path to send confirmation-code
-    path('send_email', views.send_email, name="home"),
+    path('send_code_confirmation', views.send_code_confirmation, name="home"),
 ]
 
 if settings.DEBUG:

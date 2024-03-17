@@ -61,16 +61,18 @@
          alt="Logo de Camara Cubana del Libro" loading="lazy">
     <br>
     <hr>
-    <h1>Hola {{ nombre }} &#128400; <br> Este es su código de confirmación de correo.</h1>
+    {% block title %}<h1>Hola {{ nombre }} &#128400; <br> Este es su código de confirmación de correo.</h1>{% endblock title %}
 </header>
-<section>
-    <div class="box">
-        <p style="text-align: center" class="code">{{ code }}</p>
-    </div>
-    <h3>Inserte el código en la sección de registro de nuestro sitio web para finalizar la solicitud de
-        inscripción.</h3>
-    <hr>
-</section>
+{% block cuerpo %}
+    <section>
+        <div class="box">
+            <p style="text-align: center" class="code">{{ code }}</p>
+        </div>
+        <h3>Inserte el código en la sección de registro de nuestro sitio web para finalizar la solicitud de
+            inscripción.</h3>
+        <hr>
+    </section>
+{% endblock cuerpo %}
 <footer style="margin-top: 15px">
     Copyright &copy; {% now "Y" %} Todos los derechos reservados | Agencia Cubana del ISBN |
     Cámara Cubana del Libro | T0N1

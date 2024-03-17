@@ -5,6 +5,7 @@ from smtplib import SMTPServerDisconnected
 
 from PIL import Image as PILImage, ImageDraw
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
@@ -33,6 +34,7 @@ from reportlab.lib.pagesizes import A4, letter
 
 # ================= VARIABLES TEMPORALES =================
 datos = QueryDict
+
 
 # ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
 class MyLoginView(LoginView):
@@ -152,7 +154,7 @@ def register_user(request):
                     # Agregar la informacion inicial para que pueda ser leida por el "src" de <img> en el html
                     imagen_extension = request.FILES['imagenProfile'].content_type
                     datos['imagenProfile'] = f"data:{imagen_extension};base64," + datos['imagenProfile']
-                confirmation_code = send_email(request)
+                confirmation_code = send_code_confirmation(request)
                 datos['code_confirmation'] = confirmation_code
                 request.session['datos'] = datos
                 return render(request, 'registration/email_confirmation.html')
@@ -174,8 +176,6 @@ def email_confirmation(request):
             solicitud.status = 'Pendiente'
             solicitud.temporal = request.session.get('datos')
             solicitud.save()
-            # LINEA PARA TRANSFORMAR DE BASE64 A IMAGE
-            # PILImage.open(io.BytesIO(base64.b64decode(request.session.get('datos')['imagenProfile'])))
             messages.success(request, 'Su solicitud se ha enviado correctamente, le notificaremos a su correo '
                                       'cuando haya sido aceptada.')
             return HttpResponseRedirect('/')
@@ -250,6 +250,62 @@ def backend_solicitudes(request):
     all_solicitudes = paginator.get_page(page)
     return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes})
 
+
+def guardar_imagen_base64(base64_string):
+    # Decodificar la cadena base64 en una imagen
+    image_data = base64.b64decode(base64_string)
+
+    # Crear una imagen PIL desde los datos decodificados
+    image = PILImage.open(io.BytesIO(image_data))
+
+    # Crear un InMemoryUploadedFile a partir de la imagen PIL
+    image_io = io.BytesIO()
+    image.save(image_io, format='JPEG')
+    image_file = InMemoryUploadedFile(image_io, None, 'temp.jpg', 'image/jpeg', image_io.tell(), None)
+
+    return image_file
+
+
+# Function to Accept an Inscription
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def accept_inscription(request, solicitud_id):
+    solicitud = Solicitud.objects.get(id=solicitud_id)
+    prefijo_editor = generate_prefijo_editor(solicitud.temporal['editorPrefijo'])
+    user = User()
+    editor = Editor()
+    user.username = solicitud.temporal['username']
+    user.password = solicitud.temporal['password']
+    user.first_name = solicitud.temporal['first_name']
+    user.email = solicitud.temporal['email']
+    if solicitud.temporal['editorType'] == 'Independiente':
+        user.last_name = solicitud.temporal['last_name']
+        editor.age = solicitud.temporal['age']
+    editor.user = user
+    editor.phone = solicitud.temporal['phone']
+    editor.prefijo = prefijo_editor
+    editor.type = solicitud.temporal['editorType']
+    # PARA TRANSFORMAR DE BASE64 A IMAGE
+    # imagen = PILImage.open(io.BytesIO(base64.b64decode(solicitud.temporal['imagenProfile'].split(',')[1])))
+    imagen = guardar_imagen_base64(solicitud.temporal['imagenProfile'].split(',')[1])
+    editor.image_profile = imagen
+    editor.note = solicitud.temporal['note']
+    editor.directions = solicitud.temporal['address']
+    editor.id_tribute = solicitud.temporal['idTribute']
+    solicitud.editor = editor
+    solicitud.temporal = {}
+    solicitud.status = 'Atendido'
+    correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email, username=user.username, password=user.password)
+    if correo:
+        user.save()
+        editor.save()
+        solicitud.save()
+        messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a '{user.first_name}' al "
+                                  f"correo '{user.email}'. Ahora {user.first_name} ya "
+                                  f"puede realizar solicitudes ISMN !")
+    else:
+        messages.error(request, 'Ha ocurrido un error al intentar notificar al correo del cliente, pruebe más tarde')
+    return HttpResponseRedirect('/backend_solicitudes')
 
 # Function to Add Editor
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -485,13 +541,13 @@ def generate_confirmation_code():
     return randint(1000, 9999)
 
 
-def send_email(request):
+def send_code_confirmation(request):
     confirmation_code = generate_confirmation_code()
     context = {
         'nombre': request.POST.get('first_name'),
         'code': confirmation_code
     }
-    message = loader.render_to_string('mail_confirmation_client.html', context)
+    message = loader.render_to_string('emails/mail_confirmation_client.html', context)
     email = EmailMultiAlternatives(
         "Confirmación de Correo", message,
         "CCL de Cuba",
@@ -504,6 +560,26 @@ def send_email(request):
     except TimeoutError or SMTPServerDisconnected:
         messages.error('Error en la conexión. Intente más tarde.')
         return HttpResponseRedirect('/')
+
+
+def send_info_inscripcion(nombre, user_email, username, password):
+    context = {
+        'nombre': nombre,
+        'username': username,
+        'password': password
+    }
+    message = loader.render_to_string('emails/accept_inscription.html', context)
+    email = EmailMultiAlternatives(
+        "Solicitud de inscripción aceptada", message,
+        "CCL de Cuba",
+        [user_email],
+    )
+    email.content_subtype = 'html'
+    try:
+        email.send()
+        return True
+    except TimeoutError or SMTPServerDisconnected:
+        return False
 
 
 def export_musical_publication(request, musical_publication_id):

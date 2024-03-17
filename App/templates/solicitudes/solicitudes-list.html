@@ -152,6 +152,12 @@
                             </div>
                           </div>
                       </div>
+
+                      <div class="modal-footer justify-content-center">
+                        <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal" id="btn-accept">
+                            <a href="{% url 'accept_inscription' solicitud.id %}" type="button" class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Aceptar</a>
+                        </button>
+                      </div>
                   {% else %}
                       <h4 class="display-6 mb-3">{{ solicitud }}</h4>
                       <div class="container_img mb-4" style="background-color: transparent;">
@@ -212,12 +218,12 @@
                             </div>
                           </div>
                       </div>
+                      <div class="modal-footer justify-content-center">
+                        <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal">
+                            <a href="#" type="button" class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Aceptar</a>
+                        </button>
+                      </div>
                   {% endif %}
-              </div>
-              <div class="modal-footer justify-content-center">
-                <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal">
-                    <a href="#" type="button" class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Aceptar</a>
-                </button>
               </div>
             </div>
           </div>

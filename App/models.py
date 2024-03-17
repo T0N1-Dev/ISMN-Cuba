@@ -191,16 +191,16 @@ class Musical_Publication(models.Model):
 # Solicitudes
 class Solicitud(models.Model):
 
-    EDITOR_ADD_SOLIC = 'EADDS'
-    ISMN_ADD_SOLIC = 'ISMNADDS'
+    EDITOR_ADD_SOLIC = 'Solicitud-Inscripción'
+    ISMN_ADD_SOLIC = 'Solicitud-ISMN'
 
     SOLICITUD_TYPE = {
         (EDITOR_ADD_SOLIC, "Solicitud-Inscripción"),
         (ISMN_ADD_SOLIC, "Solicitud-ISMN")
     }
 
-    PENDIENTE = 'P'
-    ATENDIDO = 'A'
+    PENDIENTE = 'Pendiente'
+    ATENDIDO = 'Atendido'
 
     ESTATUS = {
         (PENDIENTE, "Pendiente"),

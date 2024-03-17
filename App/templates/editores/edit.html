@@ -38,7 +38,14 @@
     {{ editor.prefijo.rango }}
 {% endblock Value-publications_per_year %}
 {% block Value-disbled %} readonly {% endblock Value-disbled %}
-
+{% block Title-Imagen-Sub %}
+    Cambiar imagen del editor.
+{% endblock Title-Imagen-Sub %}
+{% block Value-imagen %}
+    <div class="mb-3">Actualmente:
+        <a href="/media/{{ editor.image_profile.name }}">{{ editor.image_profile.name }}</a>
+    </div>
+{% endblock Value-imagen %}
 
 <!-- Extends ADD Button -->
 {% block Btn-content %}

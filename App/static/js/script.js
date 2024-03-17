@@ -116,7 +116,7 @@ $(document).ready(function (){
 });
 
 // 3) Script to put First Letter capitalized
-$("#autor, #first_name, #last_name, #address, #autor").keyup(function () {
+$("#autor, #first_name, #last_name, #autor").keyup(function () {
     var txt = $(this).val();
     $(this).val(txt.replace(/^(.)|\s(.)/g, function ($1){return $1.toUpperCase( );}));
 });
@@ -259,7 +259,7 @@ $('#editorPrefijo').mousedown((e) => {
 })
 
 // 19 Boostrap's Spinner to sending email
-$('#btn-add').click((e) => {
+$('#btn-add, #btn-accept').click((e) => {
     if (validateAll()) {
         $("#preloader").css('animation', 'preloader_forever 1.2s forwards infinite');
     }
