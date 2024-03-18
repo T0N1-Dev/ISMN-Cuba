@@ -1,10 +1,11 @@
 import base64
 from datetime import datetime
 from random import randint
-from smtplib import SMTPServerDisconnected
+from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 
 from PIL import Image as PILImage, ImageDraw
 from django.contrib.auth.models import User
+from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -33,6 +34,8 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4, letter
 
 # ================= VARIABLES TEMPORALES =================
+from djangoProject.settings import MEDIA_ROOT
+
 datos = QueryDict
 
 
@@ -154,6 +157,10 @@ def register_user(request):
                     # Agregar la informacion inicial para que pueda ser leida por el "src" de <img> en el html
                     imagen_extension = request.FILES['imagenProfile'].content_type
                     datos['imagenProfile'] = f"data:{imagen_extension};base64," + datos['imagenProfile']
+                else:
+                    with open(f"{MEDIA_ROOT}\profile_default.png", "rb") as image_profile:
+                        datos['imagenProfile'] = f"data:png;base64," + base64.b64encode(image_profile.read()).decode()
+
                 confirmation_code = send_code_confirmation(request)
                 datos['code_confirmation'] = confirmation_code
                 request.session['datos'] = datos
@@ -251,18 +258,21 @@ def backend_solicitudes(request):
     return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes})
 
 
-def guardar_imagen_base64(base64_string):
+def guardar_imagen_base64(base64_string, name):
+    # Extraer el base64 y la extension de la imagen
+    header, base64_data = base64_string.split(';base64,')
+    extension = header.split('/')[-1]
+
     # Decodificar la cadena base64 en una imagen
-    image_data = base64.b64decode(base64_string)
+    image_data = base64.b64decode(base64_data)
 
     # Crear una imagen PIL desde los datos decodificados
     image = PILImage.open(io.BytesIO(image_data))
-
     # Crear un InMemoryUploadedFile a partir de la imagen PIL
     image_io = io.BytesIO()
-    image.save(image_io, format='JPEG')
-    image_file = InMemoryUploadedFile(image_io, None, 'temp.jpg', 'image/jpeg', image_io.tell(), None)
-
+    image.save(image_io, format=extension.upper())
+    image_file = InMemoryUploadedFile(image_io, None, f'{name}_image.{extension}',
+                                      f'image/{extension}', image_io.tell(), None)
     return image_file
 
 
@@ -287,7 +297,7 @@ def accept_inscription(request, solicitud_id):
     editor.type = solicitud.temporal['editorType']
     # PARA TRANSFORMAR DE BASE64 A IMAGE
     # imagen = PILImage.open(io.BytesIO(base64.b64decode(solicitud.temporal['imagenProfile'].split(',')[1])))
-    imagen = guardar_imagen_base64(solicitud.temporal['imagenProfile'].split(',')[1])
+    imagen = guardar_imagen_base64(solicitud.temporal['imagenProfile'], user.first_name)
     editor.image_profile = imagen
     editor.note = solicitud.temporal['note']
     editor.directions = solicitud.temporal['address']
@@ -295,14 +305,19 @@ def accept_inscription(request, solicitud_id):
     solicitud.editor = editor
     solicitud.temporal = {}
     solicitud.status = 'Atendido'
+    contact = Registered_Data()
+    contact.email = user.email
+    contact.phone = editor.phone
     correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email, username=user.username, password=user.password)
     if correo:
         user.save()
         editor.save()
         solicitud.save()
-        messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a '{user.first_name}' al "
-                                  f"correo '{user.email}'. Ahora {user.first_name} ya "
+        contact.save()
+        messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} al "
+                                  f"correo {user.email}. Ahora {user.first_name} ya "
                                   f"puede realizar solicitudes ISMN !")
+
     else:
         messages.error(request, 'Ha ocurrido un error al intentar notificar al correo del cliente, pruebe más tarde')
     return HttpResponseRedirect('/backend_solicitudes')
@@ -578,7 +593,7 @@ def send_info_inscripcion(nombre, user_email, username, password):
     try:
         email.send()
         return True
-    except TimeoutError or SMTPServerDisconnected:
+    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError:
         return False
 
 
