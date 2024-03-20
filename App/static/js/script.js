@@ -259,8 +259,38 @@ $('#editorPrefijo').mousedown((e) => {
 })
 
 // 19 Boostrap's Spinner to sending email
-$('#btn-add, #btn-accept').click((e) => {
+$('#btn-accept').click((e) => {
     if (validateAll()) {
         $("#preloader").css('animation', 'preloader_forever 1.2s forwards infinite');
     }
+})
+
+// 20 Ajax Calls to Spinner Loading
+jQuery(function ($) {
+    $(document).ajaxSend(function () {
+        $(".spinner-border").fadeIn(500);
+
+        let loading = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>&nbsp;
+                       <span role="status">Espere...</span>`
+        $("#btn-add").html(loading);
+    });
+
+
+
+    $("#btn-add").click(function () {
+        let val = validateAll()
+        if (val) {
+           $.ajax({
+                type: 'GET',
+                success: function (data) {
+                    console.log(data);
+                }
+            }).done( () => {
+                setTimeout(() => {
+                    $("#spinner-border").fadeOut(500);
+                }, 700);
+            });
+        }
+
+    });
 })

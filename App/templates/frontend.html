@@ -23,6 +23,7 @@
         </div>
     </div>
     <br><br><br><br>
+
 {% endblock content %}
 
 {% block Offcanvas %}
@@ -35,7 +36,7 @@
                 de Publicaciones</a>
             <a class="btn btn-dark" href="{% url 'backend_solicitudes' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista de Solicitudes</a>
         {% elif request.user.editor %}
-            <a class="btn btn-dark" id="btn-Solicitud-ISMN" href="#" data-bs-toggle="modal" data-bs-target="#sendemailtestModal"><i class="fas fa-envelope"></i>&nbsp;&nbsp;Solicitud ISMN</a>
+            <a class="btn btn-dark" href="#"><i class="fas fa-envelope"></i>&nbsp;&nbsp;Solicitud ISMN</a>
         {% endif %}
         <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
     {% else %}
@@ -46,3 +47,4 @@
         <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
     </a>
 {% endblock Offcanvas %}
+

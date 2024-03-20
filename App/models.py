@@ -6,7 +6,8 @@ import os
 
 # Prevent duplicated emails
 class Registered_Data(models.Model):
-    email = models.EmailField(max_length=40)
+    user_name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=50)
     phone = models.CharField(max_length=20)
 
     def __str__(self):
@@ -116,7 +117,7 @@ class Editor(models.Model):
                                            null=True, blank=True)
     prefijo = models.OneToOneField(PrefijoEditor, on_delete=models.PROTECT)
     type = models.CharField(max_length=100, null=True, choices=TYPE)
-    image_profile = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
+    image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png")
     note = models.TextField(blank=True)
     directions = models.CharField(max_length=150)
     id_tribute = models.PositiveBigIntegerField()
@@ -133,7 +134,7 @@ class Especialista(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=20)
     note = models.TextField(blank=True)
-    image_profile = models.ImageField(upload_to="profile", null=True, default="profile_default.png")
+    image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png")
     directions = models.CharField(max_length=150)
 
     class Meta:
@@ -168,7 +169,7 @@ class Musical_Publication(models.Model):
     ismn = models.CharField(max_length=20, unique=True)
     letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)
-    imagen = models.ImageField(upload_to="publications", default="default.jpg")
+    imagen = models.ImageField(upload_to="publications", blank=True, default="default.jpg")
     date_time = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     gender = models.CharField(max_length=100, null=True, choices=MUSICAL_GENDER)

@@ -5,7 +5,6 @@ from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 
 from PIL import Image as PILImage, ImageDraw
 from django.contrib.auth.models import User
-from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -35,8 +34,6 @@ from reportlab.lib.pagesizes import A4, letter
 
 # ================= VARIABLES TEMPORALES =================
 from djangoProject.settings import MEDIA_ROOT
-
-datos = QueryDict
 
 
 # ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
@@ -131,6 +128,7 @@ def generate_prefijo_publicacion(valor):
 def register_user(request):
     if request.method == 'POST':
         # Check if email exists in BD
+        username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
         if Registered_Data.objects.filter(email=email).exists():
@@ -138,6 +136,9 @@ def register_user(request):
             return HttpResponseRedirect('/login')
         elif Registered_Data.objects.filter(phone=phone).exists():
             messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        elif Registered_Data.objects.filter(user_name=username).exists():
+            messages.error(request, "Este nombre de usuario ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/login')
         # ===========================
         else:
@@ -215,8 +216,9 @@ def backend_editores(request):
     paginator = Paginator(all_editor_list, 4)
     page = request.GET.get('page')
     all_editor = paginator.get_page(page)
-
-    return render(request, 'editores/editores-list.html', {"editores": all_editor})
+    solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+    return render(request, 'editores/editores-list.html', {"editores": all_editor,
+                                                           'solicitudes_pendientes': solicitudes_pendientes})
 
 
 # Function to render publication's lists
@@ -235,8 +237,9 @@ def backend_publicaciones(request):
     paginator = Paginator(all_publication_list, 4)
     page = request.GET.get('page')
     all_publication = paginator.get_page(page)
-
-    return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication})
+    solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+    return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication,
+                                                                    'solicitudes_pendientes': solicitudes_pendientes})
 
 
 # Function to render las listas de solicitudes
@@ -255,13 +258,18 @@ def backend_solicitudes(request):
     paginator = Paginator(all_solicitudes_list, 4)
     page = request.GET.get('page')
     all_solicitudes = paginator.get_page(page)
-    return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes})
+    solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+    return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes,
+                                                                 'solicitudes_pendientes': solicitudes_pendientes})
 
 
 def guardar_imagen_base64(base64_string, name):
     # Extraer el base64 y la extension de la imagen
     header, base64_data = base64_string.split(';base64,')
-    extension = header.split('/')[-1]
+    if 'jpg' in header:
+        extension = header.split('/')[-1]
+    else:
+        extension = header.split(':')[-1]
 
     # Decodificar la cadena base64 en una imagen
     image_data = base64.b64decode(base64_data)
@@ -285,7 +293,7 @@ def accept_inscription(request, solicitud_id):
     user = User()
     editor = Editor()
     user.username = solicitud.temporal['username']
-    user.password = solicitud.temporal['password']
+    user.set_password(solicitud.temporal['password'])
     user.first_name = solicitud.temporal['first_name']
     user.email = solicitud.temporal['email']
     if solicitud.temporal['editorType'] == 'Independiente':
@@ -308,6 +316,7 @@ def accept_inscription(request, solicitud_id):
     contact = Registered_Data()
     contact.email = user.email
     contact.phone = editor.phone
+    contact.user_name = user.username
     correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email, username=user.username, password=user.password)
     if correo:
         user.save()
@@ -329,6 +338,7 @@ def add_editor(request):
     if request.method == 'POST':
 
         # Check if email exist in BD
+        username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
         if Registered_Data.objects.filter(email=email).exists():
@@ -337,6 +347,9 @@ def add_editor(request):
         elif Registered_Data.objects.filter(phone=phone).exists():
             messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/backend')
+        elif Registered_Data.objects.filter(user_name=username).exists():
+            messages.error(request, "Este nombre de usuario ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
         # ===========================
         else:
             if request.POST.get('username') \
@@ -351,7 +364,7 @@ def add_editor(request):
                 editor = Editor()
                 user = User()
                 user.username = request.POST.get('username')
-                user.password = request.POST.get('password')
+                user.set_password(request.POST.get('password'))
                 user.first_name = request.POST.get('first_name')
                 editor.phone = request.POST.get('phone')
                 user.email = request.POST.get('email')
@@ -365,12 +378,14 @@ def add_editor(request):
                 editor.user = user
                 editor.prefijo = generate_prefijo_editor(request.POST.get('editorPrefijo'))
                 editor.note = request.POST.get('note')
-                editor.image_profile = request.FILES.get('imagenProfile')
-                user.save()
-                editor.save()
+                if request.FILES.get('imagenProfile'):
+                    editor.image_profile = request.FILES.get('imagenProfile')
+                    user.save()
+                    editor.save()
 
                 # Register email and phone inside BD
                 contact = Registered_Data()
+                contact.user_name = user.username
                 contact.email = email
                 contact.phone = phone
                 contact.save()
@@ -558,6 +573,7 @@ def generate_confirmation_code():
 
 def send_code_confirmation(request):
     confirmation_code = generate_confirmation_code()
+    print(confirmation_code)
     context = {
         'nombre': request.POST.get('first_name'),
         'code': confirmation_code

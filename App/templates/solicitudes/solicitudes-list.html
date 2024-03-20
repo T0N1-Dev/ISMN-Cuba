@@ -4,7 +4,7 @@
 
 <!-- Navbar content -->
 {% block navbar-content %}
-    <i class="fas fa-external-link-alt"></i>&nbsp;&nbsp;Solicitudes de Inscripción
+    <i class="fas fa-envelope-open-text"></i>&nbsp;&nbsp;Solicitudes
 {% endblock navbar-content %}
 
 {% block btn-add %}{% endblock %}
@@ -40,13 +40,17 @@
             {% if solicitud.status == 'Pendiente' %}
                 <td style="color: red"><b>{{ solicitud.status }}</b></td>
             {% else %}
-                <td>{{ solicitud.status }}</td>
+                <td style="color: darkgreen"><b>{{ solicitud.status }}</b></td>
             {% endif %}
             {% if solicitud.temporal %}
                 <td>
                     <a class="btn btn-sm btn-info" title="Más Información" data-bs-toggle="modal" data-bs-target="#infoModal{{ solicitud.id }}">
                         <i class="fas fa-info-circle"></i>
                     </a>
+                </td>
+            {% else %}
+                <td>
+                    <button type="button" class="btn btn-sm btn-success" title="Hecho"><i class="fas fa-check"></i></button>
                 </td>
             {% endif %}
             <td>
@@ -67,7 +71,7 @@
                 <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                   <div class="text-center text-danger">
                       <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA SOLICITUD ???</span>
-                      <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name }} </b></div>
+                      <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name }} {{ solicitud.editor }} </b></div>
                   </div>
               </div>
               <div class="modal-footer">
@@ -237,3 +241,33 @@
         </div>
     {% endfor %}
 {% endblock for-data-table %}
+
+{% block pagination %}
+    <nav class="mt-4" aria-label="Page navigation example">
+        {% if solicitudes.has_other_pages %}
+            <ul class="pagination justify-content-left">
+            {% if solicitudes.has_previous %}
+                <a href="?page=1" class="btn btn-outline-primary mb-4" style="width: auto; border-radius: 1px; border: 1px solid #d3d3d3">Primera</a>
+                <li class="page-item"><a class="page-link" href="?page={{ solicitudes.previous_page_number }}"><i class="fas fa-angle-double-left"></i></a></li>
+            {% else %}
+                <li class="page-item disabled"></li>
+            {% endif %}
+
+            {% for i in solicitudes.paginator.page_range %}
+                {% if solicitudes.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}<span class="sr-only"></span></span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if solicitudes.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ solicitudes.next_page_number }}"><i class="fas fa-angle-double-right"></i></a></li>
+                <a href="?page={{ solicitudes.paginator.num_pages }}" class="btn btn-outline-primary mb-4" style="width: auto; border-radius: 1px; border: 1px solid #d3d3d3; border-left: none;">Última</a>
+            {% else %}
+                <li class="page-item disabled"></li>
+            {% endif %}
+            </ul>
+        {% endif %}
+    </nav>
+{% endblock pagination %}
