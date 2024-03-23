@@ -42,6 +42,8 @@ urlpatterns = [
     path('delete_musical_publication/<str:musical_publication_id>', views.delete_musical_publication, name="delete_musical_publication"),
     # Path to delete a Solicitud
     path('delete_solicitud/<str:solicitud_id>', views.delete_solicitud, name="delete_solicitud"),
+    # Path to send an ISMN-application
+    path('solicitud-ismn/', views.solicitud_ismn, name="solicitud-ismn"),
 
     # ========================== EXPORT DOCUMENTS ==========================
     # Path to export a single musical publication

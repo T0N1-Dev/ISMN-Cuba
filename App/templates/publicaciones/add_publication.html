@@ -301,7 +301,7 @@
                     valor_prefijo_public = String(cant_public_editor + 1)
                     prefijo_publicacion = formatear_prefijo(valor_prefijo_public, cant_digitos_prefijo_editor);
                     // En el excepcional caso que el prefijo del editor necesite un cero delante
-                    if ({{ editor.prefijo }} < 10) {
+                    if ( '{{ editor.prefijo }}' < 10) {
                         prefijo_editor = formatear_prefijo('{{ editor.prefijo }}', prefijo_publicacion.length)
                     } else prefijo_editor = '{{ editor.prefijo }}'
                     editor_prefijo_input.value = "Prefijo del Editor: " + prefijo_editor;

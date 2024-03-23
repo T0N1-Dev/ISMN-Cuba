@@ -14,7 +14,7 @@ from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEdi
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect, QueryDict  # Redirect the page after submit
+from django.http import HttpResponseRedirect  # Redirect the page after submit
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
@@ -304,27 +304,27 @@ def accept_inscription(request, solicitud_id):
     editor.prefijo = prefijo_editor
     editor.type = solicitud.temporal['editorType']
     # PARA TRANSFORMAR DE BASE64 A IMAGE
-    # imagen = PILImage.open(io.BytesIO(base64.b64decode(solicitud.temporal['imagenProfile'].split(',')[1])))
     imagen = guardar_imagen_base64(solicitud.temporal['imagenProfile'], user.first_name)
     editor.image_profile = imagen
     editor.note = solicitud.temporal['note']
     editor.directions = solicitud.temporal['address']
     editor.id_tribute = solicitud.temporal['idTribute']
     solicitud.editor = editor
-    solicitud.temporal = {}
     solicitud.status = 'Atendido'
     contact = Registered_Data()
     contact.email = user.email
     contact.phone = editor.phone
     contact.user_name = user.username
-    correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email, username=user.username, password=user.password)
+    correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email,
+                                   username=user.username, password=solicitud.temporal['password'])
+    solicitud.temporal = {}
     if correo:
         user.save()
         editor.save()
         solicitud.save()
         contact.save()
-        messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} al "
-                                  f"correo {user.email}. Ahora {user.first_name} ya "
+        messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a"
+                                  f"su correo. Ahora {user.first_name} ya "
                                   f"puede realizar solicitudes ISMN !")
 
     else:
@@ -566,6 +566,56 @@ def delete_solicitud(request, solicitud_id):
     return HttpResponseRedirect('/backend_solicitudes')
 
 
+# ---- GENERAR ISMN ------
+# Notas
+# 1- La cantidad de digitos que debe tener un ismn en total para Cuba son 13
+# 2- La cantidad de digitos que deben sumar los prefijos de publicacion y editor son 8
+# 3- El digito de control se calcula mediante este metodo
+#    http://www.grupoalquerque.es/mate_cerca/paneles_2012/168_ISBN2.pdf
+
+# Funcion que formatea el prefijo_publicacion para que tenga el formato de ismn: 001,012,0002, etc
+def formatear_prefijo(valor, cant_digitos_prefijo_companiero):
+
+    # Cantidad de digitos que debe tener la publicacion segun las reglas ISMN
+    cant_digitos = 8 - cant_digitos_prefijo_companiero
+
+    # Cantidad de ceros que debe agregar al prefijo de la publicacion
+    cant_zeros = cant_digitos - len(valor)
+
+    # Retorna el valor de la publicacion listo para insertar en el ISMN
+    return '0' * cant_zeros + valor
+
+
+def generar_ismn(editor):
+    cant_digitos_prefijo_editor = str(editor.prefijo.rango.rango_superior).__len__()
+    cant_public_editor = editor.musical_publication_set.count()
+    valor_prefijo_public = str(cant_public_editor + 1)
+    prefijo_publicacion = formatear_prefijo(valor_prefijo_public, cant_digitos_prefijo_editor)
+
+#   En el excepcional caso que el prefijo del editor necesite un cero delante
+    if editor.prefijo.value < 10:
+        prefijo_editor = formatear_prefijo(editor.prefijo.value, len(prefijo_publicacion))
+    else:
+        prefijo_editor = editor.prefijo.value
+
+@login_required(login_url="login")
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def solicitud_ismn(request):
+    if request.POST:
+        solicitud = Solicitud()
+        solicitud.editor = Editor.objects.get(user__username=request.user)
+        solicitud.temporal = request.POST
+        solicitud.temporal['ismn'] = generar_ismn(solicitud.editor)
+        solicitud.tipo = "Solicitud-ISMN"
+        solicitud.status = "Pendiente"
+        solicitud.save()
+        messages.success(request, 'Su solicitud se ha enviado correctamente, pronto se '
+                                  'le enviará un reporte de su publicación junto al ISMN asignado.')
+        return HttpResponseRedirect('/')
+    else:
+        return render(request, 'solicitudes/solicitud-ISMN.html')
+
+
 # Function to send Confirmation Code
 def generate_confirmation_code():
     return randint(1000, 9999)
@@ -573,7 +623,6 @@ def generate_confirmation_code():
 
 def send_code_confirmation(request):
     confirmation_code = generate_confirmation_code()
-    print(confirmation_code)
     context = {
         'nombre': request.POST.get('first_name'),
         'code': confirmation_code
@@ -589,7 +638,7 @@ def send_code_confirmation(request):
         email.send()
         return confirmation_code
     except TimeoutError or SMTPServerDisconnected:
-        messages.error('Error en la conexión. Intente más tarde.')
+        messages.error(request, 'Error en la conexión. Intente más tarde.')
         return HttpResponseRedirect('/')
 
 

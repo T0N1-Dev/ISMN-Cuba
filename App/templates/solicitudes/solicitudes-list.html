@@ -71,7 +71,7 @@
                 <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                   <div class="text-center text-danger">
                       <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA SOLICITUD ???</span>
-                      <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name }} {{ solicitud.editor }} </b></div>
+                      <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name }} </b></div>
                   </div>
               </div>
               <div class="modal-footer">
@@ -92,7 +92,7 @@
               </div>
               <div class="modal-body">
                   <h4 class="display-6 mb-3">{{ solicitud }}</h4>
-                  {% if solicitud.tipo == 'Solicitud-Inscripción' and solicitud.temporal %}
+                  {% if solicitud.tipo == 'Solicitud-Inscripción' %}
                       <div class="container_img mb-4" style="background-color: transparent;">
                           <img class="card-img img_detail" src="{{ solicitud.temporal.imagenProfile }}" alt="imagen del solicitante">
                       </div>
@@ -163,15 +163,15 @@
                             <a href="{% url 'accept_inscription' solicitud.id %}" type="button" class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Aceptar</a>
                         </button>
                       </div>
-                  {% elif solicitud.tipo == 'Solicitud-ISMN' and solicitud.temporal %}
-                      <h4 class="display-6 mb-3">{{ solicitud }}</h4>
+                  {% elif solicitud.tipo == 'Solicitud-ISMN' %}
+                      <h4 class="display-6 mb-3">{{ solicitud.temporal.tipo }}</h4>
                       <div class="container_img mb-4" style="background-color: transparent;">
-                          <img class="card-img img_detail" src="{{ solicitud.temporal.imagen.url }}" alt="imagen musical">
+                          <img class="card-img img_detail" src="{{ solicitud.temporal.publication_image|default:'/media/default.jpg' }}" alt="imagen musical">
                       </div>
                       <div class="container-fluid" style="font-size: large; text-align: left">
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Título:</strong> &nbsp;&nbsp;{{ solicitud.temporal.name }}
+                                <strong>Título:</strong> &nbsp;&nbsp;{{ solicitud.temporal.title }}
                             </div>
                           </div>
                           <hr>
@@ -183,7 +183,7 @@
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Editor:</strong> &nbsp;&nbsp;{{ solicitud.temporal.editor }}
+                                <strong>Editor:</strong> &nbsp;&nbsp;{{ request.user.first_name }}
                             </div>
                           </div>
                           <hr>
