@@ -71,7 +71,11 @@
                 <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
                   <div class="text-center text-danger">
                       <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA SOLICITUD ???</span>
-                      <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name }} </b></div>
+                      {% if solicitud.tipo == 'Solicitud-ISMN' %}
+                         <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.title }} </b></div>
+                      {% else %}
+                          <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name }} </b></div>
+                      {% endif %}
                   </div>
               </div>
               <div class="modal-footer">
@@ -177,6 +181,12 @@
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
+                                <strong>Fecha de creación:</strong> &nbsp;&nbsp;{{ solicitud.temporal.date }}
+                            </div>
+                          </div>
+                          <hr>
+                          <div class="row mb-1">
+                            <div class="col-12">
                                 <strong>Autor:</strong> &nbsp;&nbsp;{{ solicitud.temporal.autor }}
                             </div>
                           </div>
@@ -201,31 +211,26 @@
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Letra:</strong> &nbsp;&nbsp;<a href="/media/{{ solicitud.temporal.letra }}">{{ solicitud.temporal.letra_base_name }}</a>
+                                <strong>Letra:</strong> &nbsp;&nbsp;<a href="{{ solicitud.temporal.publication_letra }}">{{ solicitud.temporal.publication_letra }}</a>
                             </div>
                           </div>
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Descripción:</strong> &nbsp;&nbsp;{{ solicitud.temporal.description }}
+                                <strong>Descripción:</strong> &nbsp;&nbsp;{{ solicitud.temporal.note }}
                             </div>
                           </div>
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Fecha de creación:</strong> &nbsp;&nbsp;{{ solicitud.temporal.date_time }}
-                            </div>
-                          </div>
-                          <hr>
-                          <div class="row mb-1">
-                            <div class="col-12">
-                                <strong>Fecha de publicación:</strong> &nbsp;&nbsp;{{ solicitud.temporal.created_at }}
+                                <strong>Fecha de solicitud:</strong> &nbsp;&nbsp;{{ solicitud.created_at }}
                             </div>
                           </div>
                       </div>
                       <div class="modal-footer justify-content-center">
                         <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal">
-                            <a href="#" type="button" class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Aceptar</a>
+                            <a href="{% url 'accept_ismn_application' solicitud.id %}" type="button"
+                               class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Aceptar</a>
                         </button>
                       </div>
                   {% else %}

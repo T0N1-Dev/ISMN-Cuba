@@ -1,14 +1,18 @@
 import base64
+import os
 from datetime import datetime
 from random import randint
 from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 
 from PIL import Image as PILImage, ImageDraw
 from django.contrib.auth.models import User
+from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
+
+from django.utils.datastructures import MultiValueDictKeyError
 
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
@@ -33,7 +37,7 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4, letter
 
 # ================= VARIABLES TEMPORALES =================
-from djangoProject.settings import MEDIA_ROOT
+from djangoProject.settings import MEDIA_ROOT, BASE_DIR
 
 
 # ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
@@ -190,6 +194,7 @@ def email_confirmation(request):
     else:
         return render(request, 'registration/email_confirmation.html')
 
+
 # ================= SECCIÓN DEL USUARIO (EDITOR) =================
 # Function to render the Home Page for everybody
 def frontend(request):
@@ -324,12 +329,68 @@ def accept_inscription(request, solicitud_id):
         solicitud.save()
         contact.save()
         messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a"
-                                  f"su correo. Ahora {user.first_name} ya "
+                                  f" su correo. Ahora {user.first_name} ya "
                                   f"puede realizar solicitudes ISMN !")
 
     else:
         messages.error(request, 'Ha ocurrido un error al intentar notificar al correo del cliente, pruebe más tarde')
     return HttpResponseRedirect('/backend_solicitudes')
+
+
+# Reformat the path to files since their names
+def reformat_path(path, ruta_pathlib):
+    part_path = path.split('/')[2:]  # Extrayendo /temp/nombre_del_file.extension
+    return Path(ruta_pathlib, part_path[0], part_path[1])
+
+
+# Function to Accept an Inscription
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def accept_ismn_solicitud(request, solicitud_id):
+    # Variables
+    solicitud = Solicitud.objects.get(id=solicitud_id)
+    publicacion = Musical_Publication()
+    prefijo_str_publicacion = solicitud.temporal['ismn'].split('-')[3]
+    publicacion_prefijo = generate_prefijo_publicacion(prefijo_str_publicacion)
+    ruta_letra_publicacion = reformat_path(solicitud.temporal['publication_letra'], MEDIA_ROOT)
+    if solicitud.temporal['publication_image']:
+        ruta_imagen_publicacion = reformat_path(solicitud.temporal['publication_image'], MEDIA_ROOT)
+    else:
+        ruta_imagen_publicacion = Path(f'{MEDIA_ROOT}\default.jpg')
+
+    # Asignacion y salvas
+    publicacion.name = solicitud.temporal['title']
+    publicacion.autor = solicitud.temporal['autor']
+    publicacion.editor = solicitud.editor
+    publicacion.prefijo = publicacion_prefijo
+    publicacion.ismn = solicitud.temporal['ismn']
+    publicacion.description = solicitud.temporal['note']
+    publicacion.date_time = datetime.strptime(solicitud.temporal['date'], '%Y-%m-%d')
+    publicacion.gender = solicitud.temporal['gender']
+    with open(ruta_letra_publicacion, 'rb') as letra_file:
+        publicacion.letra.save(f'{ruta_letra_publicacion.stem}.{ruta_letra_publicacion.suffix}',
+                               File(letra_file), save=True)
+
+    if solicitud.temporal['publication_image']:
+        with open(ruta_imagen_publicacion, 'rb') as image_file:
+            publicacion.imagen.save(f'{ruta_imagen_publicacion.stem}.{ruta_imagen_publicacion.suffix}',
+                                    File(image_file), save=True)
+    else:
+        with open(ruta_imagen_publicacion, 'rb') as image_file:
+            publicacion.imagen.save(f'{ruta_imagen_publicacion.stem}.{ruta_imagen_publicacion.suffix}',
+                                    File(image_file), save=True)
+    solicitud.status = 'Atendido'
+    # Eliminando datos temporales
+    if os.path.exists(solicitud.temporal['publication_image']):
+        os.remove(solicitud.temporal['publication_image'])
+    os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
+    solicitud.temporal = {}
+    publicacion.save()
+    solicitud.save()
+    messages.success(request, f"Se ha aceptado la solicitud ISMN y se ha notificado a {solicitud.editor} a"
+                              f"su correo.")
+    return HttpResponseRedirect('/backend_solicitudes')
+
 
 # Function to Add Editor
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -402,6 +463,7 @@ def add_editor(request):
 @login_required(login_url="login")
 def delete_editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
+    editor.image_profile.delete()
     Registered_Data.objects.get(phone=editor.phone).delete()
     User.objects.get(username=editor.user.username).delete()
     editor.delete()
@@ -496,10 +558,15 @@ def add_musical_publication(request):
             musical_publication.save()
             messages.success(request, "Publicación musical añadida correctamente !")
             return HttpResponseRedirect('/backend_publicaciones')
-    else:
-        editores = Editor.objects.annotate(Count('musical_publication'))
-        data = {'editores': editores}
-        return render(request, "publicaciones/add_publication.html", data)
+    elif request.method == 'GET':
+        if Solicitud.objects.filter(status='Pendiente').exists():
+            messages.error(request, 'No es posible añadir una publicación en estos momentos. '
+                                    'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
+            return HttpResponseRedirect('/backend_publicaciones')
+        else:
+            editores = Editor.objects.annotate(Count('musical_publication'))
+            data = {'editores': editores}
+            return render(request, "publicaciones/add_publication.html", data)
 
 
 # Function to access the musical_publication individually
@@ -552,7 +619,11 @@ def edit_musical_publication(request):
 @login_required(login_url="login")
 def delete_musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
+    musical_publication.letra.delete()
+    musical_publication.imagen.delete()
+    prefijo = PrefijoPublicacion.objects.get(musical_publication.prefijo)
     musical_publication.delete()
+    prefijo.delete()
     messages.success(request, "Publicacion Musical eliminada correctamente !")
     return HttpResponseRedirect('/backend_publicaciones')
 
@@ -567,36 +638,80 @@ def delete_solicitud(request, solicitud_id):
 
 
 # ---- GENERAR ISMN ------
-# Notas
-# 1- La cantidad de digitos que debe tener un ismn en total para Cuba son 13
-# 2- La cantidad de digitos que deben sumar los prefijos de publicacion y editor son 8
-# 3- El digito de control se calcula mediante este metodo
-#    http://www.grupoalquerque.es/mate_cerca/paneles_2012/168_ISBN2.pdf
-
-# Funcion que formatea el prefijo_publicacion para que tenga el formato de ismn: 001,012,0002, etc
-def formatear_prefijo(valor, cant_digitos_prefijo_companiero):
-
-    # Cantidad de digitos que debe tener la publicacion segun las reglas ISMN
-    cant_digitos = 8 - cant_digitos_prefijo_companiero
-
-    # Cantidad de ceros que debe agregar al prefijo de la publicacion
-    cant_zeros = cant_digitos - len(valor)
-
-    # Retorna el valor de la publicacion listo para insertar en el ISMN
-    return '0' * cant_zeros + valor
-
-
 def generar_ismn(editor):
+    """ Notas
+        1- La cantidad de digitos que debe tener un ismn en total para Cuba son 13
+        2- La cantidad de digitos que deben sumar los prefijos de publicacion y editor son 8
+        3- El digito de control se calcula mediante este metodo http://www.grupoalquerque.es/mate_cerca/paneles_2012/168_ISBN2.pdf
+    """
+
+    # Funcion que formatea el prefijo_publicacion para que tenga el formato de ismn: 001,012,0002, etc
+    def formatear_prefijo(valor, cant_digitos_prefijo_companiero):
+        # Cantidad de digitos que debe tener la publicacion segun las reglas ISMN
+        cant_digitos = 8 - cant_digitos_prefijo_companiero
+
+        # Cantidad de ceros que debe agregar al prefijo de la publicacion
+        cant_zeros = cant_digitos - len(valor)
+
+        # Retorna el valor de la publicacion listo para insertar en el ISMN
+        return '0' * cant_zeros + valor
+
+    # Funcion para calcular el digito de control
+    def digito_control(editor_prefijo, publicacion_prefijo):
+        sum = 39  # Esta es la suma de lote '979-0' aplicando el metodo de 9*1 + 7*3 + 9*1 + 0*3 = 39.
+        multiplicador = [1, 3]  # Multiplicadores que se van alternando en cada digito de ambos prefijos
+        # (Editor, Publicacion) para crear el digito de control.
+        digit_control = int  # Puede tener valor minimo de 0 y maximo de 9.
+
+        for i in range(len(editor_prefijo)):
+            if i % 2 == 0:
+                sum += int(editor_prefijo[i]) * multiplicador[0]
+            else:
+                sum += int(editor_prefijo[i]) * multiplicador[1]
+
+        if len(editor_prefijo) % 2 != 0:
+            multiplicador = [3, 1]
+
+        for i in range(len(publicacion_prefijo)):
+            if i % 2 == 0:
+                sum += int(publicacion_prefijo[i]) * multiplicador[0]
+            else:
+                sum += int(publicacion_prefijo[i]) * multiplicador[1]
+
+        for i in range(10):
+            if (sum + i) % 10 == 0:
+                digit_control = i
+                break
+
+        return str(digit_control)
+
+    # Funcion que conforma el ISMN con sus diferentes partes
+    def crear_ismn(editor_prefijo, publicacion_prefijo):
+        digit_validation = digito_control(editor_prefijo, publicacion_prefijo)
+        return '979-0' + '-' + editor_prefijo + '-' + publicacion_prefijo + '-' + digit_validation
+
     cant_digitos_prefijo_editor = str(editor.prefijo.rango.rango_superior).__len__()
     cant_public_editor = editor.musical_publication_set.count()
-    valor_prefijo_public = str(cant_public_editor + 1)
+    cant_solicitudes_editor = editor.solicitud_set.exclude(tipo='Solicitud-Inscripción').count()
+    valor_prefijo_public = str(cant_public_editor + cant_solicitudes_editor + 1)
     prefijo_publicacion = formatear_prefijo(valor_prefijo_public, cant_digitos_prefijo_editor)
 
-#   En el excepcional caso que el prefijo del editor necesite un cero delante
+    #   En el excepcional caso que el prefijo del editor necesite un cero delante
     if editor.prefijo.value < 10:
         prefijo_editor = formatear_prefijo(editor.prefijo.value, len(prefijo_publicacion))
     else:
-        prefijo_editor = editor.prefijo.value
+        prefijo_editor = str(editor.prefijo.value)
+
+    return crear_ismn(prefijo_editor, prefijo_publicacion)
+
+
+def almacenar_file_temporal(file):
+    ruta = f"{MEDIA_ROOT}\\temp\\{file}"
+    with open(ruta, "wb+") as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+    return f'/media/temp/{file}'
+
 
 @login_required(login_url="login")
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -604,8 +719,15 @@ def solicitud_ismn(request):
     if request.POST:
         solicitud = Solicitud()
         solicitud.editor = Editor.objects.get(user__username=request.user)
-        solicitud.temporal = request.POST
+        solicitud.temporal = request.POST.copy()
         solicitud.temporal['ismn'] = generar_ismn(solicitud.editor)
+        try:
+            imagen_file = request.FILES['publication_image']
+            solicitud.temporal['publication_image'] = almacenar_file_temporal(imagen_file)
+        except MultiValueDictKeyError:
+            solicitud.temporal['publication_image'] = ''
+        letra_file = request.FILES['publication_letter']
+        solicitud.temporal['publication_letra'] = almacenar_file_temporal(letra_file)
         solicitud.tipo = "Solicitud-ISMN"
         solicitud.status = "Pendiente"
         solicitud.save()
@@ -616,13 +738,8 @@ def solicitud_ismn(request):
         return render(request, 'solicitudes/solicitud-ISMN.html')
 
 
-# Function to send Confirmation Code
-def generate_confirmation_code():
-    return randint(1000, 9999)
-
-
 def send_code_confirmation(request):
-    confirmation_code = generate_confirmation_code()
+    confirmation_code = randint(1000, 9999)
     context = {
         'nombre': request.POST.get('first_name'),
         'code': confirmation_code
@@ -1052,5 +1169,3 @@ def export_catalogo_peliculas(request, musical_publication_id):
     build_doc(buffer)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"CATÁLOGO_DE_PELICULAS_{titulo_catalogo}.pdf")
-
-
