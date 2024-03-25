@@ -35,45 +35,6 @@
     </div>
 {% endblock notifications %}
 
-{% block notification-modal %}
-
-{#    <div class="modal fade" id="modalpending" tabindex="-1" aria-labelledby="modalpendingLabel" aria-hidden="true">#}
-{#      <div class="modal-dialog">#}
-{#        <div class="modal-content">#}
-{#          <div class="modal-header">#}
-{#            <h1 class="modal-title fs-5" id="modalpendingLabel">Solicitudes Pendientes</h1>#}
-{#            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
-{#          </div>#}
-{#          <div class="modal-body">#}
-{#            <table class="table">#}
-{#              <thead>#}
-{#                <tr>#}
-{#                  <th scope="col">#</th>#}
-{#                  <th scope="col">Editor</th>#}
-{#                  <th scope="col">Fecha</th>#}
-{#                  <th scope="col">Tipo</th>#}
-{#                </tr>#}
-{#              </thead>#}
-{#              <tbody>#}
-{#                {% for solicitud in solicitudes_pendientes %}#}
-{#                    <tr style="font-size: 13px;">#}
-{#                        <td>{{ solicitud.id }}</td>#}
-{#                        <td>{{ solicitud.editor|default:'-' }}</td>#}
-{#                        <td>{{ solicitud.created_at }}</td>#}
-{#                        <td>{{ solicitud.tipo }}</td>#}
-{#                    </tr>#}
-{#                {% endfor %}#}
-{#              </tbody>#}
-{#            </table>#}
-{#              <hr>#}
-{#              <div>TOTAL = {{ solicitudes_pendientes.count }}</div>#}
-{#          </div>#}
-{#        </div>#}
-{#      </div>#}
-{#    </div>#}
-{% endblock notification-modal %}
-
-
 <!-- CONTENT PAGE -->
 {% block content %}
     {% if request.user.especialista %}

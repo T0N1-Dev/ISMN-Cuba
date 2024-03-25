@@ -45,7 +45,7 @@
         <td>{{ publicacion.date_time }}</td>
         <td>{{ publicacion.gender }}</td>
         <td>
-            <a href="{% url 'musical_publication' publicacion.id %}" class="btn btn-sm btn-primary"
+            <a href="{% url 'musical_publication' publicacion.id %}" id="edit_public" class="btn btn-sm btn-primary"
                title="Editar Publicacion">
                 <i class="fas fa-pen"></i>
             </a>
@@ -56,9 +56,9 @@
             </a>
         </td>
         <td>
-            <a class="btn btn-sm btn-secondary" title="Eliminar Publicacion" data-bs-toggle="modal" data-bs-target="#deleteModal{{ publicacion.pk }}">
+            <button class="btn btn-sm btn-secondary" id="eliminar_public" title="Eliminar Publicacion" data-bs-toggle="modal" data-bs-target="#deleteModal{{ publicacion.pk }}">
                 <i class="fas fa-trash"></i>
-            </a>
+            </button>
         </td>
     </tr>
 
@@ -85,6 +85,23 @@
         </div>
       </div>
     </div>
+
+    <script>
+
+        {% for pendiente in solicitudes_pendientes %}
+            let btn_delete = document.getElementById("eliminar_public");
+
+            if ('{{ pendiente }}') {
+                btn_delete.removeAttribute("data-bs-target");
+                btn_delete.removeAttribute("data-bs-toggle");
+                btn_delete.addEventListener('click', function (e) {
+                    swal('Error', 'No es posible eliminar publicaciones mientras haya solicitudes ISMN.', 'error');
+                });
+                }
+
+        {% endfor %}
+
+    </script>
 
     <!-- Publication Info - MODAL -->
     <div class="modal fade" id="infoModal{{ publicacion.pk }}" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">

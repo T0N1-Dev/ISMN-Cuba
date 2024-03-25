@@ -375,16 +375,13 @@ def accept_ismn_solicitud(request, solicitud_id):
         with open(ruta_imagen_publicacion, 'rb') as image_file:
             publicacion.imagen.save(f'{ruta_imagen_publicacion.stem}.{ruta_imagen_publicacion.suffix}',
                                     File(image_file), save=True)
-    else:
-        with open(ruta_imagen_publicacion, 'rb') as image_file:
-            publicacion.imagen.save(f'{ruta_imagen_publicacion.stem}.{ruta_imagen_publicacion.suffix}',
-                                    File(image_file), save=True)
     solicitud.status = 'Atendido'
     # Eliminando datos temporales
-    if os.path.exists(solicitud.temporal['publication_image']):
-        os.remove(solicitud.temporal['publication_image'])
+    if solicitud.temporal['publication_image']:
+        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
     os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
-    solicitud.temporal = {}
+    del solicitud.temporal['publication_image']
+    del solicitud.temporal['csrfmiddlewaretoken']
     publicacion.save()
     solicitud.save()
     messages.success(request, f"Se ha aceptado la solicitud ISMN y se ha notificado a {solicitud.editor} a"
@@ -441,9 +438,9 @@ def add_editor(request):
                 editor.note = request.POST.get('note')
                 if request.FILES.get('imagenProfile'):
                     editor.image_profile = request.FILES.get('imagenProfile')
-                    user.save()
-                    editor.save()
 
+                user.save()
+                editor.save()
                 # Register email and phone inside BD
                 contact = Registered_Data()
                 contact.user_name = user.username
@@ -576,8 +573,13 @@ def musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
     editores = Editor.objects.all()
     data = {"musical_publication": musical_publication, "editores": editores}
-    if musical_publication:
+    if Solicitud.objects.filter(status='Pendiente').exists():
+        messages.error(request, 'No es posible editar una publicación en estos momentos. '
+                                'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
+        return HttpResponseRedirect('/backend_publicaciones')
+    else:
         return render(request, "publicaciones/edit_publication.html", data)
+
 
 
 # Function to edit the patients
@@ -614,16 +616,17 @@ def edit_musical_publication(request):
             return HttpResponseRedirect('/backend_publicaciones')
 
 
+
 # Function to delete a musical publication
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def delete_musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
     musical_publication.letra.delete()
-    musical_publication.imagen.delete()
-    prefijo = PrefijoPublicacion.objects.get(musical_publication.prefijo)
+    if musical_publication.imagen.name != 'default.jpg':
+        musical_publication.imagen.delete()
+    musical_publication.prefijo.delete()
     musical_publication.delete()
-    prefijo.delete()
     messages.success(request, "Publicacion Musical eliminada correctamente !")
     return HttpResponseRedirect('/backend_publicaciones')
 
@@ -632,6 +635,10 @@ def delete_musical_publication(request, musical_publication_id):
 @login_required(login_url="login")
 def delete_solicitud(request, solicitud_id):
     solicitud = Solicitud.objects.get(id=solicitud_id)
+    if solicitud.temporal:
+        if solicitud.status == 'Pendiente' and solicitud.temporal['publication_image']:
+            os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
+        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
     solicitud.delete()
     messages.success(request, "Solicitud eliminada correctamente !")
     return HttpResponseRedirect('/backend_solicitudes')
@@ -655,6 +662,13 @@ def generar_ismn(editor):
 
         # Retorna el valor de la publicacion listo para insertar en el ISMN
         return '0' * cant_zeros + valor
+
+    # Para determinar el valor del prefijo de la publicacion
+    def determinar_valor_prefijo_publicacion(musical_pub_exist, solicitud_ismn_exist):
+        valor_prefijo_ultima_publicacion = editor.musical_publication_set.last().prefijo.value if musical_pub_exist else 0
+        valor_prefijo_ultima_solicitud = int(editor.solicitud_set.last().temporal.get('ismn').split('-')[-2]) if solicitud_ismn_exist else 0
+        valor_prefijo_publicacion = max(valor_prefijo_ultima_solicitud, valor_prefijo_ultima_publicacion)
+        return valor_prefijo_publicacion + 1
 
     # Funcion para calcular el digito de control
     def digito_control(editor_prefijo, publicacion_prefijo):
@@ -691,10 +705,9 @@ def generar_ismn(editor):
         return '979-0' + '-' + editor_prefijo + '-' + publicacion_prefijo + '-' + digit_validation
 
     cant_digitos_prefijo_editor = str(editor.prefijo.rango.rango_superior).__len__()
-    cant_public_editor = editor.musical_publication_set.count()
-    cant_solicitudes_editor = editor.solicitud_set.exclude(tipo='Solicitud-Inscripción').count()
-    valor_prefijo_public = str(cant_public_editor + cant_solicitudes_editor + 1)
-    prefijo_publicacion = formatear_prefijo(valor_prefijo_public, cant_digitos_prefijo_editor)
+    valor_prefijo_public = determinar_valor_prefijo_publicacion(editor.musical_publication_set.exists(),
+                                                                editor.solicitud_set.filter(tipo='Solicitud-ISMN').filter(status='Pendiente').exists())
+    prefijo_publicacion = formatear_prefijo(str(valor_prefijo_public), cant_digitos_prefijo_editor)
 
     #   En el excepcional caso que el prefijo del editor necesite un cero delante
     if editor.prefijo.value < 10:
@@ -740,6 +753,7 @@ def solicitud_ismn(request):
 
 def send_code_confirmation(request):
     confirmation_code = randint(1000, 9999)
+    print(confirmation_code)
     context = {
         'nombre': request.POST.get('first_name'),
         'code': confirmation_code

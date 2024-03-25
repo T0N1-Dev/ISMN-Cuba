@@ -298,7 +298,9 @@
                 if (e.target.value === "{{ editor }}") {
                     cant_digitos_prefijo_editor = '{{ editor.prefijo.rango.rango_superior }}'.length;
                     cant_public_editor = {{ editor.musical_publication_set.count }};
-                    valor_prefijo_public = String(cant_public_editor + 1)
+                    if (cant_public_editor !== 0) {
+                        valor_prefijo_public = String({{ editor.musical_publication_set.last.prefijo.value }} + 1)
+                    } else valor_prefijo_public = '1'
                     prefijo_publicacion = formatear_prefijo(valor_prefijo_public, cant_digitos_prefijo_editor);
                     // En el excepcional caso que el prefijo del editor necesite un cero delante
                     if ( '{{ editor.prefijo }}' < 10) {

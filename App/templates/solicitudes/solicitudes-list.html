@@ -42,13 +42,13 @@
             {% else %}
                 <td style="color: darkgreen"><b>{{ solicitud.status }}</b></td>
             {% endif %}
-            {% if solicitud.temporal %}
+            {% if solicitud.status == 'Pendiente' %}
                 <td>
                     <a class="btn btn-sm btn-info" title="Más Información" data-bs-toggle="modal" data-bs-target="#infoModal{{ solicitud.id }}">
                         <i class="fas fa-info-circle"></i>
                     </a>
                 </td>
-            {% else %}
+            {% elif solicitud.status == 'Atendido' %}
                 <td>
                     <button type="button" class="btn btn-sm btn-success" title="Hecho"><i class="fas fa-check"></i></button>
                 </td>
@@ -72,9 +72,9 @@
                   <div class="text-center text-danger">
                       <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA SOLICITUD ???</span>
                       {% if solicitud.tipo == 'Solicitud-ISMN' %}
-                         <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.title }} </b></div>
+                         <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.title|default:solicitud.editor }} </b></div>
                       {% else %}
-                          <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name }} </b></div>
+                          <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name|default:solicitud.editor }} </b></div>
                       {% endif %}
                   </div>
               </div>
@@ -193,7 +193,7 @@
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Editor:</strong> &nbsp;&nbsp;{{ request.user.first_name }}
+                                <strong>Editor:</strong> &nbsp;&nbsp;{{ solicitud.editor.user.first_name }}
                             </div>
                           </div>
                           <hr>
