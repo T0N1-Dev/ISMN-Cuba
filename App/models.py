@@ -167,6 +167,7 @@ class Musical_Publication(models.Model):
     editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True, blank=True)
     prefijo = models.OneToOneField(PrefijoPublicacion, on_delete=models.CASCADE)
     ismn = models.CharField(max_length=20, unique=True)
+    barcode = models.ImageField(upload_to="publications/barcodes")
     letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)
     imagen = models.ImageField(upload_to="publications", blank=True, default="default.jpg")
@@ -182,6 +183,10 @@ class Musical_Publication(models.Model):
 
     def letra_base_name(self):
         rute = self.letra.path
+        return os.path.basename(rute)
+
+    def barcode_base_name(self):
+        rute = self.barcode.path
         return os.path.basename(rute)
 
     def image_base_name(self):

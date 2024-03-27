@@ -4,3 +4,4 @@ pillow
 coverage
 django-bootstrap-v5
 reportlab
+python-barcode

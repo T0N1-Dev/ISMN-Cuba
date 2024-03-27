@@ -5,6 +5,8 @@ from random import randint
 from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 
 from PIL import Image as PILImage, ImageDraw
+from barcode import EAN13
+from barcode.writer import ImageWriter
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -165,6 +167,7 @@ def register_user(request):
                 else:
                     with open(f"{MEDIA_ROOT}\profile_default.png", "rb") as image_profile:
                         datos['imagenProfile'] = f"data:png;base64," + base64.b64encode(image_profile.read()).decode()
+                        image_profile.close()
 
                 confirmation_code = send_code_confirmation(request)
                 datos['code_confirmation'] = confirmation_code
@@ -364,17 +367,21 @@ def accept_ismn_solicitud(request, solicitud_id):
     publicacion.editor = solicitud.editor
     publicacion.prefijo = publicacion_prefijo
     publicacion.ismn = solicitud.temporal['ismn']
+    barcode_rute, barcode_io = generate_barcode(publicacion.ismn, publicacion.name)
     publicacion.description = solicitud.temporal['note']
     publicacion.date_time = datetime.strptime(solicitud.temporal['date'], '%Y-%m-%d')
     publicacion.gender = solicitud.temporal['gender']
     with open(ruta_letra_publicacion, 'rb') as letra_file:
         publicacion.letra.save(f'{ruta_letra_publicacion.stem}.{ruta_letra_publicacion.suffix}',
                                File(letra_file), save=True)
+        letra_file.close()
 
     if solicitud.temporal['publication_image']:
         with open(ruta_imagen_publicacion, 'rb') as image_file:
             publicacion.imagen.save(f'{ruta_imagen_publicacion.stem}.{ruta_imagen_publicacion.suffix}',
                                     File(image_file), save=True)
+            image_file.close()
+    publicacion.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}', File(barcode_io), save=True)
     solicitud.status = 'Atendido'
     # Eliminando datos temporales
     if solicitud.temporal['publication_image']:
@@ -438,7 +445,6 @@ def add_editor(request):
                 editor.note = request.POST.get('note')
                 if request.FILES.get('imagenProfile'):
                     editor.image_profile = request.FILES.get('imagenProfile')
-
                 user.save()
                 editor.save()
                 # Register email and phone inside BD
@@ -523,6 +529,15 @@ def musical_colections_list(request):
     return render(request, 'colecciones-musicales.html', data)
 
 
+# Function to generate a barcode
+def generate_barcode(ismn, titulo):
+    ruta = f'{MEDIA_ROOT}\\publications\\barcodes\\{titulo}_barcode'
+    number = ismn.replace('-', '')
+    bar_code = EAN13(number, writer=ImageWriter())
+    bytes_io = io.BytesIO()
+    bar_code.write(bytes_io)
+    return Path(ruta + '.png'), bytes_io
+
 # Function to add a musical publication
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
@@ -544,6 +559,8 @@ def add_musical_publication(request):
             musical_publication.editor = editor
             musical_publication.prefijo = prefijo
             musical_publication.ismn = request.POST.get('ismn')
+            barcode_rute, barcode_io = generate_barcode(musical_publication.ismn, musical_publication.name)
+            print(barcode_rute)
             musical_publication.gender = request.POST.get('gender')
             musical_publication.letra = request.FILES.get('publication_letter')
             if request.FILES.get('publication_image'):
@@ -552,6 +569,8 @@ def add_musical_publication(request):
                 pass
             musical_publication.description = request.POST.get('note')
             musical_publication.date_time = request.POST.get('date')
+            musical_publication.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}',
+                                    File(barcode_io), save=True)
             musical_publication.save()
             messages.success(request, "Publicación musical añadida correctamente !")
             return HttpResponseRedirect('/backend_publicaciones')
@@ -623,6 +642,7 @@ def edit_musical_publication(request):
 def delete_musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
     musical_publication.letra.delete()
+    musical_publication.barcode.delete()
     if musical_publication.imagen.name != 'default.jpg':
         musical_publication.imagen.delete()
     musical_publication.prefijo.delete()
@@ -635,10 +655,9 @@ def delete_musical_publication(request, musical_publication_id):
 @login_required(login_url="login")
 def delete_solicitud(request, solicitud_id):
     solicitud = Solicitud.objects.get(id=solicitud_id)
-    if solicitud.temporal:
-        if solicitud.status == 'Pendiente' and solicitud.temporal['publication_image']:
-            os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
-        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
+    if solicitud.temporal['publication_image']:
+        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
+    os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
     solicitud.delete()
     messages.success(request, "Solicitud eliminada correctamente !")
     return HttpResponseRedirect('/backend_solicitudes')
@@ -665,6 +684,8 @@ def generar_ismn(editor):
 
     # Para determinar el valor del prefijo de la publicacion
     def determinar_valor_prefijo_publicacion(musical_pub_exist, solicitud_ismn_exist):
+        print(musical_pub_exist)
+        print(solicitud_ismn_exist)
         valor_prefijo_ultima_publicacion = editor.musical_publication_set.last().prefijo.value if musical_pub_exist else 0
         valor_prefijo_ultima_solicitud = int(editor.solicitud_set.last().temporal.get('ismn').split('-')[-2]) if solicitud_ismn_exist else 0
         valor_prefijo_publicacion = max(valor_prefijo_ultima_solicitud, valor_prefijo_ultima_publicacion)
@@ -723,6 +744,7 @@ def almacenar_file_temporal(file):
     with open(ruta, "wb+") as destination:
         for chunk in file.chunks():
             destination.write(chunk)
+        destination.close()
     return f'/media/temp/{file}'
 
 

@@ -7,6 +7,9 @@
     <i class="fas fa-music"></i>&nbsp;&nbsp;Publicaciones Musicales
 {% endblock navbar-content %}
 
+<!-- SweetAlert (frontend) -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
 {% block btn-add %}
     <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Publicación</a>
 {% endblock btn-add %}
@@ -86,23 +89,6 @@
       </div>
     </div>
 
-    <script>
-
-        {% for pendiente in solicitudes_pendientes %}
-            let btn_delete = document.getElementById("eliminar_public");
-
-            if ('{{ pendiente }}') {
-                btn_delete.removeAttribute("data-bs-target");
-                btn_delete.removeAttribute("data-bs-toggle");
-                btn_delete.addEventListener('click', function (e) {
-                    swal('Error', 'No es posible eliminar publicaciones mientras haya solicitudes ISMN.', 'error');
-                });
-                }
-
-        {% endfor %}
-
-    </script>
-
     <!-- Publication Info - MODAL -->
     <div class="modal fade" id="infoModal{{ publicacion.pk }}" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-scrollable">
@@ -138,6 +124,12 @@
                   <div class="row mb-1">
                     <div class="col-12">
                         <strong>ISMN:</strong> &nbsp;&nbsp;{{ publicacion.ismn }}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-1">
+                    <div class="col-12">
+                        <strong>Código de barras:</strong> &nbsp;&nbsp;<a href="/media/{{ publicacion.barcode }}">{{ publicacion.barcode_base_name }}</a>
                     </div>
                   </div>
                   <hr>
@@ -194,6 +186,24 @@
     </div>
 {% endfor %}
 {% endblock %}
+
+<script>
+
+    {% for pendiente in solicitudes_pendientes %}
+        let btn_delete = document.getElementById("eliminar_public");
+        console.log('Hola Mundo')
+
+        if ('{{ pendiente }}') {
+            btn_delete.removeAttribute("data-bs-target");
+            btn_delete.removeAttribute("data-bs-toggle");
+            btn_delete.addEventListener('click', function (e) {
+                swal('Error', 'No es posible eliminar publicaciones mientras haya solicitudes ISMN.', 'error');
+            });
+            }
+
+    {% endfor %}
+
+</script>
 
 {% block pagination %}
     <nav class="mt-4" aria-label="Page navigation example">
