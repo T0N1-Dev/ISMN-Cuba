@@ -902,9 +902,7 @@ def export_musical_publication(request, musical_publication_id):
                                           ('FONT', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
                                           ('FONT', (1, 0), (1, -1), 'Roboto'),
                                           ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
-                                          ('LINEBEFORE', (1, 0), (1, -1), 0, colors.Color(1, 0, 0, alpha=0)),
-                                          # ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34)),
-                                          # ('LINEABOVE', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34))
+                                          ('LINEBEFORE', (1, 0), (1, -1), 0, colors.Color(1, 0, 0, alpha=0))
                                           ])
         table_autoria.setStyle(table_autoria_style)
         table_autoria.wrapOn(canvas, 50, 475)
@@ -975,55 +973,18 @@ def export_musical_publication(request, musical_publication_id):
         options.textLine('no')
         canvas.drawText(options)
 
-        # Cover de la publicacion
-        def redondear_imagen(imagen, radio):
-            # Crear una máscara redonda del mismo tamaño que la imagen
-            mascara = PILImage.new("L", imagen.size, 0)
-            dibujo = ImageDraw.Draw(mascara)
-            dibujo.ellipse((0, 0, imagen.width, imagen.height), fill=255)
-
-            # Crear una nueva imagen con fondo transparente
-            imagen_redonda = PILImage.new("RGBA", imagen.size, (0, 0, 0, 0))
-
-            # Pegar la imagen original en la nueva imagen usando la máscara
-            imagen_redonda.paste(imagen, mask=mascara)
-
-            # Crear una nueva máscara redonda con un borde transparente
-            borde = PILImage.new("L", imagen.size, 0)
-            dibujo_borde = ImageDraw.Draw(borde)
-            dibujo_borde.ellipse(
-                (radio, radio, imagen.width - radio, imagen.height - radio), fill=255
-            )
-
-            # Pegar la imagen redonda en una nueva imagen con el borde
-            imagen_final = PILImage.new("RGBA", imagen.size, (0, 0, 0, 0))
-            imagen_final.paste(imagen_redonda, mask=borde)
-
-            return imagen_final
-
-        # Abrir la imagen original
-        imagen_original = PILImage.open(publication.imagen.path)
-
-        # Radio del borde redondeado
-        radio_borde = 5
-
-        # Redondear la imagen
-        imagen_redondeada = redondear_imagen(imagen_original, radio_borde)
-
-        # Guardar la imagen redondeada
-        imagen_redondeada.save(f"App/static/img/imagen_redondeada.png")
-
-        cover = Image("App/static/img/imagen_redondeada.png", width=150, height=120)
-        w, h = cover.wrapOn(canvas, 350, 120)
-        cover.drawOn(canvas, 350, y_coord_table_description - h - 20)
+        # Imagen del codigo de barras al final del reporte
+        barcode = Image(publication.barcode.path, width=150, height=120)
+        w, h = barcode.wrapOn(canvas, 350, 120)
+        barcode.drawOn(canvas, 360, y_coord_table_description - h - 20)
 
         # Text url from cover
         cover_style = ParagraphStyle(name='style', fontName="Roboto")
-        cover_url = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.imagen.url}" '
+        cover_url = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.barcode.url}" '
                               f'color="blue">Mostrar Imagen</a></u>', cover_style)
         w = canvas.stringWidth('Mostrar Imagen', 'Roboto', 10)
         cover_url.wrapOn(canvas, 88, 12)
-        cover_url.drawOn(canvas, 424 - w / 2, 110)
+        cover_url.drawOn(canvas, 435 - w / 2, 117)
 
         # Texto Informativo
         text_info_style = ParagraphStyle(name='text_info_style')
