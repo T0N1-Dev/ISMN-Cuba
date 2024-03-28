@@ -1,6 +1,8 @@
 import base64
 import os
 from datetime import datetime
+from email import encoders
+from email.mime.base import MIMEBase
 from random import randint
 from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 
@@ -382,6 +384,8 @@ def accept_ismn_solicitud(request, solicitud_id):
                                     File(image_file), save=True)
             image_file.close()
     publicacion.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}', File(barcode_io), save=True)
+    # Enviar email de aceptacion
+    send_solicitud_ismn_accepted(request.user, publicacion)
     solicitud.status = 'Atendido'
     # Eliminando datos temporales
     if solicitud.temporal['publication_image']:
@@ -466,7 +470,8 @@ def add_editor(request):
 @login_required(login_url="login")
 def delete_editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
-    editor.image_profile.delete()
+    if editor.image_profile.name != 'profile_default.png':
+        editor.image_profile.delete()
     Registered_Data.objects.get(phone=editor.phone).delete()
     User.objects.get(username=editor.user.username).delete()
     editor.delete()
@@ -732,7 +737,7 @@ def generar_ismn(editor):
 
     #   En el excepcional caso que el prefijo del editor necesite un cero delante
     if editor.prefijo.value < 10:
-        prefijo_editor = formatear_prefijo(editor.prefijo.value, len(prefijo_publicacion))
+        prefijo_editor = formatear_prefijo(str(editor.prefijo.value), len(prefijo_publicacion))
     else:
         prefijo_editor = str(editor.prefijo.value)
 
@@ -815,13 +820,46 @@ def send_info_inscripcion(nombre, user_email, username, password):
         return False
 
 
-def export_musical_publication(request, musical_publication_id):
-    # Tomar la Info. de la Publicación a exportar
-    publication = Musical_Publication.objects.get(id=musical_publication_id)
+def send_solicitud_ismn_accepted(user, publicacion):
+    context = {
+        'nombre': publicacion.editor.user.first_name,
+    }
 
-    # Crear el temporal para el pdf
-    buffer = io.BytesIO()
+    message = loader.render_to_string('emails/accept_solicitud_ismn.html', context)
 
+    email = EmailMultiAlternatives(
+        "Solicitud ISMN aceptada", message,
+        "CCL de Cuba",
+        [publicacion.editor.user.email],
+    )
+    email.content_subtype = 'html'
+
+    # Generar el reporte y saber su ruta
+    ruta = save_temporal_doc_documentation(user, publicacion)
+
+    # Leer el archivo PDF en modo binario
+    with open(ruta, "rb") as archivo_pdf:
+        contenido_pdf = archivo_pdf.read()
+
+    # Crear un objeto MIMEBase
+    archivo_adjunto = MIMEBase('application', 'octet-stream')
+    archivo_adjunto.set_payload(contenido_pdf)
+
+    # Codificar el archivo adjunto en base64
+    encoders.encode_base64(archivo_adjunto)
+
+    # Establecer las cabeceras del archivo adjunto
+    archivo_adjunto.add_header('Content-Disposition', f'attachment; filename="{ruta.name}"')
+
+    email.attach(archivo_adjunto)
+    try:
+        email.send()
+        return True
+    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError:
+        return False
+
+
+def crear_doc_publicacion(user, publication):
     # Importar las fuentes externas
     pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
     pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
@@ -1002,13 +1040,13 @@ def export_musical_publication(request, musical_publication_id):
 
         # Tabla de Reportado por:
         # Datos
-        if request.user.especialista:
+        if user.especialista:
             departamento = 'Informatica - CCL'
         else:
             departamento = '-'
         data_table_report_by = [
             ['REPORTADO POR:', ''],
-            ['Nombre:', request.user.first_name],
+            ['Nombre:', user.first_name],
             ['Fecha:', datetime.today().date()],
             ['Departamento:', departamento]
         ]
@@ -1032,13 +1070,32 @@ def export_musical_publication(request, musical_publication_id):
         canvas.setFillColorRGB(0.21, 0.25, 0.33)
         canvas.rect(0, 0, 600, 10, stroke=0, fill=1)
         canvas.restoreState()
+    return myPage
 
-    story = [Paragraph('')]
+
+def export_musical_publication(request, musical_publication_id):
+    # Tomar la Info. de la Publicación a exportar
+    publication = Musical_Publication.objects.get(id=musical_publication_id)
+
+    # Crear el temporal para el pdf
+    buffer = io.BytesIO()
+    # Contenido del reporte
+    mypage = crear_doc_publicacion(request.user, publication)
+
+    story = [Spacer(1, 2*inch)]
     doc = SimpleDocTemplate(buffer)
-    doc.build(story, onFirstPage=myPage)
+    doc.build(story, onFirstPage=mypage)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"{publication.name}.pdf")
 
+
+def save_temporal_doc_documentation(user, publication):
+    ruta = Path(f"{MEDIA_ROOT}/temp/{publication.name}.pdf")
+    doc = SimpleDocTemplate(ruta.__str__())
+    story = [Spacer(1, 2 * inch)]
+    mypage = crear_doc_publicacion(user, publication)
+    doc.build(story, onFirstPage=mypage)
+    return ruta
 
 def crear_listas():
     lista_imagenes, lista_titulos, lista_descripciones = [], [], []
