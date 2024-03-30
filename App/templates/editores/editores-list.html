@@ -43,14 +43,15 @@
 
             <br><br>
 
-            <div class="d-flex justify-content-between">
+            <!--Sub-Header-->
+            <div class="d-flex gap-2">
                 <!-- 1) Column ADD Editor and Musical Publication -->
                 {% block btn-add %}
                     <a href="{% url 'add_editor' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editor</a>
                 {% endblock %}
                 <!-- 2) Column Get users -->
-                <span>
-                    Bienvenido <strong><span class="text-primary">{{ user.get_username|capfirst }}</span></strong>
+                <span class="d-inline-block float-end ms-auto me-1">
+                    Bienvenid@ <strong><span class="text-primary">{{ user.get_username|capfirst }}</span></strong>
                 </span>
             </div>
 
@@ -241,8 +242,8 @@
 {% endblock content %}
 
 {% block Offcanvas %}
-    <a class="btn btn-dark" href="{% url 'backend_solicitudes' %}"><i class="fas fa-database"></i>&nbsp;&nbsp;Solicitudes</a>
-    <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-database"></i>&nbsp;&nbsp;Publicaciones
+    <a class="btn btn-dark" href="{% url 'backend_solicitudes' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
+    <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Publicaciones
         Musicales</a>
     <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
     <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>

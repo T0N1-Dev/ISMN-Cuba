@@ -5,8 +5,7 @@ from email import encoders
 from email.mime.base import MIMEBase
 from random import randint
 from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
-
-from PIL import Image as PILImage, ImageDraw
+from PIL import Image as PILImage
 from barcode import EAN13
 from barcode.writer import ImageWriter
 from django.contrib.auth.models import User
@@ -276,10 +275,13 @@ def backend_solicitudes(request):
 def guardar_imagen_base64(base64_string, name):
     # Extraer el base64 y la extension de la imagen
     header, base64_data = base64_string.split(';base64,')
-    if 'jpg' in header:
+
+    if 'jpg' in header or 'jpeg' in header:
         extension = header.split('/')[-1]
-    else:
+    elif 'png' in header:
         extension = header.split(':')[-1]
+    else:
+        return ''
 
     # Decodificar la cadena base64 en una imagen
     image_data = base64.b64decode(base64_data)
@@ -333,8 +335,8 @@ def accept_inscription(request, solicitud_id):
         editor.save()
         solicitud.save()
         contact.save()
-        messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a"
-                                  f" su correo. Ahora {user.first_name} ya "
+        messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a "
+                                  f"su correo. Ahora {user.first_name} ya "
                                   f"puede realizar solicitudes ISMN !")
 
     else:
@@ -385,7 +387,7 @@ def accept_ismn_solicitud(request, solicitud_id):
             image_file.close()
     publicacion.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}', File(barcode_io), save=True)
     # Enviar email de aceptacion
-    send_solicitud_ismn_accepted(request.user, publicacion)
+    email_send = send_solicitud_ismn_accepted(request.user, publicacion)
     solicitud.status = 'Atendido'
     # Eliminando datos temporales
     if solicitud.temporal['publication_image']:
@@ -395,9 +397,13 @@ def accept_ismn_solicitud(request, solicitud_id):
     del solicitud.temporal['csrfmiddlewaretoken']
     publicacion.save()
     solicitud.save()
-    messages.success(request, f"Se ha aceptado la solicitud ISMN y se ha notificado a {solicitud.editor} a"
-                              f"su correo.")
-    return HttpResponseRedirect('/backend_solicitudes')
+    if email_send:
+        messages.success(request, f"Se ha aceptado la solicitud ISMN y se ha notificado a {solicitud.editor} a "
+                                  f"su correo.")
+        return HttpResponseRedirect('/backend_solicitudes')
+    else:
+        messages.error(request, "Ha ocurrido un error al intentar notificar al correo del editor. Por favor contactelo.")
+        return HttpResponseRedirect('/backend_solicitudes')
 
 
 # Function to Add Editor
@@ -405,7 +411,6 @@ def accept_ismn_solicitud(request, solicitud_id):
 @login_required(login_url="login")
 def add_editor(request):
     if request.method == 'POST':
-
         # Check if email exist in BD
         username = request.POST['username']
         email = request.POST['email']
@@ -461,8 +466,13 @@ def add_editor(request):
 
                 messages.success(request, "Editor añadido correctamente !")
                 return HttpResponseRedirect('/backend')
-    else:
-        return render(request, "editores/add.html")
+    elif request.method == 'GET':
+        if Solicitud.objects.filter(status='Pendiente').filter(tipo='Solicitud-Inscripción').exists():
+            messages.error(request, 'No es posible añadir un editor en este momento. '
+                                    'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
+            return HttpResponseRedirect('/backend')
+        else:
+            return render(request, "editores/add.html")
 
 
 # Function to delete Editor
@@ -484,8 +494,14 @@ def delete_editor(request, editor_id):
 @login_required(login_url="login")
 def editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
+    solicitud_inscripcion = Solicitud.objects.filter(tipo='Solicitud-Inscripción').filter(status='Pendiente').exists()
     if editor:
-        return render(request, "editores/edit.html", {"editor": editor})
+        if solicitud_inscripcion:
+            messages.error(request, 'No es posible editar un editor en este momento. '
+                                    'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
+            return HttpResponseRedirect('/backend')
+        else:
+            return render(request, "editores/edit.html", {"editor": editor})
     else:
         return HttpResponseRedirect('/backend')
 
@@ -565,7 +581,6 @@ def add_musical_publication(request):
             musical_publication.prefijo = prefijo
             musical_publication.ismn = request.POST.get('ismn')
             barcode_rute, barcode_io = generate_barcode(musical_publication.ismn, musical_publication.name)
-            print(barcode_rute)
             musical_publication.gender = request.POST.get('gender')
             musical_publication.letra = request.FILES.get('publication_letter')
             if request.FILES.get('publication_image'):
@@ -597,7 +612,7 @@ def musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
     editores = Editor.objects.all()
     data = {"musical_publication": musical_publication, "editores": editores}
-    if Solicitud.objects.filter(status='Pendiente').exists():
+    if Solicitud.objects.filter(status='Pendiente').filter(tipo='Solicitud-ISMN').exists():
         messages.error(request, 'No es posible editar una publicación en estos momentos. '
                                 'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
         return HttpResponseRedirect('/backend_publicaciones')
@@ -689,8 +704,6 @@ def generar_ismn(editor):
 
     # Para determinar el valor del prefijo de la publicacion
     def determinar_valor_prefijo_publicacion(musical_pub_exist, solicitud_ismn_exist):
-        print(musical_pub_exist)
-        print(solicitud_ismn_exist)
         valor_prefijo_ultima_publicacion = editor.musical_publication_set.last().prefijo.value if musical_pub_exist else 0
         valor_prefijo_ultima_solicitud = int(editor.solicitud_set.last().temporal.get('ismn').split('-')[-2]) if solicitud_ismn_exist else 0
         valor_prefijo_publicacion = max(valor_prefijo_ultima_solicitud, valor_prefijo_ultima_publicacion)
@@ -871,6 +884,15 @@ def crear_doc_publicacion(user, publication):
     style_description = ParagraphStyle(name='description_style', rightIndent=15, leading=15, fontName="Roboto")
     letra = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.letra.url}" '
                       f'color="blue">http://127.0.0.1:8000/{publication.letra.url}</a></u>', style_letra)
+
+    if publication.imagen.name == 'default.jpg':
+        cover_title = publication.imagen.name
+    else:
+        cover_title = publication.imagen.name[13:]
+
+    cover = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.imagen.url}" '
+                      f'color="blue">{cover_title}</a></u>', style_letra)
+
     if publication.description:
         descripcion = Paragraph(f'<font name="RobotoCondensed-Bold" '
                                 f'color={colors.Color(0.21, 0.25, 0.33)}>DESCRIPCIÓN</font>'
@@ -889,9 +911,9 @@ def crear_doc_publicacion(user, publication):
             ['EDITOR', publication.editor],
             ['LETRA DE LA CANCIÓN', letra, ''],
             ['ISMN', publication.ismn, descripcion],
-            ['PREFIJO', publication.prefijo, ''],
+            ['COVER', cover, ''],
             ['FECHA DE PUBLICACIÓN', publication.created_at.date(), ''],
-            ['FECHA DE REALIZACIÓN', publication.date_time, ''],
+            ['FECHA DE REALIZACIÓN', f'{publication.date_time.year}-{publication.date_time.month}-{publication.date_time.day}', ''],
             ['DERECHOS DE AUTOR', 'EN VENTA', '']
             ]
 
@@ -1022,7 +1044,7 @@ def crear_doc_publicacion(user, publication):
                               f'color="blue">Mostrar Imagen</a></u>', cover_style)
         w = canvas.stringWidth('Mostrar Imagen', 'Roboto', 10)
         cover_url.wrapOn(canvas, 88, 12)
-        cover_url.drawOn(canvas, 435 - w / 2, 117)
+        cover_url.drawOn(canvas, 432 - w / 2, y_coord_table_description - h - 40)
 
         # Texto Informativo
         text_info_style = ParagraphStyle(name='text_info_style')
@@ -1089,6 +1111,108 @@ def export_musical_publication(request, musical_publication_id):
     return FileResponse(buffer, as_attachment=True, filename=f"{publication.name}.pdf")
 
 
+def extraer_datos_model(modelo_list):
+    # Saber con que tipo de modelo estamos trabajando:
+    modelo_type = modelo_list.model._meta.model_name
+    contenido = dict()
+
+    if modelo_type == 'musical_publication':
+        contenido['ID'] = [publicacion.id for publicacion in modelo_list]
+        contenido['Título'] = [publicacion.name for publicacion in modelo_list]
+        contenido['Autor'] = [publicacion.autor for publicacion in modelo_list]
+        contenido['Editor'] = [publicacion.editor.user.first_name for publicacion in modelo_list]
+        contenido['ISMN'] = [publicacion.ismn for publicacion in modelo_list]
+        contenido['Fecha'] = [publicacion.date_time for publicacion in modelo_list]
+        contenido['Género'] = [publicacion.gender for publicacion in modelo_list]
+    elif modelo_type == 'editor':
+        contenido['ID'] = [editor.id for editor in modelo_list]
+        contenido['Tipo'] = [editor.tipo for editor in modelo_list]
+        contenido['Nombre'] = [editor.user.first_name for editor in modelo_list]
+        contenido['ID Tributaria'] = [editor.id_tribute for editor in modelo_list]
+        contenido['Prefijo'] = [editor.prefijo for editor in modelo_list]
+        contenido['Estado'] = [editor.state for editor in modelo_list]
+        contenido['Dirección'] = [editor.directions for editor in modelo_list]
+        contenido['Teléfono'] = [editor.phone for editor in modelo_list]
+    elif modelo_type == 'solicitud':
+        contenido['ID'] = [solicitud.id for solicitud in modelo_list]
+        contenido['Editor'] = [solicitud.editor.user.first_name if solicitud.editor else '-' for solicitud in modelo_list]
+        contenido['Fecha'] = [solicitud.created_at for solicitud in modelo_list]
+        contenido['Fecha'] = [solicitud.tipo for solicitud in modelo_list]
+        contenido['Fecha'] = [solicitud.status for solicitud in modelo_list]
+    else:
+        pass
+    return contenido
+
+
+def crear_report_list(model_list, buffer):
+    # Datos del modelo que sea
+    data_list = extraer_datos_model(model_list)
+
+    # Importar las fuentes externas
+    pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
+    pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto-Italic', 'fonts/RobotoCondensed-Italic.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto', 'fonts/RobotoCondensed-Regular.ttf'))
+
+    PAGE_WIDTH, PAGE_HEIGHT = A4
+    style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")
+
+    def myFirstPage(canvas, doc):
+        canvas.saveState()
+        # Color de Fondo
+        canvas.setFillColorRGB(0.94, 0.94, 0.94)
+        canvas.rect(0, 0, 600, 900, fill=1)
+        # Barra de encabezado
+        canvas.setFillColorRGB(0.21, 0.25, 0.33)
+        canvas.rect(0, 810, 600, 50, stroke=0, fill=1)
+        # Imprimir el Logo de la empresa
+        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH - 80) / 2, 685, 80, 110)
+        # Crear encabezado del reporte
+        publication_info_textobject = canvas.beginText()
+        texto_encabezado = 'INFORMACIÓN DE LA PUBLICACIÓN'
+        width_texto_encabezado = canvas.stringWidth(texto_encabezado, 'RobotoCondensed-Bold', 15)
+        origin_start = (PAGE_WIDTH - width_texto_encabezado) / 2
+        publication_info_textobject.setTextOrigin(origin_start, 665)
+        publication_info_textobject.setFont('RobotoCondensed-Bold', 15)
+        publication_info_textobject.setFillColorRGB(0.21, 0.25, 0.33)
+        publication_info_textobject.setCharSpace(0.4)
+        publication_info_textobject.textLine(texto_encabezado)
+        # Titulo de la publicacion
+        width_title_publicaction = canvas.stringWidth('Lista de Publicaciones Musicales', 'RobotoSlab', 30)
+        origin_start = PAGE_WIDTH / 2 - width_title_publicaction / 2
+        publication_info_textobject.setTextOrigin(origin_start, 626)
+        publication_info_textobject.setFont('RobotoSlab', 30)
+        publication_info_textobject.setFillColorRGB(0.49, 0.30, 0.34)
+        publication_info_textobject.textLine('Lista de Publicaciones Musicales')
+        canvas.drawText(publication_info_textobject)
+        # Raya separadora inicial
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(50, 600, 500, 4, stroke=0, fill=1)
+        # Raya separadora final
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(50, 50, 500, 4, stroke=0, fill=1)
+
+    def myLaterPage(canvas, doc):
+        canvas.saveState()
+
+    def build_doc(pbuffer):
+        # Datos para conformar el documento
+        doc = SimpleDocTemplate(pbuffer)
+
+    build_doc(buffer)
+
+def export_publications_list(request):
+    # Crear el temporal para el pdf
+    buffer = io.BytesIO()
+
+    list_publications = Musical_Publication.objects.all().order_by('-id')
+
+    crear_report_list(list_publications, buffer)
+
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f"Publicaciones_lista.pdf")
+
+
 def save_temporal_doc_documentation(user, publication):
     ruta = Path(f"{MEDIA_ROOT}/temp/{publication.name}.pdf")
     doc = SimpleDocTemplate(ruta.__str__())
@@ -1096,6 +1220,7 @@ def save_temporal_doc_documentation(user, publication):
     mypage = crear_doc_publicacion(user, publication)
     doc.build(story, onFirstPage=mypage)
     return ruta
+
 
 def crear_listas():
     lista_imagenes, lista_titulos, lista_descripciones = [], [], []

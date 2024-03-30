@@ -11,7 +11,8 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 {% block btn-add %}
-    <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Publicación</a>
+    <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm "><i class="fas fa-plus"></i>&nbsp;&nbsp;Añadir Publicación</a>
+    <a href="{% url 'export_publications_list' %}"  class="btn btn-outline-primary btn-sm "><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar Tabla</a>
 {% endblock btn-add %}
 
 {% block Offcanvas %}
@@ -59,7 +60,7 @@
             </a>
         </td>
         <td>
-            <button class="btn btn-sm btn-secondary" id="eliminar_public" title="Eliminar Publicacion" data-bs-toggle="modal" data-bs-target="#deleteModal{{ publicacion.pk }}">
+            <button class="btn btn-sm btn-secondary" title="Eliminar Publicacion" data-bs-toggle="modal" data-bs-target="#deleteModal{{ publicacion.pk }}">
                 <i class="fas fa-trash"></i>
             </button>
         </td>
@@ -186,24 +187,6 @@
     </div>
 {% endfor %}
 {% endblock %}
-
-<script>
-
-    {% for pendiente in solicitudes_pendientes %}
-        let btn_delete = document.getElementById("eliminar_public");
-        console.log('Hola Mundo')
-
-        if ('{{ pendiente }}') {
-            btn_delete.removeAttribute("data-bs-target");
-            btn_delete.removeAttribute("data-bs-toggle");
-            btn_delete.addEventListener('click', function (e) {
-                swal('Error', 'No es posible eliminar publicaciones mientras haya solicitudes ISMN.', 'error');
-            });
-            }
-
-    {% endfor %}
-
-</script>
 
 {% block pagination %}
     <nav class="mt-4" aria-label="Page navigation example">
