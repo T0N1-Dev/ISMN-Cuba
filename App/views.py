@@ -16,6 +16,7 @@ from django.contrib.auth.decorators import login_required
 from pathlib import Path
 
 from django.utils.datastructures import MultiValueDictKeyError
+from reportlab.pdfgen.canvas import Canvas
 
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
@@ -33,7 +34,7 @@ from django.http import FileResponse
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle, Image
+from reportlab.platypus import Table, TableStyle, Image, Frame, PageTemplate, PageBreak
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
@@ -1137,8 +1138,8 @@ def extraer_datos_model(modelo_list):
         contenido['ID'] = [solicitud.id for solicitud in modelo_list]
         contenido['Editor'] = [solicitud.editor.user.first_name if solicitud.editor else '-' for solicitud in modelo_list]
         contenido['Fecha'] = [solicitud.created_at for solicitud in modelo_list]
-        contenido['Fecha'] = [solicitud.tipo for solicitud in modelo_list]
-        contenido['Fecha'] = [solicitud.status for solicitud in modelo_list]
+        contenido['Tipo'] = [solicitud.tipo for solicitud in modelo_list]
+        contenido['Estado'] = [solicitud.status for solicitud in modelo_list]
     else:
         pass
     return contenido
@@ -1161,45 +1162,125 @@ def crear_report_list(model_list, buffer):
         canvas.saveState()
         # Color de Fondo
         canvas.setFillColorRGB(0.94, 0.94, 0.94)
-        canvas.rect(0, 0, 600, 900, fill=1)
+        canvas.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, fill=1)
         # Barra de encabezado
         canvas.setFillColorRGB(0.21, 0.25, 0.33)
-        canvas.rect(0, 810, 600, 50, stroke=0, fill=1)
+        canvas.rect(0, PAGE_HEIGHT - 31, PAGE_WIDTH, PAGE_HEIGHT, stroke=0, fill=1)
         # Imprimir el Logo de la empresa
-        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH - 80) / 2, 685, 80, 110)
+        img_h = 110
+        img_w = 80
+        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH - img_w) / 2, PAGE_HEIGHT-155, img_w, img_h)
         # Crear encabezado del reporte
         publication_info_textobject = canvas.beginText()
-        texto_encabezado = 'INFORMACIÓN DE LA PUBLICACIÓN'
+        texto_encabezado = 'LISTADO DE BASE DE DATOS'
         width_texto_encabezado = canvas.stringWidth(texto_encabezado, 'RobotoCondensed-Bold', 15)
         origin_start = (PAGE_WIDTH - width_texto_encabezado) / 2
-        publication_info_textobject.setTextOrigin(origin_start, 665)
+        publication_info_textobject.setTextOrigin(origin_start, PAGE_HEIGHT-175)
         publication_info_textobject.setFont('RobotoCondensed-Bold', 15)
         publication_info_textobject.setFillColorRGB(0.21, 0.25, 0.33)
         publication_info_textobject.setCharSpace(0.4)
         publication_info_textobject.textLine(texto_encabezado)
-        # Titulo de la publicacion
-        width_title_publicaction = canvas.stringWidth('Lista de Publicaciones Musicales', 'RobotoSlab', 30)
-        origin_start = PAGE_WIDTH / 2 - width_title_publicaction / 2
-        publication_info_textobject.setTextOrigin(origin_start, 626)
+        # Titulo del listado
+        width_title_publicaction = canvas.stringWidth('Publicaciones Musicales', 'RobotoSlab', 30)
+        origin_start = (PAGE_WIDTH - width_title_publicaction) / 2
+        publication_info_textobject.setTextOrigin(origin_start, PAGE_HEIGHT-215)
         publication_info_textobject.setFont('RobotoSlab', 30)
         publication_info_textobject.setFillColorRGB(0.49, 0.30, 0.34)
-        publication_info_textobject.textLine('Lista de Publicaciones Musicales')
+        publication_info_textobject.textLine('Publicaciones Musicales')
         canvas.drawText(publication_info_textobject)
         # Raya separadora inicial
+        w_rect = 500
+        h_rect = 4
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
-        canvas.rect(50, 600, 500, 4, stroke=0, fill=1)
+        canvas.rect(PAGE_WIDTH - 545, PAGE_HEIGHT - 241, w_rect, h_rect, stroke=0, fill=1)
         # Raya separadora final
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
-        canvas.rect(50, 50, 500, 4, stroke=0, fill=1)
+        canvas.rect(PAGE_WIDTH - 545, PAGE_HEIGHT - 800, w_rect, h_rect, stroke=0, fill=1)
+        canvas.restoreState()
 
     def myLaterPage(canvas, doc):
         canvas.saveState()
+        # Color de Fondo
+        canvas.setFillColorRGB(0.94, 0.94, 0.94)
+        canvas.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, fill=1)
+        # Barra de encabezado
+        canvas.setFillColorRGB(0.21, 0.25, 0.33)
+        canvas.rect(0, PAGE_HEIGHT - 31, PAGE_WIDTH, PAGE_HEIGHT, stroke=0, fill=1)
+
+        # Imprimir el Logo de la empresa transparente
+        img_h = 440
+        img_w = 320
+        canvas.drawImage('media/logo_transparent.png', (PAGE_WIDTH - img_w) / 2, (PAGE_HEIGHT - img_h) / 2, img_w, img_h, mask='auto')
+        # Raya separadora inicial
+        w_rect = 500
+        h_rect = 4
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(PAGE_WIDTH - 545, PAGE_HEIGHT - 71, w_rect, h_rect, stroke=0, fill=1)
+        # Numeracion de Paginas
+        page_number = canvas.beginText()
+        page_number.setTextOrigin(inch, 0.90 * inch)
+        page_number.setFont('RobotoSlab', 10)
+        page_number.setFillColorRGB(0.49, 0.30, 0.34)
+        page_number.textLine("Page %s" % (doc.page - 1))
+        canvas.drawText(page_number)
+        # Raya separadora final
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(PAGE_WIDTH - 545, PAGE_HEIGHT - 800, w_rect, h_rect, stroke=0, fill=1)
+        canvas.restoreState()
 
     def build_doc(pbuffer):
         # Datos para conformar el documento
         doc = SimpleDocTemplate(pbuffer)
-
+        story = [Spacer(PAGE_WIDTH - 545, PAGE_HEIGHT - 650)]
+        datas = [['ID', 'Titulo', 'Editor', 'ISMN', 'Fecha', 'Genero'],
+                 ['12', 'Mia', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['13', 'Reloj', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['14', 'Sabor a mi', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['15', 'Juliana', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
+                 ]
+        # TABLE
+        table = Table(datas)
+        story.append(table)
+        doc.build(story, onFirstPage=myFirstPage, onLaterPages=myLaterPage)
     build_doc(buffer)
+
 
 def export_publications_list(request):
     # Crear el temporal para el pdf
@@ -1275,6 +1356,7 @@ def export_catalogo_peliculas(request, musical_publication_id):
 
     def myLaterPage(canvas, doc):
         canvas.saveState()
+
         canvas.drawString(inch, 0.75 * inch, "Page %s" % (doc.page - 1))
         canvas.restoreState()
 
