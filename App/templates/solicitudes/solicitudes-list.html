@@ -8,7 +8,9 @@
 {% endblock navbar-content %}
 
 
-{% block btn-add %}{% endblock %}
+{% block btn-add %}
+    <a href="{% url 'export_solicitudes_list' %}"  class="btn btn-outline-primary btn-sm "><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar Tabla</a>
+{% endblock btn-add %}
 
 {% block Offcanvas %}
     <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Publicaciones</a>

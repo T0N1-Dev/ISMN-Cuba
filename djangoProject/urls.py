@@ -51,6 +51,8 @@ urlpatterns = [
     # Path to export a single musical publication
     path('export_musical_publication/<str:musical_publication_id>', views.export_musical_publication, name="export_publication"),
     path('export_publications_list/', views.export_publications_list, name='export_publications_list'),
+    path('export_editores_list/', views.export_editores_list, name='export_editores_list'),
+    path('export_solicitudes_list/', views.export_solicitudes_list, name='export_solicitudes_list'),
 
     # ========================== SEND EMAIL ==========================
     # Path to send confirmation-code

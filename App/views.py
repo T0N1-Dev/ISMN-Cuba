@@ -38,7 +38,7 @@ from reportlab.platypus import Table, TableStyle, Image, Frame, PageTemplate, Pa
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.lib.pagesizes import A4, letter
+from reportlab.lib.pagesizes import A4, letter, landscape
 
 # ================= VARIABLES TEMPORALES =================
 from djangoProject.settings import MEDIA_ROOT, BASE_DIR
@@ -336,9 +336,10 @@ def accept_inscription(request, solicitud_id):
         editor.save()
         solicitud.save()
         contact.save()
-        messages.success(request, f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a "
-                                  f"su correo. Ahora {user.first_name} ya "
-                                  f"puede realizar solicitudes ISMN !")
+        messages.success(request,
+                         f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a "
+                         f"su correo. Ahora {user.first_name} ya "
+                         f"puede realizar solicitudes ISMN !")
 
     else:
         messages.error(request, 'Ha ocurrido un error al intentar notificar al correo del cliente, pruebe más tarde')
@@ -403,7 +404,8 @@ def accept_ismn_solicitud(request, solicitud_id):
                                   f"su correo.")
         return HttpResponseRedirect('/backend_solicitudes')
     else:
-        messages.error(request, "Ha ocurrido un error al intentar notificar al correo del editor. Por favor contactelo.")
+        messages.error(request,
+                       "Ha ocurrido un error al intentar notificar al correo del editor. Por favor contactelo.")
         return HttpResponseRedirect('/backend_solicitudes')
 
 
@@ -560,6 +562,7 @@ def generate_barcode(ismn, titulo):
     bar_code.write(bytes_io)
     return Path(ruta + '.png'), bytes_io
 
+
 # Function to add a musical publication
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
@@ -591,7 +594,7 @@ def add_musical_publication(request):
             musical_publication.description = request.POST.get('note')
             musical_publication.date_time = request.POST.get('date')
             musical_publication.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}',
-                                    File(barcode_io), save=True)
+                                             File(barcode_io), save=True)
             musical_publication.save()
             messages.success(request, "Publicación musical añadida correctamente !")
             return HttpResponseRedirect('/backend_publicaciones')
@@ -619,7 +622,6 @@ def musical_publication(request, musical_publication_id):
         return HttpResponseRedirect('/backend_publicaciones')
     else:
         return render(request, "publicaciones/edit_publication.html", data)
-
 
 
 # Function to edit the patients
@@ -654,7 +656,6 @@ def edit_musical_publication(request):
             musical_publication.save()
             messages.success(request, "Publicacion Musical actualizada correctamente !")
             return HttpResponseRedirect('/backend_publicaciones')
-
 
 
 # Function to delete a musical publication
@@ -706,7 +707,8 @@ def generar_ismn(editor):
     # Para determinar el valor del prefijo de la publicacion
     def determinar_valor_prefijo_publicacion(musical_pub_exist, solicitud_ismn_exist):
         valor_prefijo_ultima_publicacion = editor.musical_publication_set.last().prefijo.value if musical_pub_exist else 0
-        valor_prefijo_ultima_solicitud = int(editor.solicitud_set.last().temporal.get('ismn').split('-')[-2]) if solicitud_ismn_exist else 0
+        valor_prefijo_ultima_solicitud = int(
+            editor.solicitud_set.last().temporal.get('ismn').split('-')[-2]) if solicitud_ismn_exist else 0
         valor_prefijo_publicacion = max(valor_prefijo_ultima_solicitud, valor_prefijo_ultima_publicacion)
         return valor_prefijo_publicacion + 1
 
@@ -746,7 +748,9 @@ def generar_ismn(editor):
 
     cant_digitos_prefijo_editor = str(editor.prefijo.rango.rango_superior).__len__()
     valor_prefijo_public = determinar_valor_prefijo_publicacion(editor.musical_publication_set.exists(),
-                                                                editor.solicitud_set.filter(tipo='Solicitud-ISMN').filter(status='Pendiente').exists())
+                                                                editor.solicitud_set.filter(
+                                                                    tipo='Solicitud-ISMN').filter(
+                                                                    status='Pendiente').exists())
     prefijo_publicacion = formatear_prefijo(str(valor_prefijo_public), cant_digitos_prefijo_editor)
 
     #   En el excepcional caso que el prefijo del editor necesite un cero delante
@@ -914,7 +918,8 @@ def crear_doc_publicacion(user, publication):
             ['ISMN', publication.ismn, descripcion],
             ['COVER', cover, ''],
             ['FECHA DE PUBLICACIÓN', publication.created_at.date(), ''],
-            ['FECHA DE REALIZACIÓN', f'{publication.date_time.year}-{publication.date_time.month}-{publication.date_time.day}', ''],
+            ['FECHA DE REALIZACIÓN',
+             f'{publication.date_time.year}-{publication.date_time.month}-{publication.date_time.day}', ''],
             ['DERECHOS DE AUTOR', 'EN VENTA', '']
             ]
 
@@ -1093,6 +1098,7 @@ def crear_doc_publicacion(user, publication):
         canvas.setFillColorRGB(0.21, 0.25, 0.33)
         canvas.rect(0, 0, 600, 10, stroke=0, fill=1)
         canvas.restoreState()
+
     return myPage
 
 
@@ -1105,7 +1111,7 @@ def export_musical_publication(request, musical_publication_id):
     # Contenido del reporte
     mypage = crear_doc_publicacion(request.user, publication)
 
-    story = [Spacer(1, 2*inch)]
+    story = [Spacer(1, 2 * inch)]
     doc = SimpleDocTemplate(buffer)
     doc.build(story, onFirstPage=mypage)
     buffer.seek(0)
@@ -1127,17 +1133,21 @@ def extraer_datos_model(modelo_list):
         contenido['Género'] = [publicacion.gender for publicacion in modelo_list]
     elif modelo_type == 'editor':
         contenido['ID'] = [editor.id for editor in modelo_list]
-        contenido['Tipo'] = [editor.tipo for editor in modelo_list]
+        contenido['Tipo'] = [editor.type for editor in modelo_list]
         contenido['Nombre'] = [editor.user.first_name for editor in modelo_list]
         contenido['ID Tributaria'] = [editor.id_tribute for editor in modelo_list]
         contenido['Prefijo'] = [editor.prefijo for editor in modelo_list]
-        contenido['Estado'] = [editor.state for editor in modelo_list]
+        contenido['Estado'] = [editor.get_state_display() for editor in modelo_list]
         contenido['Dirección'] = [editor.directions for editor in modelo_list]
         contenido['Teléfono'] = [editor.phone for editor in modelo_list]
     elif modelo_type == 'solicitud':
         contenido['ID'] = [solicitud.id for solicitud in modelo_list]
-        contenido['Editor'] = [solicitud.editor.user.first_name if solicitud.editor else '-' for solicitud in modelo_list]
-        contenido['Fecha'] = [solicitud.created_at for solicitud in modelo_list]
+        contenido['Editor'] = [solicitud.editor.user.first_name if solicitud.editor else '-' for solicitud in
+                               modelo_list]
+        contenido['Solicitante'] = [solicitud.temporal['first_name'] if solicitud.tipo == 'Solicitud-Inscripción'
+                                                                        and solicitud.status == 'Pendiente' else '-'
+                                    for solicitud in modelo_list]
+        contenido['Fecha'] = [solicitud.created_at.strftime('%Y-%m-%d') for solicitud in modelo_list]
         contenido['Tipo'] = [solicitud.tipo for solicitud in modelo_list]
         contenido['Estado'] = [solicitud.status for solicitud in modelo_list]
     else:
@@ -1146,8 +1156,24 @@ def extraer_datos_model(modelo_list):
 
 
 def crear_report_list(model_list, buffer):
-    # Datos del modelo que sea
-    data_list = extraer_datos_model(model_list)
+    #  --- Datos del modelo que queremos reportar ---
+    # Datos de la Tabla
+    diccionario = extraer_datos_model(model_list)
+    # Tipo de Modelo (Editor, Publicacion, Solicitud)
+    tipo = model_list.model.__name__
+    # Titulo de la primera pagina, tipo de modelo a reportar
+    title = str()
+    # Ancho de las columnas de la tabla
+    col_widths = list()
+    if tipo == "Musical_Publication":
+        title = 'Publicaciones Musicales'
+        col_widths = [30, 120, 120, 110, 110, 110]
+    elif tipo == 'Editor':
+        title = 'Editores'
+        col_widths = [30, 90, 120, 90, 60, 50, 160, 90]
+    else:
+        title = 'Solicitudes'
+        col_widths = [30, 130, 130, 100, 115, 110]
 
     # Importar las fuentes externas
     pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
@@ -1155,7 +1181,7 @@ def crear_report_list(model_list, buffer):
     pdfmetrics.registerFont(TTFont('Roboto-Italic', 'fonts/RobotoCondensed-Italic.ttf'))
     pdfmetrics.registerFont(TTFont('Roboto', 'fonts/RobotoCondensed-Regular.ttf'))
 
-    PAGE_WIDTH, PAGE_HEIGHT = A4
+    PAGE_HEIGHT, PAGE_WIDTH = A4
     style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")
 
     def myFirstPage(canvas, doc):
@@ -1169,33 +1195,33 @@ def crear_report_list(model_list, buffer):
         # Imprimir el Logo de la empresa
         img_h = 110
         img_w = 80
-        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH - img_w) / 2, PAGE_HEIGHT-155, img_w, img_h)
+        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH - img_w) / 2, PAGE_HEIGHT - 155, img_w, img_h)
         # Crear encabezado del reporte
         publication_info_textobject = canvas.beginText()
         texto_encabezado = 'LISTADO DE BASE DE DATOS'
         width_texto_encabezado = canvas.stringWidth(texto_encabezado, 'RobotoCondensed-Bold', 15)
         origin_start = (PAGE_WIDTH - width_texto_encabezado) / 2
-        publication_info_textobject.setTextOrigin(origin_start, PAGE_HEIGHT-175)
+        publication_info_textobject.setTextOrigin(origin_start, PAGE_HEIGHT - 175)
         publication_info_textobject.setFont('RobotoCondensed-Bold', 15)
         publication_info_textobject.setFillColorRGB(0.21, 0.25, 0.33)
         publication_info_textobject.setCharSpace(0.4)
         publication_info_textobject.textLine(texto_encabezado)
         # Titulo del listado
-        width_title_publicaction = canvas.stringWidth('Publicaciones Musicales', 'RobotoSlab', 30)
+        width_title_publicaction = canvas.stringWidth(title, 'RobotoSlab', 30)
         origin_start = (PAGE_WIDTH - width_title_publicaction) / 2
-        publication_info_textobject.setTextOrigin(origin_start, PAGE_HEIGHT-215)
+        publication_info_textobject.setTextOrigin(origin_start, PAGE_HEIGHT - 215)
         publication_info_textobject.setFont('RobotoSlab', 30)
         publication_info_textobject.setFillColorRGB(0.49, 0.30, 0.34)
-        publication_info_textobject.textLine('Publicaciones Musicales')
+        publication_info_textobject.textLine(title)
         canvas.drawText(publication_info_textobject)
         # Raya separadora inicial
-        w_rect = 500
+        w_rect = 740
         h_rect = 4
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
-        canvas.rect(PAGE_WIDTH - 545, PAGE_HEIGHT - 241, w_rect, h_rect, stroke=0, fill=1)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 241, w_rect, h_rect, stroke=0, fill=1)
         # Raya separadora final
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
-        canvas.rect(PAGE_WIDTH - 545, PAGE_HEIGHT - 800, w_rect, h_rect, stroke=0, fill=1)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 550, w_rect, h_rect, stroke=0, fill=1)
         canvas.restoreState()
 
     def myLaterPage(canvas, doc):
@@ -1210,75 +1236,57 @@ def crear_report_list(model_list, buffer):
         # Imprimir el Logo de la empresa transparente
         img_h = 440
         img_w = 320
-        canvas.drawImage('media/logo_transparent.png', (PAGE_WIDTH - img_w) / 2, (PAGE_HEIGHT - img_h) / 2, img_w, img_h, mask='auto')
+        canvas.drawImage('media/logo_transparent.png', (PAGE_WIDTH - img_w) / 2, (PAGE_HEIGHT - img_h) / 2, img_w,
+                         img_h, mask='auto')
         # Raya separadora inicial
-        w_rect = 500
+        w_rect = 740
         h_rect = 4
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
-        canvas.rect(PAGE_WIDTH - 545, PAGE_HEIGHT - 71, w_rect, h_rect, stroke=0, fill=1)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 65, w_rect, h_rect, stroke=0, fill=1)
         # Numeracion de Paginas
         page_number = canvas.beginText()
         page_number.setTextOrigin(inch, 0.90 * inch)
         page_number.setFont('RobotoSlab', 10)
         page_number.setFillColorRGB(0.49, 0.30, 0.34)
-        page_number.textLine("Page %s" % (doc.page - 1))
+        page_number.textLine("Página %s" % doc.page)
         canvas.drawText(page_number)
         # Raya separadora final
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
-        canvas.rect(PAGE_WIDTH - 545, PAGE_HEIGHT - 800, w_rect, h_rect, stroke=0, fill=1)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 550, w_rect, h_rect, stroke=0, fill=1)
         canvas.restoreState()
 
     def build_doc(pbuffer):
         # Datos para conformar el documento
-        doc = SimpleDocTemplate(pbuffer)
-        story = [Spacer(PAGE_WIDTH - 545, PAGE_HEIGHT - 650)]
-        datas = [['ID', 'Titulo', 'Editor', 'ISMN', 'Fecha', 'Genero'],
-                 ['12', 'Mia', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['13', 'Reloj', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['14', 'Sabor a mi', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['15', 'Juliana', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ['16', 'El Amor', 'Blanca', '979-0-10001-002-3', '26 de julio de 1985', 'Bolero'],
-                 ]
+        doc = SimpleDocTemplate(pbuffer, pagesize=landscape(A4))
+
+        story = [Spacer(PAGE_WIDTH - 545, PAGE_HEIGHT - 400)]
+        style_table = TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                  ('FONT', (0, 0), (-1, 0), 'RobotoCondensed-Bold'),
+                                  ('FONT', (0, 1), (-1, -1), 'Roboto'),
+                                  ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
+                                  ('GRID', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34))
+                                  ])
+
+        # Conformar los datos para la tabla de ReportLab
+        # Obtener todas las llaves
+        llaves = list(diccionario.keys())
+        # Crear la lista resultante
+        datas = [llaves]
+        # Obtener el número de elementos del modelo
+        num_elementos = len(list(diccionario.values())[0])
+        # Iterar sobre los elementos
+        for i in range(num_elementos):
+            fila = []
+            for llave in llaves:
+                valor = diccionario[llave][i]
+                fila.append(valor)
+            datas.append(fila)
         # TABLE
-        table = Table(datas)
+        table = Table(datas, colWidths=col_widths)
+        table.setStyle(style_table)
         story.append(table)
         doc.build(story, onFirstPage=myFirstPage, onLaterPages=myLaterPage)
+
     build_doc(buffer)
 
 
@@ -1292,6 +1300,30 @@ def export_publications_list(request):
 
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"Publicaciones_lista.pdf")
+
+
+def export_editores_list(request):
+    # Crear el temporal para el pdf
+    buffer = io.BytesIO()
+
+    list_editores = Editor.objects.all().order_by('-id')
+
+    crear_report_list(list_editores, buffer)
+
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f"Editores_lista.pdf")
+
+
+def export_solicitudes_list(request):
+    # Crear el temporal para el pdf
+    buffer = io.BytesIO()
+
+    list_solicitudes = Solicitud.objects.all().order_by('-id')
+
+    crear_report_list(list_solicitudes, buffer)
+
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f"Solicitudes_lista.pdf")
 
 
 def save_temporal_doc_documentation(user, publication):

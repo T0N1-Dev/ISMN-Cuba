@@ -129,6 +129,9 @@ class Editor(models.Model):
     def __str__(self):
         return self.user.first_name
 
+    def get_state_display(self):
+        return 'Activo' if self.state else 'Inactivo'
+
 
 class Especialista(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
