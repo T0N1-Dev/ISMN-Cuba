@@ -535,7 +535,7 @@ def edit_editor(request):
 
 # Function to show musical collections
 def musical_colections_list(request):
-    Musical_Collections_Objects = Musical_Publication.objects.all()
+    Musical_Collections_Objects = Musical_Publication.objects.all().order_by('-created_at')
     data = {
         'publicaciones_musicales': Musical_Collections_Objects,
     }
