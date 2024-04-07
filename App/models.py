@@ -1,7 +1,14 @@
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 import os
+# Validate Dates
+from django.utils import timezone
+
+
+def validate_date(value):
+    if value > timezone.now():
+        raise ValidationError('La fecha no puede ser en el futuro.')
 
 
 # Prevent duplicated emails
@@ -9,6 +16,7 @@ class Registered_Data(models.Model):
     user_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=50)
     phone = models.CharField(max_length=20)
+    id_tribute = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"email: {self.email} \n phone: {self.phone}"
@@ -113,14 +121,13 @@ class Editor(models.Model):
     }
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=20)
-    age = models.PositiveSmallIntegerField(validators=[MaxValueValidator(120), MinValueValidator(18)],
-                                           null=True, blank=True)
+    birthday = models.DateTimeField(validators=[validate_date], blank=True, null=True)
     prefijo = models.OneToOneField(PrefijoEditor, on_delete=models.PROTECT)
     type = models.CharField(max_length=100, null=True, choices=TYPE)
     image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png")
     note = models.TextField(blank=True)
     directions = models.CharField(max_length=150)
-    id_tribute = models.PositiveBigIntegerField()
+    id_tribute = models.PositiveBigIntegerField(unique=True)
     state = models.BooleanField(default=True)
 
     class Meta:
@@ -150,6 +157,7 @@ class Especialista(models.Model):
 # Modelo que representa a cada publicación musical
 class Musical_Publication(models.Model):
     BOLERO_GENDER = 'Bolero'
+    FUSION = 'Fusion'
     POPULAR_BAILABLE_GENDER = 'Popular Bailable'
     MAMBO_GENDER = 'Mambo'
     CHACHACHA_GENDER = 'Chachacha'
@@ -158,6 +166,7 @@ class Musical_Publication(models.Model):
 
     MUSICAL_GENDER = [
         (BOLERO_GENDER, "BL"),
+        (FUSION, 'FS'),
         (POPULAR_BAILABLE_GENDER, "PB"),
         (MAMBO_GENDER, "MB"),
         (CHACHACHA_GENDER, "CH"),
@@ -174,7 +183,7 @@ class Musical_Publication(models.Model):
     letra = models.FileField(upload_to="publications/letters")
     description = models.TextField(blank=True)
     imagen = models.ImageField(upload_to="publications", blank=True, default="default.jpg")
-    date_time = models.DateField()
+    date_time = models.DateTimeField(validators=[validate_date])
     created_at = models.DateTimeField(auto_now_add=True)
     gender = models.CharField(max_length=100, null=True, choices=MUSICAL_GENDER)
 

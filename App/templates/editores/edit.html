@@ -27,7 +27,7 @@
     <option id="seleccion_editor_type" style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
     {{ editor.type }}
 {% endblock Editor-type %}
-{% block Value-edad %} value = "{{ editor.age }}" {% endblock Value-edad %}
+{% block Value-birthday %} value = "{{ editor.birthday | date:"Y-m-d" }}" {% endblock Value-birthday %}
 {% block Value-nombre %} value = "{{ editor.user.first_name }}" {% endblock Value-nombre %}
 {% block Value-apellido %} value = "{{ editor.user.last_name }}" {% endblock Value-apellido %}
 {% block Value-direction %} value = "{{ editor.directions }}" {% endblock Value-direction %}

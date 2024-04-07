@@ -13,6 +13,7 @@
     <!-- Static CSS-->
     <link rel="stylesheet" href="{% static 'css/colecciones_musicales.css' %}">
     <title>Colecciones Musicales</title>
+    <script src="https://cdn.jsdelivr.net/npm/flip.js"></script>
 </head>
 <body>
     <header>
@@ -22,7 +23,14 @@
 
     <section>
         {% for publicacion in publicaciones_musicales %}
-            <img src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}">
+            <div class="container-public">
+                <img id="imagen" src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}" >
+                <div id="info" class="details-public">
+                    <h2>{{ publicacion.name }}</h2>
+                    <h3>Por: &nbsp; {{ publicacion.autor }}</h3>
+                </div>
+
+            </div>
         {% endfor %}
     </section>
 
@@ -43,6 +51,18 @@
         </div>
 
     </footer>
+
+    <script>
+        var image = document.getElementById('imagen')
+        var info = document.getElementById('info')
+
+        image.addEventListener('click', flipImage)
+        // JavaScript
+        function flipImage() {
+          var flip = new Flip(document.getElementById('imagen'), document.getElementById('info'));
+          flip.toggle();
+        }
+      </script>
 
 </body>
 </html>

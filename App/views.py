@@ -16,7 +16,6 @@ from django.contrib.auth.decorators import login_required
 from pathlib import Path
 
 from django.utils.datastructures import MultiValueDictKeyError
-from reportlab.pdfgen.canvas import Canvas
 
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
@@ -218,7 +217,7 @@ def backend_editores(request):
             Q(note__icontains=q) | Q(user__first_name__icontains=q) | Q(type__icontains=q)
         ).order_by('-user__date_joined')
         if q.isnumeric():
-            all_editor_list = Editor.objects.filter(Q(age=q) | Q(phone__contains=q) | Q(prefijo__value__contains=q) |
+            all_editor_list = Editor.objects.filter(Q(phone__contains=q) | Q(prefijo__value__contains=q) |
                                                     Q(id_tribute=q)).order_by('-user__date_joined')
     else:
         all_editor_list = Editor.objects.all().order_by('-user__date_joined')
@@ -311,7 +310,7 @@ def accept_inscription(request, solicitud_id):
     user.email = solicitud.temporal['email']
     if solicitud.temporal['editorType'] == 'Independiente':
         user.last_name = solicitud.temporal['last_name']
-        editor.age = solicitud.temporal['age']
+        editor.birthday = solicitud.temporal['birthday']
     editor.user = user
     editor.phone = solicitud.temporal['phone']
     editor.prefijo = prefijo_editor
@@ -418,6 +417,7 @@ def add_editor(request):
         username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
+        id_tribute = request.POST['idTribute']
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/backend')
@@ -426,7 +426,10 @@ def add_editor(request):
             return HttpResponseRedirect('/backend')
         elif Registered_Data.objects.filter(user_name=username).exists():
             messages.error(request, "Este nombre de usuario ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/login')
+            return HttpResponseRedirect('/backend')
+        elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
+            messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
+            return HttpResponseRedirect('/backend')
         # ===========================
         else:
             if request.POST.get('username') \
@@ -449,7 +452,7 @@ def add_editor(request):
                 editor.type = request.POST.get('editorType')
                 if editor.type == 'Independiente':
                     user.last_name = request.POST.get('last_name')
-                    editor.age = request.POST.get('age')
+                    editor.birthday = request.POST.get('birthday')
                 editor.directions = request.POST.get('address')
                 editor.id_tribute = request.POST.get('idTribute')
                 editor.user = user
@@ -522,8 +525,8 @@ def edit_editor(request):
             editor.user.email = request.POST.get("email")
             editor.directions = request.POST.get('address')
             editor.type = request.POST.get("editorType")
-            if request.POST.get('age'):
-                editor.age = request.POST.get("age")
+            if request.POST.get('birthday'):
+                editor.birthday = request.POST.get("birthday")
                 editor.user.last_name = request.POST.get('last_name')
             editor.id_tribute = request.POST.get("idTribute")
             editor.note = request.POST.get("note")

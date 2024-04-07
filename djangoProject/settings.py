@@ -144,9 +144,11 @@ EMAIL_USE_TLS = True
 
 JAZZMIN_SETTINGS = {
     "site_title": "ISMN-Cuba",
+    "site_header": "ISMN-Cuba",
     "site_logo": "img/cuba.png",
     "site_brand": "ISMN-Cuba",
-    "login_logo": "img/cuba.png",
+    "login_logo": "img/ismnlogo.png",
+    "welcome_sign": "Bienvenido a la administración ISMN-CUBA",
     "copyright": "Cámara Cubana del Libro. Departamento ISMN",
 }
 

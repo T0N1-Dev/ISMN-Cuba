@@ -136,6 +136,7 @@
                                     {% endblock Value-Gender %}
                                     <option disabled></option>
                                     <option>Danzón</option>
+                                    <option>Fusión</option>
                                     <option>Bolero</option>
                                     <option>Popular Bailable</option>
                                     <option>Mambo</option>
@@ -149,8 +150,9 @@
                             <div class="input-group input-group-sm mb-3">
                                 <span class="input-group-text side-label-form justify-content-center"><i
                                         class="fas fa fa-calendar"></i></span>
-                                <input type="date" class="form-control" maxlength="40" name="date" id="date"
-                                       placeholder="dd/mm/aaaa" required
+                                <input type="text" class="form-control" maxlength="40" name="date" id="date"
+                                       placeholder="Fecha de creación" required title="Fecha de creación"
+                                       onfocus="this(type='date')" onblur="this(type='text')"
                                         {% block Value-date %}{% endblock Value-date %}>
                             </div>
                         </div>

@@ -21,7 +21,7 @@
         </a>
         {% if solicitudes_pendientes.count > 9 %}
             <a class="text-light" id="btn-notif" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingModal">
-                <i class="fas fa-bell"></i><span class="plus_nine">9+</span>
+                <i class="fas fa-bell fa-bounce"></i><span class="plus_nine">9+</span>
             </a>
         {% elif solicitudes_pendientes.count == 0 %}
             <div class="text-light" id="btn-notif">
@@ -29,7 +29,7 @@
             </div>
         {% else %}
             <a class="text-light" id="btn-notif" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingModal">
-                <i class="fas fa-bell"></i><span class="pending" >{{ solicitudes_pendientes.count }}</span>
+                <i class="fas fa-bell fa-bounce"></i><span class="pending" >{{ solicitudes_pendientes.count }}</span>
             </a>
         {% endif %}
     </div>
