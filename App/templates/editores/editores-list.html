@@ -21,7 +21,7 @@
         </a>
         {% if solicitudes_pendientes.count > 9 %}
             <a class="text-light" id="btn-notif" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingModal">
-                <i class="fas fa-bell fa-bounce"></i><span class="plus_nine">9+</span>
+                <i class="fas fa-bell fa-shake"></i><span class="plus_nine">9+</span>
             </a>
         {% elif solicitudes_pendientes.count == 0 %}
             <div class="text-light" id="btn-notif">
@@ -29,7 +29,7 @@
             </div>
         {% else %}
             <a class="text-light" id="btn-notif" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingModal">
-                <i class="fas fa-bell fa-bounce"></i><span class="pending" >{{ solicitudes_pendientes.count }}</span>
+                <i class="fas fa-bell fa-shake"></i><span class="pending" >{{ solicitudes_pendientes.count }}</span>
             </a>
         {% endif %}
     </div>
@@ -65,11 +65,11 @@
             </form>
 
             <div style="text-align: center;">
-                <table class="table table-bordered table-sm mt-4" style="text-align: center; font-size: 14px;">
+                <table id="miTabla" class="table table-bordered table-sm mt-4" style="text-align: center; font-size: 14px;">
                     <thead class="table-secondary">
                         <tr>
                             {% block title-table %}
-                                <th style="width: 4%">ID</th>
+                                <th style="width: 4%;">ID</th>
                                 <th style="width: 10%">Tipo</th>
                                 <th style="width: 12%">Nombre</th>
                                 <th style="width: 15%">N&deg; de ID Tributaria</th>
@@ -186,7 +186,13 @@
                           </tbody>
                         </table>
                         <hr>
-                        <footer>TOTAL = {{ solicitudes_pendientes.count }}</footer>
+
+                        <div class="d-flex align-items-center justify-content-between">
+                            <p class="w-50 my-0">TOTAL = {{ solicitudes_pendientes.count }}</p>
+                            <a class="dropdown-item w-50"
+                               href="{% url 'backend_solicitudes' %}">
+                                <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver Todo</a>
+                        </div>
                       </div>
                     </div>
                   </div>

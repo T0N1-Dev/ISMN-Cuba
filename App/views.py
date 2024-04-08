@@ -15,6 +15,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
 
+from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
@@ -46,7 +47,14 @@ from djangoProject.settings import MEDIA_ROOT, BASE_DIR
 # ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
 class MyLoginView(LoginView):
     template_name = 'registration/login.html'
-    next_page = '/'
+
+    def get_success_url(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            return '/admin/'
+        else:
+            return reverse('frontend')
 
 
 class MyLogoutView(LogoutView):
@@ -222,7 +230,7 @@ def backend_editores(request):
     else:
         all_editor_list = Editor.objects.all().order_by('-user__date_joined')
 
-    paginator = Paginator(all_editor_list, 4)
+    paginator = Paginator(all_editor_list, 5)
     page = request.GET.get('page')
     all_editor = paginator.get_page(page)
     solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
@@ -243,7 +251,7 @@ def backend_publicaciones(request):
     else:
         all_publication_list = Musical_Publication.objects.all().order_by('-created_at')
 
-    paginator = Paginator(all_publication_list, 4)
+    paginator = Paginator(all_publication_list, 5)
     page = request.GET.get('page')
     all_publication = paginator.get_page(page)
     solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
@@ -264,7 +272,7 @@ def backend_solicitudes(request):
     else:
         all_solicitudes_list = Solicitud.objects.all().order_by('-created_at')
 
-    paginator = Paginator(all_solicitudes_list, 4)
+    paginator = Paginator(all_solicitudes_list, 5)
     page = request.GET.get('page')
     all_solicitudes = paginator.get_page(page)
     solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
@@ -389,16 +397,16 @@ def accept_ismn_solicitud(request, solicitud_id):
     publicacion.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}', File(barcode_io), save=True)
     # Enviar email de aceptacion
     email_send = send_solicitud_ismn_accepted(request.user, publicacion)
-    solicitud.status = 'Atendido'
-    # Eliminando datos temporales
-    if solicitud.temporal['publication_image']:
-        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
-    os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
-    del solicitud.temporal['publication_image']
-    del solicitud.temporal['csrfmiddlewaretoken']
-    publicacion.save()
-    solicitud.save()
     if email_send:
+        solicitud.status = 'Atendido'
+        # Eliminando datos temporales
+        if solicitud.temporal['publication_image']:
+            os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
+        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
+        del solicitud.temporal['publication_image']
+        del solicitud.temporal['csrfmiddlewaretoken']
+        publicacion.save()
+        solicitud.save()
         messages.success(request, f"Se ha aceptado la solicitud ISMN y se ha notificado a {solicitud.editor} a "
                                   f"su correo.")
         return HttpResponseRedirect('/backend_solicitudes')

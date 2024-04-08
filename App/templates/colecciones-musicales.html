@@ -18,6 +18,12 @@
 <body>
     <header>
         <h1>Colecciones Musicales</h1>
+        <form class="search-bar">
+            <div class="container">
+                <input name="q" type="text" placeholder="Buscar..." value="{{ request.GET.q }}">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </form>
         <a class="back" href="{% url 'frontend' %}"><i class="fa fa-arrow-left"></i></a>
     </header>
 
