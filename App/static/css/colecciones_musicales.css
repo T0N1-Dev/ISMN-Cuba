@@ -18,6 +18,7 @@ body {
     margin-left: auto;
     height: 25px;
     background-color: white;
+    opacity: .9;
     text-align: right;
     border-radius: 60px;
     padding: 10px 20px;

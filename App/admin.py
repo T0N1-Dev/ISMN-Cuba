@@ -3,6 +3,26 @@ from django.contrib import admin
 from App.models import (Editor, Musical_Publication, Especialista, Registered_Data, Rango_Prefijo_Editor,
                         Rango_Prefijo_Publicacion, PrefijoEditor, PrefijoPublicacion, Solicitud)
 
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+from django import forms
+
+
+class CustomUserAdminForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if not first_name.isalpha():
+            raise forms.ValidationError("El nombre no puede contener nada que no sea letras.")
+        return first_name
+
+
+class CustomUserAdmin(UserAdmin):
+    form = CustomUserAdminForm
+
 
 class EditorInline(admin.StackedInline):
     model = Editor
@@ -51,3 +71,8 @@ admin.site.register(Rango_Prefijo_Publicacion)
 admin.site.register(PrefijoEditor, Prefijo_Editor_Admin)
 admin.site.register(PrefijoPublicacion)
 admin.site.register(Solicitud, SolicitudAdmin)
+# Desregistras el UserAdmin predeterminado
+admin.site.unregister(User)
+
+# Registras tu UserAdmin personalizado
+admin.site.register(User, CustomUserAdmin)

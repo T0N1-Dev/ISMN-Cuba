@@ -234,8 +234,10 @@ def backend_editores(request):
     page = request.GET.get('page')
     all_editor = paginator.get_page(page)
     solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+    usuario = request.user
     return render(request, 'editores/editores-list.html', {"editores": all_editor,
-                                                           'solicitudes_pendientes': solicitudes_pendientes})
+                                                           'solicitudes_pendientes': solicitudes_pendientes,
+                                                           'usuario': usuario})
 
 
 # Function to render publication's lists
@@ -1473,3 +1475,9 @@ def export_catalogo_peliculas(request, musical_publication_id):
     build_doc(buffer)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"CATÁLOGO_DE_PELICULAS_{titulo_catalogo}.pdf")
+
+def prueba(request):
+    if request.user.is_authenticated:
+        return render(request, 'prueba_admin.html')
+    else:
+        return HttpResponseRedirect('admin/login.html')
