@@ -149,6 +149,33 @@ $(document).ready(function (){
     });
 });
 
+// 7) Validate Image Extension
+$(document).ready(function() {
+    $("input[name*='imagenProfile'], input[name*='publication_image']").on('change', function() {
+
+        var filePath = $(this).val();
+        var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.jfif)$/i;
+        if (!allowedExtensions.exec(filePath)) {
+            swal('Opsss !', 'Por favor, selecciona un archivo de imagen válido.', 'error');
+            $(this).val('');
+            return false;
+        }
+    });
+});
+
+// 8) Validate Letter Estension
+$(document).ready(function () {
+    $("input[name*='publication_letter']").on('change', function () {
+        var filePath = $(this).val();
+        var allowedExtensions = /(\.pdf|\.docx|\.txt)/i;
+        if (!allowedExtensions.exec(filePath)) {
+            swal('Opsss !', 'Por favor, selecciona un archivo de documento válido.', 'error');
+            $(this).val('');
+            return false;
+        }
+    });
+});
+
 // 10) Time running at real time
 setInterval(function (){
     var date = new Date();

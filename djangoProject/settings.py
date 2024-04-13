@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "crispy_forms",
+    "crispy_bootstrap5",
     'django.contrib.staticfiles',
     'App',
 ]
@@ -152,4 +154,6 @@ JAZZMIN_SETTINGS = {
     "copyright": "Cámara Cubana del Libro. Departamento ISMN",
 }
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
+CRISPY_TEMPLATE_PACK = "bootstrap5"

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 <!-- Title on tab browser -->
-{% block title %} Login {% endblock title %}
+{% block title %} Iniciar Sesión {% endblock title %}
 
 <!-- Navbar content -->
 {% block navbar-content %}
-    <i class="fas fa-key"></i>&nbsp;&nbsp; Login
+    <i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp; Iniciar sesión
 {% endblock navbar-content %}
 
 <!-- Button on navbar -->
@@ -50,10 +50,6 @@
                 swal("Acceso Denegado !", "Inserte sus datos correctamente.", "error");
             </script>
         {% endif %}
-
-        <div id="sing-in" style="text-align: center;">
-            <i class="text-primary mt-4 fas fa-sign-in-alt fa-7x fa-fade"></i>
-        </div>
     </div> <!-- END // container -->
 {% endblock content %}
 

@@ -8,6 +8,7 @@ from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 from PIL import Image as PILImage
 from barcode import EAN13
 from barcode.writer import ImageWriter
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -18,6 +19,7 @@ from pathlib import Path
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 
+from App.forms import ChangePasswordForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
@@ -59,6 +61,21 @@ class MyLoginView(LoginView):
 
 class MyLogoutView(LogoutView):
     next_page = '/'
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def change_password(request):
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, f"Se ha cambiado su contraseña exitosamente.")
+            return HttpResponseRedirect('/')
+    else:
+        form = ChangePasswordForm(request.user)
+    return render(request, 'registration/change_password.html', {"form": form})
 
 
 # ================= SECCIÓN DE CREACIÓN DE RANGOS Y PREFIJOS =================

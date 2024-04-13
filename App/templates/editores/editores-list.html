@@ -14,9 +14,6 @@
 {% endblock time %}
 
 
-
-
-
 {% block notifications %}
     <!--Notification Button-->
     <div class="notificaciones">
@@ -43,7 +40,7 @@
 {% block content %}
     {% if request.user.especialista %}
         <!-- Si inicia sesión el especialista -->
-        <div class="container">
+        <div class="container" style="min-width: 650px;">
 
             <br><br>
 
@@ -65,10 +62,10 @@
                         aria-labelledby="dropdownMenuButton1">
                         <span class="dropdown-header text-center">Cuenta</span>
                         <hr class="dropdown-divider m-0">
-                        <a class="dropdown-item py-2" href="#"><i class="fa fa-key mr-2"></i>&nbsp;&nbsp;Cambiar contraseña</a>
+                        <a class="dropdown-item py-2" href="{% url 'change_password' %}"><i class="fa fa-key mr-2"></i>&nbsp;&nbsp;Cambiar contraseña</a>
                         <hr class="dropdown-divider m-0">
                         <a class="dropdown-item btn btn-danger text-danger py-2" href="{% url 'logout' %}"
-                           data-bs-toggle="modal" data-bs-target="#exampleModal">
+                           data-bs-toggle="modal" data-bs-target="#exampleModal" style="font-size: 14px">
                             <i class="fa fa-sign-out-alt mr-2"></i>&nbsp;&nbsp;Cerrar sesión</a>
                         <hr class="dropdown-divider m-0">
                         <a href="#" class="dropdown-item dropdown-footer text-center py-2">Ver perfil</a>
@@ -84,8 +81,9 @@
                 </div>
             </form>
 
-            <div style="text-align: center;">
-                <table id="miTabla" class="table table-bordered table-sm mt-4" style="text-align: center; font-size: 14px;">
+            <div style="text-align: center; max-height: 320px; overflow: auto;">
+                <table id="miTabla" class="table table-bordered table-sm mt-4" style="text-align: center;
+                font-size: 14px; ">
                     <thead class="table-secondary">
                         <tr>
                             {% block title-table %}
