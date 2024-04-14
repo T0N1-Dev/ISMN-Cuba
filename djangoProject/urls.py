@@ -20,7 +20,7 @@ urlpatterns = [
     # Path to access the backend page
     path('backend/', views.backend_editores, name="backend_editores"),
     path('backend_publicaciones', views.backend_publicaciones, name="backend_publicaciones"),
-    path('backend_solicitudes', views.backend_solicitudes, name="backend_solicitudes"),
+    path('backend_solicitudes/<str:order>', views.backend_solicitudes, name="backend_solicitudes"),
     # Path to accept an inscription application
     path('accept_inscription/<str:solicitud_id>', views.accept_inscription, name="accept_inscription"),
     # Path to accept an ismn application

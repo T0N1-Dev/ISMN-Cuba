@@ -34,7 +34,7 @@
                 de Editores</a>
             <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
                 de Publicaciones</a>
-            <a class="btn btn-dark" href="{% url 'backend_solicitudes' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista de Solicitudes</a>
+            <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista de Solicitudes</a>
         {% elif request.user.editor %}
             <a class="btn btn-dark" href="{% url 'solicitud-ismn' %}"><i class="fas fa-paper-plane"></i>&nbsp;&nbsp;Solicitud ISMN</a>
         {% endif %}

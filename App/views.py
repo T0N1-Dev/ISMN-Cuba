@@ -281,22 +281,28 @@ def backend_publicaciones(request):
 # Function to render las listas de solicitudes
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
-def backend_solicitudes(request):
+def backend_solicitudes(request, order):
     if 'q' in request.GET:
         q = request.GET['q']
         all_solicitudes_list = Solicitud.objects.filter(
             Q(tipo__icontains=q) | Q(editor__user__username__icontains=q) |
             Q(status__icontains=q)
         ).order_by('-created_at')
-    else:
+    elif order == 'list_dsc':
         all_solicitudes_list = Solicitud.objects.all().order_by('-created_at')
+        # Para ordenar ascendente o descendente
+        flag = 'list_asc'
+    else:
+        all_solicitudes_list = Solicitud.objects.all()
+        flag = 'list_dsc'
 
     paginator = Paginator(all_solicitudes_list, 5)
     page = request.GET.get('page')
     all_solicitudes = paginator.get_page(page)
     solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
     return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes,
-                                                                 'solicitudes_pendientes': solicitudes_pendientes})
+                                                                 'solicitudes_pendientes': solicitudes_pendientes,
+                                                                 'flag': flag})
 
 
 def guardar_imagen_base64(base64_string, name):
@@ -1159,7 +1165,7 @@ def extraer_datos_model(modelo_list):
         contenido['Autor'] = [publicacion.autor for publicacion in modelo_list]
         contenido['Editor'] = [publicacion.editor.user.first_name for publicacion in modelo_list]
         contenido['ISMN'] = [publicacion.ismn for publicacion in modelo_list]
-        contenido['Fecha'] = [publicacion.date_time for publicacion in modelo_list]
+        contenido['Fecha'] = [publicacion.date_time.strftime('%Y-%m-%d') for publicacion in modelo_list]
         contenido['Género'] = [publicacion.gender for publicacion in modelo_list]
     elif modelo_type == 'editor':
         contenido['ID'] = [editor.id for editor in modelo_list]

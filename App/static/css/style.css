@@ -131,6 +131,18 @@ body {
 /* --------------------------------------
 # BACKEND | EDITORS LIST (editores-list.html)
  ---------------------------------------*/
+th.th_button {
+    cursor: pointer;
+    padding: 0 !important;
+    background-color: transparent !important;
+}
+
+.btn-header-list {
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+}
+
 #no-data, #no-access {
     position: absolute;
     top: 50%;
@@ -145,36 +157,8 @@ body {
     overflow-y: auto;
 }
 
-.musicales {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.musical {
-    width: 20%;
-    margin-top: 20px;
-}
-
-.musical img {
-    width: 100%;
-    height: 200px;
-}
-
-.musical .contenedor_musical {
-    background-color: white;
-    width: 80%;
-    margin: auto;
-}
-
 #loginForm {
     max-width: 500px;
-}
-
-.img_detail {
-  margin-left: auto;
-  margin-right: auto;
-  width: 60%;
-  border-radius: 5%;
 }
 
 /* Label with icon or text (left side of inputs) */
