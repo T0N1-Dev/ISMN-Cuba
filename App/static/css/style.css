@@ -135,10 +135,14 @@ th.th_button {
     cursor: pointer;
     padding: 0 !important;
     background-color: transparent !important;
+    height: 40px;
 }
 
 .btn-header-list {
     width: 100%;
+    height: 100%;
+    border-radius: 0;
+    line-height: 100%;
     text-align: center;
     padding: 8px;
 }

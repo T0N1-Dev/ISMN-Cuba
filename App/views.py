@@ -234,48 +234,62 @@ def frontend(request):
 # Function to render editor's lists
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
-def backend_editores(request):
-    if 'q' in request.GET:
-        q = request.GET['q']
-        all_editor_list = Editor.objects.filter(
-            Q(user__username__icontains=q) | Q(user__email__icontains=q) | Q(directions__icontains=q) |
-            Q(note__icontains=q) | Q(user__first_name__icontains=q) | Q(type__icontains=q)
-        ).order_by('-user__date_joined')
-        if q.isnumeric():
-            all_editor_list = Editor.objects.filter(Q(phone__contains=q) | Q(prefijo__value__contains=q) |
-                                                    Q(id_tribute=q)).order_by('-user__date_joined')
+def backend_editores(request, order):
+    if request.POST:
+        print(request.POST)
+        return HttpResponseRedirect('/export_editores_list')
     else:
-        all_editor_list = Editor.objects.all().order_by('-user__date_joined')
+        if 'q' in request.GET:
+            q = request.GET['q']
+            all_editor_list = Editor.objects.filter(
+                Q(user__username__icontains=q) | Q(user__email__icontains=q) | Q(directions__icontains=q) |
+                Q(note__icontains=q) | Q(user__first_name__icontains=q) | Q(type__icontains=q)
+            ).order_by('-user__date_joined')
+            if q.isnumeric():
+                all_editor_list = Editor.objects.filter(Q(phone__contains=q) | Q(prefijo__value__contains=q) |
+                                                        Q(id_tribute=q)).order_by('-user__date_joined')
+        elif order == 'list_dsc':
+            all_editor_list = Editor.objects.all()[::-1]
+            # Para ordenar ascendente o descendente
+            flag = 'list_asc'
+        else:
+            all_editor_list = Editor.objects.all()
+            flag = 'list_dsc'
 
-    paginator = Paginator(all_editor_list, 5)
-    page = request.GET.get('page')
-    all_editor = paginator.get_page(page)
-    solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
-    usuario = request.user
-    return render(request, 'editores/editores-list.html', {"editores": all_editor,
-                                                           'solicitudes_pendientes': solicitudes_pendientes,
-                                                           'usuario': usuario})
-
+        paginator = Paginator(all_editor_list, 5)
+        page = request.GET.get('page')
+        all_editor = paginator.get_page(page)
+        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+        usuario = request.user
+        return render(request, 'editores/editores-list.html', {"editores": all_editor,
+                                                               'solicitudes_pendientes': solicitudes_pendientes,
+                                                               'usuario': usuario, 'flag': flag})
 
 # Function to render publication's lists
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
-def backend_publicaciones(request):
+def backend_publicaciones(request, order):
     if 'q' in request.GET:
         q = request.GET['q']
         all_publication_list = Musical_Publication.objects.filter(
             Q(name__icontains=q) | Q(autor__icontains=q) | Q(editor__user__username__icontains=q) |
             Q(gender__icontains=q) | Q(ismn__icontains=q)
         ).order_by('-created_at')
-    else:
+    elif order == 'list_dsc':
         all_publication_list = Musical_Publication.objects.all().order_by('-created_at')
+        # Para ordenar ascendente o descendente
+        flag = 'list_asc'
+    else:
+        all_publication_list = Musical_Publication.objects.all()
+        flag = 'list_dsc'
 
     paginator = Paginator(all_publication_list, 5)
     page = request.GET.get('page')
     all_publication = paginator.get_page(page)
     solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
     return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication,
-                                                                    'solicitudes_pendientes': solicitudes_pendientes})
+                                                                    'solicitudes_pendientes': solicitudes_pendientes,
+                                                                    'flag': flag})
 
 
 # Function to render las listas de solicitudes

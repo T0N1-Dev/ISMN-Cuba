@@ -17,7 +17,7 @@
 
 {% block Offcanvas %}
     <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
-    <a class="btn btn-dark" href="{% url 'backend_editores' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editores</a>
+    <a class="btn btn-dark" href="{% url 'backend_editores' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editores</a>
     <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
     <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i
             class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
@@ -28,14 +28,42 @@
 {% endblock Offcanvas %}
 
 {% block title-table %}
-    <th style="width: 4%">ID</th>
-    <th style="width: 12%">Nombre</th>
-    <th style="width: 15%">Autor</th>
-    <th style="width: 15%">Editor</th>
-    <th style="width: 21%">ISMN</th>
-    <th style="width: 21%">Fecha</th>
-    <th style="width: 21%">Género</th>
-    <th style="width: 21%" colspan="3">Acciones</th>
+    <th style="width: 7%" class="th_button">
+        <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
+            ID &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 12%" class="th_button">
+        <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
+            Nombre &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 15%" class="th_button">
+        <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
+            Autor &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 15%" class="th_button">
+        <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
+            Editor &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 21%" class="th_button">
+        <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
+            ISMN &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 21%" class="th_button">
+        <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
+            Fecha &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 21%" class="th_button">
+        <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
+            Género &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 21%" colspan="3" class="th_button"><a style="border-radius: 0" href="#" class="btn btn-secondary btn-header-list">Acciones</a></th>
 {% endblock title-table %}
 
 {% block for-data-table %}
