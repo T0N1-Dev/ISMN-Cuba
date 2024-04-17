@@ -236,10 +236,10 @@ def frontend(request):
 @login_required(login_url="login")
 def backend_editores(request, order):
     if request.POST:
-        print(request.POST)
-        return HttpResponseRedirect('/export_editores_list')
+        return export_editores_list(request)
     else:
         if 'q' in request.GET:
+            flag = 'list_dsc'
             q = request.GET['q']
             all_editor_list = Editor.objects.filter(
                 Q(user__username__icontains=q) | Q(user__email__icontains=q) | Q(directions__icontains=q) |
@@ -269,27 +269,32 @@ def backend_editores(request, order):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def backend_publicaciones(request, order):
-    if 'q' in request.GET:
-        q = request.GET['q']
-        all_publication_list = Musical_Publication.objects.filter(
-            Q(name__icontains=q) | Q(autor__icontains=q) | Q(editor__user__username__icontains=q) |
-            Q(gender__icontains=q) | Q(ismn__icontains=q)
-        ).order_by('-created_at')
-    elif order == 'list_dsc':
-        all_publication_list = Musical_Publication.objects.all().order_by('-created_at')
-        # Para ordenar ascendente o descendente
-        flag = 'list_asc'
+    if request.POST:
+        return export_publications_list(request)
     else:
-        all_publication_list = Musical_Publication.objects.all()
-        flag = 'list_dsc'
 
-    paginator = Paginator(all_publication_list, 5)
-    page = request.GET.get('page')
-    all_publication = paginator.get_page(page)
-    solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
-    return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication,
-                                                                    'solicitudes_pendientes': solicitudes_pendientes,
-                                                                    'flag': flag})
+        if 'q' in request.GET:
+            flag = 'list_dsc'
+            q = request.GET['q']
+            all_publication_list = Musical_Publication.objects.filter(
+                Q(name__icontains=q) | Q(autor__icontains=q) | Q(editor__user__username__icontains=q) |
+                Q(gender__icontains=q) | Q(ismn__icontains=q)
+            ).order_by('-created_at')
+        elif order == 'list_dsc':
+            all_publication_list = Musical_Publication.objects.all().order_by('-created_at')
+            # Para ordenar ascendente o descendente
+            flag = 'list_asc'
+        else:
+            all_publication_list = Musical_Publication.objects.all()
+            flag = 'list_dsc'
+
+        paginator = Paginator(all_publication_list, 5)
+        page = request.GET.get('page')
+        all_publication = paginator.get_page(page)
+        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+        return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication,
+                                                                        'solicitudes_pendientes': solicitudes_pendientes,
+                                                                        'flag': flag})
 
 
 # Function to render las listas de solicitudes
@@ -297,6 +302,7 @@ def backend_publicaciones(request, order):
 @login_required(login_url="login")
 def backend_solicitudes(request, order):
     if 'q' in request.GET:
+        flag = 'list_dsc'
         q = request.GET['q']
         all_solicitudes_list = Solicitud.objects.filter(
             Q(tipo__icontains=q) | Q(editor__user__username__icontains=q) |
@@ -389,7 +395,7 @@ def accept_inscription(request, solicitud_id):
 
     else:
         messages.error(request, 'Ha ocurrido un error al intentar notificar al correo del cliente, pruebe más tarde')
-    return HttpResponseRedirect('/backend_solicitudes')
+    return HttpResponseRedirect('/backend_solicitudes/list_dsc')
 
 
 # Reformat the path to files since their names
@@ -448,11 +454,11 @@ def accept_ismn_solicitud(request, solicitud_id):
         solicitud.save()
         messages.success(request, f"Se ha aceptado la solicitud ISMN y se ha notificado a {solicitud.editor} a "
                                   f"su correo.")
-        return HttpResponseRedirect('/backend_solicitudes')
+        return HttpResponseRedirect('/backend_solicitudes/list_dsc')
     else:
         messages.error(request,
                        "Ha ocurrido un error al intentar notificar al correo del editor. Por favor contactelo.")
-        return HttpResponseRedirect('/backend_solicitudes')
+        return HttpResponseRedirect('/backend_solicitudes/list_dsc')
 
 
 # Function to Add Editor
@@ -467,16 +473,16 @@ def add_editor(request):
         id_tribute = request.POST['idTribute']
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/backend')
+            return HttpResponseRedirect('/add_editor')
         elif Registered_Data.objects.filter(phone=phone).exists():
             messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/backend')
+            return HttpResponseRedirect('/add_editor')
         elif Registered_Data.objects.filter(user_name=username).exists():
             messages.error(request, "Este nombre de usuario ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/backend')
+            return HttpResponseRedirect('/add_editor')
         elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
             messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
-            return HttpResponseRedirect('/backend')
+            return HttpResponseRedirect('/add_editor')
         # ===========================
         else:
             if request.POST.get('username') \
@@ -514,16 +520,17 @@ def add_editor(request):
                 contact.user_name = user.username
                 contact.email = email
                 contact.phone = phone
+                contact.id_tribute = id_tribute
                 contact.save()
                 # ========================
 
                 messages.success(request, "Editor añadido correctamente !")
-                return HttpResponseRedirect('/backend')
+                return HttpResponseRedirect('/backend/list_dsc')
     elif request.method == 'GET':
         if Solicitud.objects.filter(status='Pendiente').filter(tipo='Solicitud-Inscripción').exists():
             messages.error(request, 'No es posible añadir un editor en este momento. '
                                     'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
-            return HttpResponseRedirect('/backend')
+            return HttpResponseRedirect('/backend/list_dsc')
         else:
             return render(request, "editores/add.html")
 
@@ -539,7 +546,7 @@ def delete_editor(request, editor_id):
     User.objects.get(username=editor.user.username).delete()
     editor.delete()
     messages.success(request, "Editor eliminado correctamente !")
-    return HttpResponseRedirect('/backend')
+    return HttpResponseRedirect('/backend/list_dsc')
 
 
 # Function to access the Editor individually
@@ -552,11 +559,11 @@ def editor(request, editor_id):
         if solicitud_inscripcion:
             messages.error(request, 'No es posible editar un editor en este momento. '
                                     'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
-            return HttpResponseRedirect('/backend')
+            return HttpResponseRedirect('/backend/list_dsc')
         else:
             return render(request, "editores/edit.html", {"editor": editor})
     else:
-        return HttpResponseRedirect('/backend')
+        return HttpResponseRedirect('/backend/list_dsc')
 
 
 # Function to edit the Editor
@@ -580,7 +587,7 @@ def edit_editor(request):
             editor.image_profile = request.FILES.get('imagenProfile')
             editor.save()
             messages.success(request, "Editor editado correctamente !")
-            return HttpResponseRedirect('/backend')
+            return HttpResponseRedirect('/backend/list_dsc')
 
 
 # Function to show musical collections
@@ -647,12 +654,12 @@ def add_musical_publication(request):
                                              File(barcode_io), save=True)
             musical_publication.save()
             messages.success(request, "Publicación musical añadida correctamente !")
-            return HttpResponseRedirect('/backend_publicaciones')
+            return HttpResponseRedirect('/backend_publicaciones/list_dsc')
     elif request.method == 'GET':
         if Solicitud.objects.filter(status='Pendiente').exists():
             messages.error(request, 'No es posible añadir una publicación en estos momentos. '
                                     'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
-            return HttpResponseRedirect('/backend_publicaciones')
+            return HttpResponseRedirect('/backend_publicaciones/list_dsc')
         else:
             editores = Editor.objects.annotate(Count('musical_publication'))
             data = {'editores': editores}
@@ -669,7 +676,7 @@ def musical_publication(request, musical_publication_id):
     if Solicitud.objects.filter(status='Pendiente').filter(tipo='Solicitud-ISMN').exists():
         messages.error(request, 'No es posible editar una publicación en estos momentos. '
                                 'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
-        return HttpResponseRedirect('/backend_publicaciones')
+        return HttpResponseRedirect('/backend_publicaciones/list_dsc')
     else:
         return render(request, "publicaciones/edit_publication.html", data)
 
@@ -705,7 +712,7 @@ def edit_musical_publication(request):
             musical_publication.date_time = request.POST.get('date')
             musical_publication.save()
             messages.success(request, "Publicacion Musical actualizada correctamente !")
-            return HttpResponseRedirect('/backend_publicaciones')
+            return HttpResponseRedirect('/backend_publicaciones/list_dsc')
 
 
 # Function to delete a musical publication
@@ -720,7 +727,7 @@ def delete_musical_publication(request, musical_publication_id):
     musical_publication.prefijo.delete()
     musical_publication.delete()
     messages.success(request, "Publicacion Musical eliminada correctamente !")
-    return HttpResponseRedirect('/backend_publicaciones')
+    return HttpResponseRedirect('/backend_publicaciones/list_dsc')
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -732,7 +739,7 @@ def delete_solicitud(request, solicitud_id):
     os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
     solicitud.delete()
     messages.success(request, "Solicitud eliminada correctamente !")
-    return HttpResponseRedirect('/backend_solicitudes')
+    return HttpResponseRedirect('/backend_solicitudes/list_dsc')
 
 
 # ---- GENERAR ISMN ------
@@ -1344,7 +1351,41 @@ def export_publications_list(request):
     # Crear el temporal para el pdf
     buffer = io.BytesIO()
 
+    # Filtros de exportacion
+    titulo_filter = request.POST['titulo'] if request.POST['titulo'] else None
+    autor_filter = request.POST['autor'] if request.POST['autor'] else None
+    editor_filter = request.POST['editor'] if request.POST['editor'] else None
+    genero_filter = request.POST['genero'] if request.POST['genero'] != 'Todos' else None
+    fecha_publicacion_filter = request.POST['fecha'] if request.POST['fecha'] else None
+    orden_filter = bool('orden' in request.POST)
+    cantidades = {
+        '0': 1,
+        '1': 10,
+        '2': 25,
+        '3': 40,
+        '4': None
+    }
+    cantidad_filter = cantidades.get(request.POST.get('cant_element'), None)
+    filters = {
+        'name__icontains': titulo_filter,
+        'autor__icontains': autor_filter,
+        'editor__user__first_name__icontains': editor_filter,
+        'gender__icontains': genero_filter,
+        'date_time__gte': fecha_publicacion_filter
+    }
+
+    # Lista completa de editores en orden LIFO
     list_publications = Musical_Publication.objects.all().order_by('-id')
+
+    # Aplicando los filtros a la lista de Publicaciones
+    for key, value in filters.items():
+        if value:
+            list_publications = list_publications.filter(**{key: value})
+
+    if not orden_filter:
+        list_publications = list_publications.order_by('id')
+    if cantidad_filter and len(list_publications) >= cantidad_filter:
+        list_publications = list_publications.all()[:cantidad_filter]
 
     crear_report_list(list_publications, buffer)
 
@@ -1356,10 +1397,44 @@ def export_editores_list(request):
     # Crear el temporal para el pdf
     buffer = io.BytesIO()
 
+    # Filtros de exportacion
+    tipo_editor_filter = request.POST['flexRadioTipo'] if request.POST['flexRadioTipo'] != 'Ambos' else None
+    fecha_inscripcion_filter = request.POST['fecha'] if request.POST['fecha'] else None
+    nombre_filter = request.POST['nombre'] if request.POST['nombre'] else None
+    rango_filter = request.POST['rango'] if request.POST['rango'] != 'Todos' else None
+    activo_filter = bool('activo' in request.POST)
+    orden_filter = bool('orden' in request.POST)
+    cantidades = {
+        '0': 1,
+        '1': 10,
+        '2': 25,
+        '3': 40,
+        '4': None
+    }
+    cantidad_filter = cantidades.get(request.POST.get('cant_element'), None)
+    filters = {
+        'type': tipo_editor_filter,
+        'user__date_joined__gte': fecha_inscripcion_filter,
+        'user__first_name__icontains': nombre_filter,
+        'prefijo__rango__rango_superior': rango_filter,
+
+    }
+
+    # Lista completa de editores en orden LIFO
     list_editores = Editor.objects.all().order_by('-id')
 
-    crear_report_list(list_editores, buffer)
+    # Aplicando los filtros a la lista de Editores
+    for key, value in filters.items():
+        if value:
+            list_editores = list_editores.filter(**{key: value})
+    if not activo_filter:
+        list_editores = list_editores.filter(state=False)
+    if not orden_filter:
+        list_editores = list_editores.order_by('id')
+    if cantidad_filter and len(list_editores) >= cantidad_filter:
+        list_editores = list_editores.all()[:cantidad_filter]
 
+    crear_report_list(list_editores, buffer)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"Editores_lista.pdf")
 

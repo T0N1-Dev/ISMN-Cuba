@@ -30,9 +30,9 @@
     <a href="{% url 'musical_colections' %}" class="btn btn-dark text-white"><i class="fas fa-music"></i>&nbsp;&nbsp;Colecciones Musicales</a>
     {% if request.user.is_authenticated %}
         {% if request.user.especialista %}
-            <a class="btn btn-dark" href="{% url 'backend_editores' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
+            <a class="btn btn-dark" href="{% url 'backend_editores' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
                 de Editores</a>
-            <a class="btn btn-dark" href="{% url 'backend_publicaciones' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
+            <a class="btn btn-dark" href="{% url 'backend_publicaciones' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
                 de Publicaciones</a>
             <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista de Solicitudes</a>
         {% elif request.user.editor %}

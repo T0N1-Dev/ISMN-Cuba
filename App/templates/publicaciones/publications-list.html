@@ -12,8 +12,13 @@
 
 {% block btn-add %}
     <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm "><i class="fas fa-plus"></i>&nbsp;&nbsp;Añadir Publicación</a>
-    <a href="{% url 'export_publications_list' %}"  class="btn btn-outline-primary btn-sm "><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar Tabla</a>
+    <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exporting_pModal">
+                    <i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar Tabla</a>
 {% endblock btn-add %}
+
+{% block search_bar_link %}
+    <a href="{% url 'backend_publicaciones' 'list_asc' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
+{% endblock search_bar_link %}
 
 {% block Offcanvas %}
     <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
@@ -207,7 +212,7 @@
           </div>
           <div class="modal-footer justify-content-center">
             <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal">
-                <a href="export_musical_publication/{{ publicacion.id }}" type="button" class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</a>
+                <a href="/export_musical_publication/{{ publicacion.id }}" type="button" class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</a>
             </button>
           </div>
         </div>
@@ -215,6 +220,79 @@
     </div>
 {% endfor %}
 {% endblock %}
+
+{% block exporting_options %}
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-6 ms-auto" style="text-align: left">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="titulo" id="floatingInput" placeholder="Título">
+                      <label for="floatingInput">Nombre de la publicación</label>
+                    </div>
+                </div>
+                <div class="col-6 ms-auto" style="text-align: left">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="autor" id="floatingInput" placeholder="Autor">
+                      <label for="floatingInput">Nombre del autor</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6 ms-auto mb-3" style="text-align: left">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="editor" id="floatingInput" placeholder="Editor">
+                      <label for="floatingInput">Nombre del editor</label>
+                    </div>
+                </div>
+                <div class="col-6 ms-auto" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="floatingSelect" name="genero" aria-label="Floating label select example">
+                          <option selected>Todos</option>
+                          <option value="bolero">Bolero</option>
+                          <option value="fusión">Fusion</option>
+                          <option value="popular">Popular Bailable</option>
+                          <option value="mambo">Mambo</option>
+                          <option value="chachacha">ChaChaCha</option>
+                          <option value="rumba">Rumba</option>
+                          <option value="danzon">Danzón</option>
+                      </select>
+                      <label for="floatingSelect">Selecciona un rango de prefijo</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12">
+                    <div class="form-floating" style="height: 100%">
+                      <input type="date" class="form-control mb-4" placeholder=""
+                                id="floatingTextarea2" name="fecha" style="height: 100%">
+                      <label for="floatingTextarea2">Publicaciones agregadas después de:</label>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row mb-4">
+                <div class="col-12 form-check form-switch" style="text-align: left; margin-left: 15px">
+                  <input class="form-check-input" style="cursor: pointer;" type="checkbox" name="orden" role="switch" id="flexSwitchCheckChecked" checked>
+                  <label class="form-check-label" for="flexSwitchCheckChecked">Orden LIFO</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                  <label for="customRange2" class="form-label">Cantidad de elementos?</label>
+                  <input type="range" class="form-range" value="4" style="height: 5px" min="0" max="4" name="cant_element" id="customRange2">
+                  <div class="d-flex">
+                      <span>1</span>
+                      <span style="margin-left: 23%">10</span>
+                      <span style="margin-left: 22.3%">25</span>
+                      <span style="margin-left: 22%">40</span>
+                      <span style="margin-left: auto">Todos</span>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock exporting_options %}
 
 {% block pagination %}
     <nav class="mt-4" aria-label="Page navigation example">

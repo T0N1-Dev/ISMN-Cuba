@@ -76,9 +76,11 @@
 
             <form>
                 <div class="input-group input-group-sm mb-3 mt-4">
-                    <input name="q" type="text" class="form-control" placeholder="Search for..." value="{{ request.GET.q }}">
+                    <input name="q" type="text" class="form-control" placeholder="Buscar..." value="{{ request.GET.q }}">
                     <button class="btn btn-secondary"><i class="fas fa-search"></i></button>
-                    <a href="{% url 'backend_editores' 'list_asc' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
+                    {% block search_bar_link %}
+                        <a href="{% url 'backend_editores' 'list_asc' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
+                    {% endblock search_bar_link %}
                 </div>
             </form>
 
@@ -259,88 +261,94 @@
                         </div>
                         <form id="modalForm" method="POST" class="form-floating">
                             {% csrf_token %}
-                            <div class="modal-body">
-                                <div class="container-fluid">
-                                    <div class="row mb-2">
-                                        <div class="col-4" style="text-align: left">
-                                            <h6>Tipo de Editor</h6>
-                                              <div class="form-check">
-                                                  <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoE" value="Empresa">
-                                                  <label class="form-check-label" for="flexRadioTipoE">
-                                                    Empresa
-                                                  </label>
+                            {% block exporting_options %}
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        <div class="row mb-2">
+                                            <div class="col-4" style="text-align: left">
+                                                <h6>Tipo de Editor</h6>
+                                                  <div class="form-check">
+                                                      <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoE" value="Compañia">
+                                                      <label class="form-check-label" for="flexRadioTipoE">
+                                                        Empresa
+                                                      </label>
+                                                  </div>
+                                                  <div class="form-check">
+                                                      <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoI" value="Independiente">
+                                                      <label class="form-check-label" for="flexRadioTipoI">
+                                                        Independiente
+                                                      </label>
+                                                  </div>
+                                                  <div class="form-check">
+                                                      <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoA" value="Ambos" checked>
+                                                      <label class="form-check-label" for="flexRadioTipoA">
+                                                        Ambos
+                                                      </label>
+                                                  </div>
                                               </div>
-                                              <div class="form-check">
-                                                  <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoI" value="Independiente">
-                                                  <label class="form-check-label" for="flexRadioTipoI">
-                                                    Independiente
-                                                  </label>
-                                              </div>
-                                              <div class="form-check">
-                                                  <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoA" value="Ambos" checked>
-                                                  <label class="form-check-label" for="flexRadioTipoA">
-                                                    Ambos
-                                                  </label>
-                                              </div>
-                                          </div>
-                                        <div class="col-8">
-                                            <div class="form-floating" style="height: 100%">
-                                              <input type="date" class="form-control mb-4" placeholder=""
-                                                        id="floatingTextarea2" name="fecha" style="height: 100%">
-                                              <label for="floatingTextarea2">Fecha de inscripción</label>
+                                            <div class="col-8">
+                                                <div class="form-floating" style="height: 100%">
+                                                  <input type="date" class="form-control mb-4" placeholder=""
+                                                            id="floatingTextarea2" name="fecha" style="height: 100%">
+                                                  <label for="floatingTextarea2">Editores agregados después de:</label>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <hr>
-                                    <div class="row mb-2">
-                                        <div class="col-12 ms-auto" style="text-align: left">
-                                            <div class="form-floating">
-                                              <input type="text" class="form-control" name="nombre" id="floatingInput" placeholder="-">
-                                              <label for="floatingInput">Nombre del editor</label>
+                                        <hr>
+                                        <div class="row mb-2">
+                                            <div class="col-12 ms-auto" style="text-align: left">
+                                                <div class="form-floating">
+                                                  <input type="text" class="form-control" name="nombre" id="floatingInput" placeholder="-">
+                                                  <label for="floatingInput">Nombre del editor</label>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-12 ms-auto" style="text-align: left;">
-                                            <div class="form-floating">
-                                              <select class="form-select" id="floatingSelect" name="rango" aria-label="Floating label select example">
-                                                  <option selected>Prefijo de los editores</option>
-                                                  <option value="99">Menores</option>
-                                                  <option value="999">100-999</option>
-                                                  <option value="9999">1000-9999</option>
-                                                  <option value="99999">10000-99999</option>
-                                                  <option value="999999">Mayores</option>
-                                              </select>
-                                              <label for="floatingSelect">Selecciona un rango</label>
+                                        <div class="row mb-2">
+                                            <div class="col-12 ms-auto" style="text-align: left;">
+                                                <div class="form-floating">
+                                                  <select class="form-select" id="floatingSelect" name="rango" aria-label="Floating label select example">
+                                                      <option selected>Todos</option>
+                                                      <option value="99">Menores</option>
+                                                      <option value="999">100-999</option>
+                                                      <option value="9999">1000-9999</option>
+                                                      <option value="99999">10000-99999</option>
+                                                      <option value="999999">Mayores</option>
+                                                  </select>
+                                                  <label for="floatingSelect">Selecciona un rango de prefijo</label>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <hr>
-                                    <div class="row mt-4">
-                                        <div class="form-check form-switch" style="text-align: left; margin-left: 15px">
-                                          <input class="form-check-input" type="checkbox" name="activo" role="switch" id="flexSwitchCheckChecked" checked>
-                                          <label class="form-check-label" for="flexSwitchCheckChecked">Editores activos</label>
+                                        <hr>
+                                        <div class="row mt-6">
+                                            <div class="col-6 form-check form-switch" style="text-align: left; margin-left: 15px">
+                                              <input class="form-check-input" style="cursor: pointer;" type="checkbox" name="activo" role="switch" id="flexSwitchCheckChecked" checked>
+                                              <label class="form-check-label"  for="flexSwitchCheckChecked">Editores activos</label>
+                                            </div>
+                                            <div class="col-4 form-check form-switch" style="text-align: left; margin-left: 15px">
+                                              <input class="form-check-input" style="cursor: pointer;" type="checkbox" name="orden" role="switch" id="flexSwitchCheckChecked" checked>
+                                              <label class="form-check-label" for="flexSwitchCheckChecked">Orden LIFO</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <hr>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                          <label for="customRange2" class="form-label">Cantidad de elementos?</label>
-                                          <input type="range" class="form-range" value="4" style="height: 5px" min="0" max="4" name="cant_element" id="customRange2">
-                                          <div class="d-flex">
-                                              <span>1</span>
-                                              <span style="margin-left: 23%">10</span>
-                                              <span style="margin-left: 22.3%">25</span>
-                                              <span style="margin-left: 22%">40</span>
-                                              <span style="margin-left: auto">Todos</span>
-                                          </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                              <label for="customRange2" class="form-label">Cantidad de elementos?</label>
+                                              <input type="range" class="form-range" value="4" style="height: 5px" min="0" max="4" name="cant_element" id="customRange2">
+                                              <div class="d-flex">
+                                                  <span>1</span>
+                                                  <span style="margin-left: 23%">10</span>
+                                                  <span style="margin-left: 22.3%">25</span>
+                                                  <span style="margin-left: 22%">40</span>
+                                                  <span style="margin-left: auto">Todos</span>
+                                              </div>
+                                            </div>
                                         </div>
-                                    </div>
                                 </div>
                             </div>
+                            {% endblock exporting_options %}
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</button>
+                                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</button>
                             </div>
                         </form>
                     </div>
