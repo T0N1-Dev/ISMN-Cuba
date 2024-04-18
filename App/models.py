@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 import os
 # Validate Dates
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 def validate_date(value):

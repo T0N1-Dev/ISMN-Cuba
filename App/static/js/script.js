@@ -176,6 +176,25 @@ $(document).ready(function () {
     });
 });
 
+// 9) Validate exporting data
+$(document).ready(function () {
+    $('#floatingTextarea2').blur(function () {
+        let currentDate = new Date();
+        let date_input = new Date($(this).val())
+        let p_error = $('#p_error')
+        if (date_input > currentDate || date_input.getFullYear() < 1900){
+            $(this).addClass('is-invalid');
+            $(this).val('')
+            p_error.removeAttr('hidden').html('&ast;&nbsp;No es posible viajar en el tiempo.');
+        }
+        else {
+            $(this).removeClass('is-invalid');
+            p_error.attr('hidden', 'hidden');
+            $(this).addClass('is-valid');
+        }
+    });
+})
+
 // 10) Time running at real time
 setInterval(function (){
     var date = new Date();

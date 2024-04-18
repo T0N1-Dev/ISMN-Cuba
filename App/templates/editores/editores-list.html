@@ -264,7 +264,7 @@
                             {% block exporting_options %}
                                 <div class="modal-body">
                                     <div class="container-fluid">
-                                        <div class="row mb-2">
+                                        <div class="row">
                                             <div class="col-4" style="text-align: left">
                                                 <h6>Tipo de Editor</h6>
                                                   <div class="form-check">
@@ -288,13 +288,14 @@
                                               </div>
                                             <div class="col-8">
                                                 <div class="form-floating" style="height: 100%">
-                                                  <input type="date" class="form-control mb-4" placeholder=""
+                                                  <input type="date" class="form-control" placeholder=""
                                                             id="floatingTextarea2" name="fecha" style="height: 100%">
                                                   <label for="floatingTextarea2">Editores agregados después de:</label>
+                                                    <p id="p_error" class="text-danger fw-light text-start" style="font-size: small; margin-left: 12px;" hidden></p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <hr>
+                                        <hr class="mt-4">
                                         <div class="row mb-2">
                                             <div class="col-12 ms-auto" style="text-align: left">
                                                 <div class="form-floating">

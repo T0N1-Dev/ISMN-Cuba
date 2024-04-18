@@ -308,11 +308,64 @@
     <div class="modal-body">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-6 ms-auto" style="text-align: left">
+                <div class="col-12 ms-auto" style="text-align: left">
                     <div class="form-floating">
-                      <input type="text" class="form-control" name="titulo" id="floatingInput" placeholder="Título">
-                      <label for="floatingInput">Nombre de la publicación</label>
+                      <input type="text" class="form-control" name="sol_editor" id="floatingInput" placeholder="Editor">
+                      <label for="floatingInput">Nombre del editor</label>
                     </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12">
+                    <div class="form-floating">
+                        <input type="date" class="form-control" placeholder="" id="floatingTextarea2" name="fecha">
+                        <label for="floatingTextarea2">Solicitudes enviadas después de:</label>
+                        <p id="p_error" class="text-danger fw-light text-start" style="font-size: small; margin-left: 12px" hidden></p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="floatingSelect" name="tipo" aria-label="Floating label select example">
+                          <option selected>Todos</option>
+                          <option value="Solicitud-Inscripción">Solicitud-Inscripción</option>
+                          <option value="Solicitud-ISMN">Solicitud-ISMN</option>
+                      </select>
+                      <label for="floatingSelect">Selecciona un tipo de solicitud</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="floatingSelect" name="estado" aria-label="Floating label select example">
+                          <option selected>Ambos</option>
+                          <option value="Pendiente">Pendiente</option>
+                          <option value="Atendido">Atendido</option>
+                      </select>
+                      <label for="floatingSelect">Selecciona el estado de las solicitudes</label>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row mt-4 mb-4">
+                <div class="col-12 form-check form-switch" style="text-align: left; margin-left: 15px">
+                  <input class="form-check-input" style="cursor: pointer;" type="checkbox" name="orden" role="switch" id="flexSwitchCheckChecked" checked>
+                  <label class="form-check-label" for="flexSwitchCheckChecked">Orden LIFO</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                  <label for="customRange2" class="form-label">Cantidad de elementos?</label>
+                  <input type="range" class="form-range" value="4" style="height: 5px" min="0" max="4" name="cant_element" id="customRange2">
+                  <div class="d-flex">
+                      <span>1</span>
+                      <span style="margin-left: 23%">10</span>
+                      <span style="margin-left: 22.3%">25</span>
+                      <span style="margin-left: 22%">40</span>
+                      <span style="margin-left: auto">Todos</span>
+                  </div>
                 </div>
             </div>
         </div>

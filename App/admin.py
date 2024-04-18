@@ -21,6 +21,11 @@ class CustomUserAdminForm(forms.ModelForm):
 
 
 class CustomUserAdmin(UserAdmin):
+    def has_delete_permission(self, request, obj=None):
+        if obj is None:
+            return True
+        else:
+            return not obj.is_superuser
     form = CustomUserAdminForm
 
 

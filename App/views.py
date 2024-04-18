@@ -272,7 +272,6 @@ def backend_publicaciones(request, order):
     if request.POST:
         return export_publications_list(request)
     else:
-
         if 'q' in request.GET:
             flag = 'list_dsc'
             q = request.GET['q']
@@ -301,28 +300,31 @@ def backend_publicaciones(request, order):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def backend_solicitudes(request, order):
-    if 'q' in request.GET:
-        flag = 'list_dsc'
-        q = request.GET['q']
-        all_solicitudes_list = Solicitud.objects.filter(
-            Q(tipo__icontains=q) | Q(editor__user__username__icontains=q) |
-            Q(status__icontains=q)
-        ).order_by('-created_at')
-    elif order == 'list_dsc':
-        all_solicitudes_list = Solicitud.objects.all().order_by('-created_at')
-        # Para ordenar ascendente o descendente
-        flag = 'list_asc'
+    if request.method == "POST":
+        return export_solicitudes_list(request)
     else:
-        all_solicitudes_list = Solicitud.objects.all()
-        flag = 'list_dsc'
+        if 'q' in request.GET:
+            flag = 'list_dsc'
+            q = request.GET['q']
+            all_solicitudes_list = Solicitud.objects.filter(
+                Q(tipo__icontains=q) | Q(editor__user__username__icontains=q) |
+                Q(status__icontains=q)
+            ).order_by('-created_at')
+        elif order == 'list_dsc':
+            all_solicitudes_list = Solicitud.objects.all().order_by('-created_at')
+            # Para ordenar ascendente o descendente
+            flag = 'list_asc'
+        else:
+            all_solicitudes_list = Solicitud.objects.all()
+            flag = 'list_dsc'
 
-    paginator = Paginator(all_solicitudes_list, 5)
-    page = request.GET.get('page')
-    all_solicitudes = paginator.get_page(page)
-    solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
-    return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes,
-                                                                 'solicitudes_pendientes': solicitudes_pendientes,
-                                                                 'flag': flag})
+        paginator = Paginator(all_solicitudes_list, 5)
+        page = request.GET.get('page')
+        all_solicitudes = paginator.get_page(page)
+        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+        return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes,
+                                                                     'solicitudes_pendientes': solicitudes_pendientes,
+                                                                     'flag': flag})
 
 
 def guardar_imagen_base64(base64_string, name):
@@ -763,7 +765,9 @@ def generar_ismn(editor):
 
     # Para determinar el valor del prefijo de la publicacion
     def determinar_valor_prefijo_publicacion(musical_pub_exist, solicitud_ismn_exist):
-        valor_prefijo_ultima_publicacion = editor.musical_publication_set.last().prefijo.value if musical_pub_exist else 0
+        valor_prefijo_ultima_publicacion = \
+            editor.musical_publication_set.aggregate(Max('prefijo__value'))['prefijo__value__max'] \
+                if musical_pub_exist else 0
         valor_prefijo_ultima_solicitud = int(
             editor.solicitud_set.last().temporal.get('ismn').split('-')[-2]) if solicitud_ismn_exist else 0
         valor_prefijo_publicacion = max(valor_prefijo_ultima_solicitud, valor_prefijo_ultima_publicacion)
@@ -1443,7 +1447,38 @@ def export_solicitudes_list(request):
     # Crear el temporal para el pdf
     buffer = io.BytesIO()
 
+    # Filtros de exportacion
+    editor_filter = request.POST['sol_editor'] if request.POST['sol_editor'] else None
+    fecha_filter = request.POST['fecha'] if request.POST['fecha'] else None
+    tipo_filter = request.POST['tipo'] if request.POST['tipo'] != 'Todos' else None
+    estado_filter = request.POST['estado'] if request.POST['estado'] != 'Ambos' else None
+    orden_filter = bool('orden' in request.POST)
+    cantidades = {
+        '0': 1,
+        '1': 10,
+        '2': 25,
+        '3': 40,
+        '4': None
+    }
+    cantidad_filter = cantidades.get(request.POST['cant_element'], None)
+    filters = {
+        'editor__user__first_name__icontains': editor_filter,
+        'created_at__gte': fecha_filter,
+        'tipo': tipo_filter,
+        'status': estado_filter
+    }
+
+    # Lista completa de solicitudes en orden LIFO
     list_solicitudes = Solicitud.objects.all().order_by('-id')
+
+    # Aplicando los filtros a la lista de Solicitudes
+    for key, value in filters.items():
+        if value:
+            list_solicitudes = list_solicitudes.filter(**{key:value})
+    if not orden_filter:
+        list_solicitudes = list_solicitudes.order_by('id')
+    if cantidad_filter and len(list_solicitudes) >= cantidad_filter:
+        list_solicitudes = list_solicitudes.all()[:cantidad_filter]
 
     crear_report_list(list_solicitudes, buffer)
 
