@@ -51,6 +51,8 @@
                     <a href="{% url 'add_editor' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editor</a>
                     <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exporting_pModal">
                     <i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar Tabla</a>
+                    <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#statisticsBackdrop">
+                    <i class="fas fa-bar-chart"></i>&nbsp;&nbsp;Estadísticas</a>
                 {% endblock %}
 
                 <!-- 2) Column Get users -->
@@ -250,7 +252,7 @@
                     </div>
                   </div>
                     </div>
-                <!-- Exporting Options-->
+                <!-- Exporting Options Modal-->
                 <div class="modal fade modal-lg" id="exporting_pModal" tabindex="-1" aria-labelledby="exporting_pModalLabel" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-scrollable">
                     <div class="modal-content">
@@ -352,6 +354,26 @@
                                 <button type="submit" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</button>
                             </div>
                         </form>
+                    </div>
+                  </div>
+                </div>
+                <!-- Statistics-Modal -->
+                <div class="modal fade modal-lg" id="statisticsBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="infoModalLabel"><i class="fas fa-chart-bar"></i>&nbsp;&nbsp;Estadísticas.</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                        {% block statistics-modal %}
+                          <div class="modal-body">
+                            ...
+                          </div>
+                        {% endblock statistics-modal %}
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</button>
+                      </div>
                     </div>
                   </div>
                 </div>
