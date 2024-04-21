@@ -375,33 +375,128 @@
 {% endblock exporting_options %}
 
 {% block statistics-modal %}
-    <div class="d-flex justify-content-center">
-      <canvas id="myChart" style="width: 100%"></canvas>
+    <div class="modal-body">
+        <div class="container-fluid">
+            <h1 class="display-6 text-primary-emphasis mb-3 pl-3 fs-2">Solicitudes, Reportes y Estadísticas</h1>
+            <div class="border-bottom border-4 mb-4"></div>
+            <div class="row mb-2">
+                <div class="col-lg-6 col-md-12" style="min-width: 450px; height: 400px; flex-grow: 1; flex-basis: 0">
+                    <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart"></canvas>
+                </div>
+                <div class="col-lg-6 col-md-12" style="flex-basis: 300px; align-content: center; padding: 0">
+                    <div class="card d-flex justify-content-start flex-wrap" style="margin-top: -70px">
+                        <i class="fa-solid fa-circle-xmark text-primary-emphasis fs-1"></i>
+                        <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis align-self-center">
+                            &nbsp;&nbsp;Solicitudes rechazadas
+                        </h4>
+                    </div>
+                    <p class="card-body display-6 fs-6" style="max-width: 200px; text-align: justify; margin-left: 50px">
+                        Cantidad de solicitudes rechazadas según su tipo (ISMN ó Inscripción).
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <div class="row mb-2">
+                <div class="col-lg-6">
+                    <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart2"></canvas>
+                </div>
+                <div class="col-lg-1">
+                    <div class="border-start border-1 text-dark" style="height: 400px"></div>
+                </div>
+
+            </div>
+        </div>
     </div>
+
     <script>
       const ctx = document.getElementById('myChart');
+      const ctx2 = document.getElementById('myChart2');
 
       const data = {
           labels: [
-            'Red',
-            'Blue',
-            'Yellow'
+              'Enero', 'Febrero', 'Marzo', 'Abril'
           ],
-          datasets: [{
-            label: 'My First Dataset',
-            data: [300, 50, 100],
-            backgroundColor: [
-              'rgb(255, 99, 132)',
-              'rgb(54, 162, 235)',
-              'rgb(255, 205, 86)'
-            ],
-            hoverOffset: 4
-          }]
+          datasets: [
+              {
+                label: 'Solicitudes de Inscripción',
+                data: [4, 1, 3, 2, 0, 0],
+                borderColor: [
+                  'rgb(56,56,56)'
+                ],
+                  backgroundColor: 'rgb(140,140,140)',
+                  fill: true,
+                hoverOffset: 4
+              },
+              {
+                label: 'Solicitudes ISMN',
+                data: [24, 15, 10, 9, 30, 14],
+                borderColor: [
+                  'rgb(0,84,168)'
+                ],
+                  backgroundColor: 'rgb(99,177,255)',
+                  fill: true,
+                hoverOffset: 4
+              }
+          ]
+        };
+      const data2 = {
+          labels: [
+              'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'
+          ],
+          datasets: [
+              {
+                label: 'Solicitudes de Inscripción',
+                data: [4, 1, 3, 2, 0, 0, 1],
+                backgroundColor: 'rgb(140,140,140)',
+                hoverOffset: 4,
+                stack: 'Stack 0'
+              },
+              {
+                label: 'Solicitudes ISMN',
+                data: [24, 15, 10, 9, 30, 14, 19],
+                backgroundColor: 'rgb(99,177,255)',
+                hoverOffset: 4,
+                stack: 'Stack 0'
+              }
+          ]
         };
 
+      const options = {
+          plugins: {
+              legend: {
+                  position: 'bottom'
+              },
+              title: {
+                display: true,
+                text: 'Solicitudes rechazadas en el último semestre.'
+              }
+          },
+
+          responsive: true
+      }
+      const options2 = {
+          plugins: {
+              legend: {
+                  position: 'bottom'
+              },
+              title: {
+                  display: true,
+                  text: 'Solicitudes enviadas esta semana.'
+              },
+          },
+          responsive: true,
+      }
+
       new Chart(ctx, {
-        type: 'doughnut',
-        data: data,
+          type: 'line',
+          data: data,
+          options: options
       });
+      new Chart(ctx2, {
+          type: 'bar',
+          data: data2,
+          options: options2
+      });
+
     </script>
 {% endblock statistics-modal %}
