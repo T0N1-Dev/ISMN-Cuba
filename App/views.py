@@ -259,7 +259,7 @@ def backend_editores(request, order):
         paginator = Paginator(all_editor_list, 5)
         page = request.GET.get('page')
         all_editor = paginator.get_page(page)
-        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente', deleted=False).order_by('created_at')
         usuario = request.user
         return render(request, 'editores/editores-list.html', {"editores": all_editor,
                                                                'solicitudes_pendientes': solicitudes_pendientes,
@@ -290,7 +290,7 @@ def backend_publicaciones(request, order):
         paginator = Paginator(all_publication_list, 5)
         page = request.GET.get('page')
         all_publication = paginator.get_page(page)
-        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente', deleted=False).order_by('created_at')
         return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication,
                                                                         'solicitudes_pendientes': solicitudes_pendientes,
                                                                         'flag': flag})
@@ -308,23 +308,26 @@ def backend_solicitudes(request, order):
             q = request.GET['q']
             all_solicitudes_list = Solicitud.objects.filter(
                 Q(tipo__icontains=q) | Q(editor__user__username__icontains=q) |
-                Q(status__icontains=q)
+                Q(status__icontains=q, deleted=False)
             ).order_by('-created_at')
         elif order == 'list_dsc':
-            all_solicitudes_list = Solicitud.objects.all().order_by('-created_at')
+            all_solicitudes_list = Solicitud.objects.filter(deleted=False).order_by('-created_at')
             # Para ordenar ascendente o descendente
             flag = 'list_asc'
         else:
-            all_solicitudes_list = Solicitud.objects.all()
+            all_solicitudes_list = Solicitud.objects.filter(deleted=False)
             flag = 'list_dsc'
 
         paginator = Paginator(all_solicitudes_list, 5)
         page = request.GET.get('page')
         all_solicitudes = paginator.get_page(page)
-        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente').order_by('created_at')
+        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente', deleted=False).order_by('created_at')
+        solicitudes_rechazadas = Solicitud.objects.filter(deleted=True)
         return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes,
                                                                      'solicitudes_pendientes': solicitudes_pendientes,
-                                                                     'flag': flag})
+                                                                     'flag': flag,
+                                                                     'solicitudes_rechazadas': solicitudes_rechazadas
+                                                                     })
 
 
 def guardar_imagen_base64(base64_string, name):
@@ -736,10 +739,12 @@ def delete_musical_publication(request, musical_publication_id):
 @login_required(login_url="login")
 def delete_solicitud(request, solicitud_id):
     solicitud = Solicitud.objects.get(id=solicitud_id)
-    if solicitud.temporal['publication_image']:
-        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
-    os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
-    solicitud.delete()
+    if solicitud.tipo == 'Solicitud-ISMN':
+        if solicitud.temporal['publication_image']:
+            os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
+        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
+    solicitud.deleted = True
+    solicitud.save()
     messages.success(request, "Solicitud eliminada correctamente !")
     return HttpResponseRedirect('/backend_solicitudes/list_dsc')
 
@@ -769,7 +774,7 @@ def generar_ismn(editor):
             editor.musical_publication_set.aggregate(Max('prefijo__value'))['prefijo__value__max'] \
                 if musical_pub_exist else 0
         valor_prefijo_ultima_solicitud = int(
-            editor.solicitud_set.last().temporal.get('ismn').split('-')[-2]) if solicitud_ismn_exist else 0
+            editor.solicitud_set.filter(deleted=False).last().temporal.get('ismn').split('-')[-2]) if solicitud_ismn_exist else 0
         valor_prefijo_publicacion = max(valor_prefijo_ultima_solicitud, valor_prefijo_ultima_publicacion)
         return valor_prefijo_publicacion + 1
 

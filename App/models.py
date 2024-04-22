@@ -231,6 +231,7 @@ class Solicitud(models.Model):
     tipo = models.CharField(max_length=50, choices=SOLICITUD_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=ESTATUS)
+    deleted = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = 'solicitudes'

@@ -384,13 +384,13 @@
                     <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart"></canvas>
                 </div>
                 <div class="col-lg-6 col-md-12" style="flex-basis: 300px; align-content: center; padding: 0">
-                    <div class="card d-flex justify-content-start flex-wrap" style="margin-top: -70px">
+                    <div class="d-flex justify-content-start flex-wrap" style="margin-top: -70px">
                         <i class="fa-solid fa-circle-xmark text-primary-emphasis fs-1"></i>
                         <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis align-self-center">
-                            &nbsp;&nbsp;Solicitudes rechazadas
+                            &nbsp;&nbsp;Solicitudes rechazadas.
                         </h4>
                     </div>
-                    <p class="card-body display-6 fs-6" style="max-width: 200px; text-align: justify; margin-left: 50px">
+                    <p class=" display-6 fs-6" style="max-width: 200px; text-align: justify; margin-left: 50px">
                         Cantidad de solicitudes rechazadas según su tipo (ISMN ó Inscripción).
                     </p>
                 </div>
@@ -398,20 +398,129 @@
             <hr>
             <div class="row mb-2">
                 <div class="col-lg-6">
+                    <div class="d-flex justify-content-center flex-wrap mt-1 mb-2">
+                        <i class="fa-solid fa-envelope-square text-primary-emphasis fs-1"></i>
+                        <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis mt-auto">
+                            &nbsp;&nbsp;Solicitudes enviadas.
+                        </h4>
+                    </div>
                     <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart2"></canvas>
                 </div>
-                <div class="col-lg-1">
+                <div class="col-lg-1" style="max-width: 10px">
                     <div class="border-start border-1 text-dark" style="height: 400px"></div>
                 </div>
-
+                <div class="col-lg-5">
+                    <div class="d-flex justify-content-center flex-wrap mt-1 mb-3">
+                        <i class="fa-solid fa-check-circle text-primary-emphasis fs-1"></i>
+                        <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis mt-auto">
+                            &nbsp;&nbsp;Solicitudes aceptadas.
+                        </h4>
+                    </div>
+                    <table class="table table-hover table-striped table-sm">
+                      <thead>
+                        <tr class="table-primary">
+                          <th scope="col" class="text-center">&nbsp;Fecha</th>
+                          <th scope="col" class="text-center">&nbsp;Tipo</th>
+                          <th scope="col" class="text-center">&nbsp;Cantidad</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">14/4</th>
+                          <td>Solicitud-ISMN</td>
+                          <td>10</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">-</th>
+                          <td>Solicitud-Inscripción</td>
+                          <td>1</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">15/4</th>
+                          <td>Solicitud-ISMN</td>
+                          <td>7</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">-</th>
+                          <td>Solicitud-Inscripción</td>
+                          <td>0</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">16/4</th>
+                          <td>Solicitud-ISMN</td>
+                          <td>12</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">-</th>
+                          <td>Solicitud-Inscripción</td>
+                          <td>1</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">17/4</th>
+                          <td>Solicitud-ISMN</td>
+                          <td>8</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">-</th>
+                          <td>Solicitud-Inscripción</td>
+                          <td>2</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">18/4</th>
+                          <td>Total</td>
+                          <td id="sol_accept_total">45</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+
+      function inicializarMeses() {
+          const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+          dicc = {};
+          meses.forEach(mes => dicc[mes] = 0);
+          return dicc;
+      }
+
+      let cant_sol_rechazadas = {'cant_ismn_rechazados': 0, 'cant_inscrip_rechazados': 0};
+      let ismn_rechazados = inicializarMeses()
+      let inscrip_rechazados = inicializarMeses()
+
+      {% for solicitud_r in solicitudes_rechazadas %}
+          {% if solicitud_r.tipo == 'Solicitud-ISMN' %}
+              cant_sol_rechazadas['cant_ismn_rechazados'] += 1;
+              {% if solicitud_r.created_at.month == 1  %}
+                  ismn_rechazados['Enero'] += 1;
+              {% elif solicitud_r.created_at.month == 2 %}
+                  ismn_rechazados['Febrero'] +=1;
+              {% elif solicitud_r.created_at.month == 3 %}
+                  ismn_rechazados['Marzo'] +=1;
+              {% else %}
+                  ismn_rechazados['Abril'] +=1;
+              {% endif %}
+          {% else %}
+              cant_sol_rechazadas['cant_inscrip_rechazados'] += 1;
+              {% if solicitud_r.created_at.month == 1  %}
+                  inscrip_rechazados['Enero'] += 1;
+              {% elif solicitud_r.created_at.month == 2 %}
+                  inscrip_rechazados['Febrero'] +=1;
+              {% elif solicitud_r.created_at.month == 3 %}
+                  inscrip_rechazados['Marzo'] +=1;
+              {% else %}
+                  inscrip_rechazados['Abril'] +=1;
+              {% endif %}
+          {% endif %}
+      {% endfor %}
+
+      let td_total_sol = document.getElementById('sol_accept_total')
+      td_total_sol.innerHTML = cant_sol_rechazadas['cant_ismn_rechazados'] + cant_sol_rechazadas['cant_inscrip_rechazados']
+      // Datos para Chart.js
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
-
       const data = {
           labels: [
               'Enero', 'Febrero', 'Marzo', 'Abril'
@@ -419,21 +528,23 @@
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: [4, 1, 3, 2, 0, 0],
+                data: [inscrip_rechazados['Enero'], inscrip_rechazados['Febrero'],
+                    inscrip_rechazados['Marzo'], inscrip_rechazados['Abril']],
                 borderColor: [
                   'rgb(56,56,56)'
                 ],
-                  backgroundColor: 'rgb(140,140,140)',
+                  backgroundColor: 'rgba(140, 140, 140, .5)',
                   fill: true,
                 hoverOffset: 4
               },
               {
                 label: 'Solicitudes ISMN',
-                data: [24, 15, 10, 9, 30, 14],
+                data: [ismn_rechazados['Enero'], ismn_rechazados['Febrero'],
+                    ismn_rechazados['Marzo'], ismn_rechazados['Abril']],
                 borderColor: [
                   'rgb(0,84,168)'
                 ],
-                  backgroundColor: 'rgb(99,177,255)',
+                  backgroundColor: 'rgba(99, 177, 255, .5)',
                   fill: true,
                 hoverOffset: 4
               }
@@ -478,11 +589,7 @@
           plugins: {
               legend: {
                   position: 'bottom'
-              },
-              title: {
-                  display: true,
-                  text: 'Solicitudes enviadas esta semana.'
-              },
+              }
           },
           responsive: true,
       }
