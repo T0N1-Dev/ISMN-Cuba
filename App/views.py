@@ -259,7 +259,7 @@ def backend_editores(request, order):
         paginator = Paginator(all_editor_list, 5)
         page = request.GET.get('page')
         all_editor = paginator.get_page(page)
-        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente', deleted=False).order_by('created_at')
+        solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
         usuario = request.user
         return render(request, 'editores/editores-list.html', {"editores": all_editor,
                                                                'solicitudes_pendientes': solicitudes_pendientes,
@@ -290,7 +290,7 @@ def backend_publicaciones(request, order):
         paginator = Paginator(all_publication_list, 5)
         page = request.GET.get('page')
         all_publication = paginator.get_page(page)
-        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente', deleted=False).order_by('created_at')
+        solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
         return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication,
                                                                         'solicitudes_pendientes': solicitudes_pendientes,
                                                                         'flag': flag})
@@ -321,13 +321,13 @@ def backend_solicitudes(request, order):
         paginator = Paginator(all_solicitudes_list, 5)
         page = request.GET.get('page')
         all_solicitudes = paginator.get_page(page)
-        solicitudes_pendientes = Solicitud.objects.filter(status='Pendiente', deleted=False).order_by('created_at')
-        solicitudes_rechazadas = Solicitud.objects.filter(deleted=True)
-        return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes,
-                                                                     'solicitudes_pendientes': solicitudes_pendientes,
-                                                                     'flag': flag,
-                                                                     'solicitudes_rechazadas': solicitudes_rechazadas
-                                                                     })
+        solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
+        solicitudes_rechazadas = Solicitud.return_deleted()
+        solicitudes_enviadas_semana = Solicitud.last_week()
+        return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes, 'flag': flag,
+                                                                     "solicitudes_pendientes": solicitudes_pendientes,
+                                                                     "solicitudes_rechazadas": solicitudes_rechazadas,
+                                                                     "solicitudes_enviadas_semana": solicitudes_enviadas_semana})
 
 
 def guardar_imagen_base64(base64_string, name):

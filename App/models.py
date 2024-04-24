@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
@@ -238,3 +240,21 @@ class Solicitud(models.Model):
 
     def __str__(self):
         return self.tipo
+
+    @classmethod
+    def last_week(cls):
+        today = timezone.now()
+        one_week_ago = today - datetime.timedelta(days=7)
+        return cls.objects.filter(created_at__gte=one_week_ago)
+
+    @classmethod
+    def return_deleted(cls):
+        return cls.objects.filter(deleted=True)
+
+    @classmethod
+    def return_active(cls):
+        return cls.objects.filter(deleted=False)
+
+    @classmethod
+    def filter_pending_not_deleted_ordered(cls):
+        return cls.objects.filter(status='Pendiente', deleted=False).order_by('-created_at')

@@ -386,13 +386,14 @@
                 <div class="col-lg-6 col-md-12" style="flex-basis: 300px; align-content: center; padding: 0">
                     <div class="d-flex justify-content-start flex-wrap" style="margin-top: -70px">
                         <i class="fa-solid fa-circle-xmark text-primary-emphasis fs-1"></i>
-                        <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis align-self-center">
+                        <h4 class="display-5 font-weight-light fs-5 text-primary-emphasis align-self-center">
                             &nbsp;&nbsp;Solicitudes rechazadas.
                         </h4>
                     </div>
                     <p class=" display-6 fs-6" style="max-width: 200px; text-align: justify; margin-left: 50px">
                         Cantidad de solicitudes rechazadas según su tipo (ISMN ó Inscripción).
                     </p>
+                    <b class="display-5 fs-5 text-center text-primary-emphasis">Total: {{ solicitudes_rechazadas.count }}.</b>
                 </div>
             </div>
             <hr>
@@ -401,7 +402,7 @@
                     <div class="d-flex justify-content-center flex-wrap mt-1 mb-2">
                         <i class="fa-solid fa-envelope-square text-primary-emphasis fs-1"></i>
                         <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis mt-auto">
-                            &nbsp;&nbsp;Solicitudes enviadas.
+                            &nbsp;&nbsp;Solicitudes recibidas.
                         </h4>
                     </div>
                     <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart2"></canvas>
@@ -486,13 +487,21 @@
           return dicc;
       }
 
-      let cant_sol_rechazadas = {'cant_ismn_rechazados': 0, 'cant_inscrip_rechazados': 0};
+      function inicializarSemana() {
+          const days = ['lunes','martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+          dicc = {};
+          days.forEach(day => dicc[day] = 0);
+          return dicc;
+      }
+
       let ismn_rechazados = inicializarMeses()
       let inscrip_rechazados = inicializarMeses()
+      let ismn_enviados_week = inicializarSemana()
+      let inscrip_enviados_week = inicializarSemana()
+
 
       {% for solicitud_r in solicitudes_rechazadas %}
           {% if solicitud_r.tipo == 'Solicitud-ISMN' %}
-              cant_sol_rechazadas['cant_ismn_rechazados'] += 1;
               {% if solicitud_r.created_at.month == 1  %}
                   ismn_rechazados['Enero'] += 1;
               {% elif solicitud_r.created_at.month == 2 %}
@@ -503,7 +512,6 @@
                   ismn_rechazados['Abril'] +=1;
               {% endif %}
           {% else %}
-              cant_sol_rechazadas['cant_inscrip_rechazados'] += 1;
               {% if solicitud_r.created_at.month == 1  %}
                   inscrip_rechazados['Enero'] += 1;
               {% elif solicitud_r.created_at.month == 2 %}
@@ -515,12 +523,46 @@
               {% endif %}
           {% endif %}
       {% endfor %}
+      {% for solicitud_e in solicitudes_enviadas_semana %}
+          {% if solicitud_e.tipo == 'Solicitud-ISMN' %}
+              {% if solicitud_e.created_at|date:'l' == 'lunes'  %}
+                  ismn_enviados_week['lunes'] += 1;
+              {% elif solicitud_e.created_at|date:'l' == 'martes' %}
+                  ismn_enviados_week['martes'] +=1;
+              {% elif solicitud_e.created_at|date:'l' == 'miércoles' %}
+                  ismn_enviados_week['miercoles'] +=1;
+              {% elif solicitud_e.created_at|date:'l' == 'jueves' %}
+                  ismn_enviados_week['jueves'] +=1;
+              {% elif solicitud_e.created_at|date:'l' == 'viernes' %}
+                  ismn_enviados_week['viernes'] +=1;
+              {% elif solicitud_e.created_at|date:'l' == 'sábado' %}
+                  ismn_enviados_week['sabado'] +=1;
+              {% else %}
+                  ismn_enviados_week['domingo'] +=1;
+              {% endif %}
+          {% else %}
+              {% if solicitud_e.created_at|date:'l' == 'lunes'  %}
+                  inscrip_enviados_week['lunes'] += 1;
+              {% elif solicitud_e.created_at|date:'l' == 'martes' %}
+                  inscrip_enviados_week['martes'] +=1;
+              {% elif solicitud_e.created_at|date:'l' == 'miércoles' %}
+                  inscrip_enviados_week['miercoles'] +=1;
+              {% elif solicitud_e.created_at|date:'l' == 'jueves' %}
+                  inscrip_enviados_week['jueves'] +=1;
+              {% elif solicitud_e.created_at|date:'l' == 'viernes' %}
+                  inscrip_enviados_week['viernes'] +=1;
+              {% elif solicitud_e.created_at|date:'l' == 'sábado' %}
+                  inscrip_enviados_week['sabado'] +=1;
+              {% else %}
+                  inscrip_enviados_week['domingo'] +=1;
+              {% endif %}
+          {% endif %}
+      {% endfor %}
 
-      let td_total_sol = document.getElementById('sol_accept_total')
-      td_total_sol.innerHTML = cant_sol_rechazadas['cant_ismn_rechazados'] + cant_sol_rechazadas['cant_inscrip_rechazados']
       // Datos para Chart.js
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
+
       const data = {
           labels: [
               'Enero', 'Febrero', 'Marzo', 'Abril'
@@ -557,19 +599,43 @@
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: [4, 1, 3, 2, 0, 0, 1],
+                data: [inscrip_enviados_week['lunes'], inscrip_enviados_week['martes'], inscrip_enviados_week['miercoles'],
+                    inscrip_enviados_week['jueves'], inscrip_enviados_week['viernes'], inscrip_enviados_week['sabado'],
+                    inscrip_enviados_week['domingo']],
                 backgroundColor: 'rgb(140,140,140)',
                 hoverOffset: 4,
                 stack: 'Stack 0'
               },
               {
                 label: 'Solicitudes ISMN',
-                data: [24, 15, 10, 9, 30, 14, 19],
+                data: [ismn_enviados_week['lunes'], ismn_enviados_week['martes'], ismn_enviados_week['miercoles'],
+                    ismn_enviados_week['jueves'], ismn_enviados_week['viernes'], ismn_enviados_week['sabado'],
+                    ismn_enviados_week['domingo']],
                 backgroundColor: 'rgb(99,177,255)',
                 hoverOffset: 4,
                 stack: 'Stack 0'
               }
           ]
+        };
+
+        // Obtener el día de la semana actual (0 para domingo, 1 para lunes, ..., 6 para sábado)
+        const currentDay = new Date().getDay();
+
+        // Reorganizar los días en los labels y data
+        const reorderedLabels = data2.labels.slice(currentDay).concat(data2.labels.slice(0, currentDay));
+        const reorderedData = data2.datasets.map(dataset => {
+          const dataSlice1 = dataset.data.slice(currentDay);
+          const dataSlice2 = dataset.data.slice(0, currentDay);
+          return dataSlice1.concat(dataSlice2);
+        });
+
+        // Crear el objeto de datos reordenados
+        const reorderedData2 = {
+          labels: reorderedLabels,
+          datasets: data2.datasets.map((dataset, index) => ({
+            ...dataset,
+            data: reorderedData[index]
+          }))
         };
 
       const options = {
@@ -589,6 +655,11 @@
           plugins: {
               legend: {
                   position: 'bottom'
+              },
+              title: {
+                display: true,
+                text: 'Total: {{ solicitudes_enviadas_semana.count }}.',
+                  position: 'bottom'
               }
           },
           responsive: true,
@@ -601,7 +672,7 @@
       });
       new Chart(ctx2, {
           type: 'bar',
-          data: data2,
+          data: reorderedData2,
           options: options2
       });
 
