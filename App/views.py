@@ -323,11 +323,11 @@ def backend_solicitudes(request, order):
         all_solicitudes = paginator.get_page(page)
         solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
         solicitudes_rechazadas = Solicitud.return_deleted()
-        solicitudes_enviadas_semana = Solicitud.last_week()
+        solicitudes_enviadas = Solicitud.objects.all().order_by('created_at')
         return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes, 'flag': flag,
                                                                      "solicitudes_pendientes": solicitudes_pendientes,
                                                                      "solicitudes_rechazadas": solicitudes_rechazadas,
-                                                                     "solicitudes_enviadas_semana": solicitudes_enviadas_semana})
+                                                                     "solicitudes_enviadas": solicitudes_enviadas})
 
 
 def guardar_imagen_base64(base64_string, name):

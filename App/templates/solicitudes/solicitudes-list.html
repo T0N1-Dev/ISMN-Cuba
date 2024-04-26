@@ -480,82 +480,44 @@
 
     <script>
 
-      function inicializarMeses() {
-          const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-          dicc = {};
-          meses.forEach(mes => dicc[mes] = 0);
-          return dicc;
-      }
+        function sumar_rechazo_mes(diccionario, year, mes) {
+            if (!(year in diccionario)) {
+                diccionario[year] = inicializar_meses();
+            }
+            if (!(mes in diccionario[year])) {
+                diccionario[year][mes] = 0;
+            }
+            diccionario[year][mes]++;
+            return diccionario;
+        }
 
-      function inicializarSemana() {
-          const days = ['lunes','martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
-          dicc = {};
-          days.forEach(day => dicc[day] = 0);
-          return dicc;
-      }
+        function sumar_solicitud_enviada(diccionario, date) {
+          if (!(date in diccionario)) {
+                diccionario[date] = 0;
+            }
+            diccionario[date]++;
+            return diccionario;
+        }
 
-      let ismn_rechazados = inicializarMeses()
-      let inscrip_rechazados = inicializarMeses()
-      let ismn_enviados_week = inicializarSemana()
-      let inscrip_enviados_week = inicializarSemana()
-
+        // Inicializar los datos de los gráficos
+      let ismn_rechazados = {}
+      let inscrip_rechazados = {}
+      let ismn_enviados = {}
+      let inscrip_enviados = {}
 
       {% for solicitud_r in solicitudes_rechazadas %}
           {% if solicitud_r.tipo == 'Solicitud-ISMN' %}
-              {% if solicitud_r.created_at.month == 1  %}
-                  ismn_rechazados['Enero'] += 1;
-              {% elif solicitud_r.created_at.month == 2 %}
-                  ismn_rechazados['Febrero'] +=1;
-              {% elif solicitud_r.created_at.month == 3 %}
-                  ismn_rechazados['Marzo'] +=1;
-              {% else %}
-                  ismn_rechazados['Abril'] +=1;
-              {% endif %}
+              sumar_rechazo_mes(ismn_rechazados, {{ solicitud_r.created_at.year }}, '{{ solicitud_r.created_at|date:'b' }}')
           {% else %}
-              {% if solicitud_r.created_at.month == 1  %}
-                  inscrip_rechazados['Enero'] += 1;
-              {% elif solicitud_r.created_at.month == 2 %}
-                  inscrip_rechazados['Febrero'] +=1;
-              {% elif solicitud_r.created_at.month == 3 %}
-                  inscrip_rechazados['Marzo'] +=1;
-              {% else %}
-                  inscrip_rechazados['Abril'] +=1;
-              {% endif %}
+              sumar_rechazo_mes(inscrip_rechazados, {{ solicitud_r.created_at.year }}, '{{ solicitud_r.created_at|date:'b' }}')
           {% endif %}
       {% endfor %}
-      {% for solicitud_e in solicitudes_enviadas_semana %}
+
+      {% for solicitud_e in solicitudes_enviadas %}
           {% if solicitud_e.tipo == 'Solicitud-ISMN' %}
-              {% if solicitud_e.created_at|date:'l' == 'lunes'  %}
-                  ismn_enviados_week['lunes'] += 1;
-              {% elif solicitud_e.created_at|date:'l' == 'martes' %}
-                  ismn_enviados_week['martes'] +=1;
-              {% elif solicitud_e.created_at|date:'l' == 'miércoles' %}
-                  ismn_enviados_week['miercoles'] +=1;
-              {% elif solicitud_e.created_at|date:'l' == 'jueves' %}
-                  ismn_enviados_week['jueves'] +=1;
-              {% elif solicitud_e.created_at|date:'l' == 'viernes' %}
-                  ismn_enviados_week['viernes'] +=1;
-              {% elif solicitud_e.created_at|date:'l' == 'sábado' %}
-                  ismn_enviados_week['sabado'] +=1;
-              {% else %}
-                  ismn_enviados_week['domingo'] +=1;
-              {% endif %}
+              sumar_solicitud_enviada(ismn_enviados, '{{ solicitud_e.created_at|date:'Y/m/d' }}')
           {% else %}
-              {% if solicitud_e.created_at|date:'l' == 'lunes'  %}
-                  inscrip_enviados_week['lunes'] += 1;
-              {% elif solicitud_e.created_at|date:'l' == 'martes' %}
-                  inscrip_enviados_week['martes'] +=1;
-              {% elif solicitud_e.created_at|date:'l' == 'miércoles' %}
-                  inscrip_enviados_week['miercoles'] +=1;
-              {% elif solicitud_e.created_at|date:'l' == 'jueves' %}
-                  inscrip_enviados_week['jueves'] +=1;
-              {% elif solicitud_e.created_at|date:'l' == 'viernes' %}
-                  inscrip_enviados_week['viernes'] +=1;
-              {% elif solicitud_e.created_at|date:'l' == 'sábado' %}
-                  inscrip_enviados_week['sabado'] +=1;
-              {% else %}
-                  inscrip_enviados_week['domingo'] +=1;
-              {% endif %}
+              sumar_solicitud_enviada(inscrip_enviados, '{{ solicitud_e.created_at|date:'Y/m/d' }}')
           {% endif %}
       {% endfor %}
 
@@ -563,15 +525,17 @@
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
 
+      let inscrip_rechazados_last_week = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
+      let ismn_rechazados_last_week = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
+      let labels_meses = months_label({{ solicitudes_rechazadas.last.created_at.month }})
+        console.log(labels_meses)
+
       const data = {
-          labels: [
-              'Enero', 'Febrero', 'Marzo', 'Abril'
-          ],
+          labels: labels_meses,
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: [inscrip_rechazados['Enero'], inscrip_rechazados['Febrero'],
-                    inscrip_rechazados['Marzo'], inscrip_rechazados['Abril']],
+                data: inscrip_rechazados_last_week,
                 borderColor: [
                   'rgb(56,56,56)'
                 ],
@@ -581,8 +545,7 @@
               },
               {
                 label: 'Solicitudes ISMN',
-                data: [ismn_rechazados['Enero'], ismn_rechazados['Febrero'],
-                    ismn_rechazados['Marzo'], ismn_rechazados['Abril']],
+                data: ismn_rechazados_last_week,
                 borderColor: [
                   'rgb(0,84,168)'
                 ],
@@ -592,6 +555,7 @@
               }
           ]
         };
+
       const data2 = {
           labels: [
               'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'
@@ -599,18 +563,14 @@
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: [inscrip_enviados_week['lunes'], inscrip_enviados_week['martes'], inscrip_enviados_week['miercoles'],
-                    inscrip_enviados_week['jueves'], inscrip_enviados_week['viernes'], inscrip_enviados_week['sabado'],
-                    inscrip_enviados_week['domingo']],
+                data: [],
                 backgroundColor: 'rgb(140,140,140)',
                 hoverOffset: 4,
                 stack: 'Stack 0'
               },
               {
                 label: 'Solicitudes ISMN',
-                data: [ismn_enviados_week['lunes'], ismn_enviados_week['martes'], ismn_enviados_week['miercoles'],
-                    ismn_enviados_week['jueves'], ismn_enviados_week['viernes'], ismn_enviados_week['sabado'],
-                    ismn_enviados_week['domingo']],
+                data: [],
                 backgroundColor: 'rgb(99,177,255)',
                 hoverOffset: 4,
                 stack: 'Stack 0'
@@ -648,7 +608,6 @@
                 text: 'Solicitudes rechazadas en el último semestre.'
               }
           },
-
           responsive: true
       }
       const options2 = {
@@ -665,16 +624,17 @@
           responsive: true,
       }
 
-      new Chart(ctx, {
-          type: 'line',
-          data: data,
-          options: options
-      });
+      const ChartLines = new Chart(ctx, {
+                              type: 'line',
+                              data: data,
+                              options: options
+                          });
       new Chart(ctx2, {
           type: 'bar',
           data: reorderedData2,
           options: options2
       });
 
+      addData(ChartLines, 'Mayo', [0,2])
     </script>
 {% endblock statistics-modal %}

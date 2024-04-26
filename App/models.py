@@ -241,20 +241,24 @@ class Solicitud(models.Model):
     def __str__(self):
         return self.tipo
 
+    # Retorna todas las solicitudes de la última semana
     @classmethod
     def last_week(cls):
         today = timezone.now()
         one_week_ago = today - datetime.timedelta(days=7)
-        return cls.objects.filter(created_at__gte=one_week_ago)
+        return cls.objects.filter(created_at__date__gt=one_week_ago)
 
+    # Retorna todas las solicitudes que han sido eliminadas o rechazadas
     @classmethod
     def return_deleted(cls):
-        return cls.objects.filter(deleted=True)
+        return cls.objects.filter(deleted=True).order_by('created_at')
 
+    # Retorna todas las solicitudes que no han sido rechazadas, es decir, las aceptadas y las pendientes
     @classmethod
     def return_active(cls):
-        return cls.objects.filter(deleted=False)
+        return cls.objects.filter(deleted=False).order_by('created_at')
 
+    # Retorna todas las solicitude pendientes
     @classmethod
     def filter_pending_not_deleted_ordered(cls):
         return cls.objects.filter(status='Pendiente', deleted=False).order_by('-created_at')
