@@ -380,7 +380,11 @@
             <h1 class="display-6 text-primary-emphasis mb-3 pl-3 fs-2">Solicitudes, Reportes y Estadísticas</h1>
             <div class="border-bottom border-4 mb-4"></div>
             <div class="row mb-2">
-                <div class="col-lg-6 col-md-12" style="min-width: 450px; height: 400px; flex-grow: 1; flex-basis: 0">
+                <div class="col-lg-6 col-md-12" style="min-width: 450px; height: 490px; flex-grow: 1; flex-basis: 0">
+                    <div class="d-flex justify-content-start">
+                        <button type="button" id="add_data" class="btn btn-sm btn-outline-primary mb-1" style="margin-left: 35px"><i class="fas fa-plus"></i>&nbsp;&nbsp;Más datos</button>
+                        <button type="button" id="remove_data" class="btn btn-sm btn-outline-secondary mb-1" style="margin-left: 10px"><i class="fa fa-close"></i>&nbsp;&nbsp;Menos datos</button>
+                    </div>
                     <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart"></canvas>
                 </div>
                 <div class="col-lg-6 col-md-12" style="flex-basis: 300px; align-content: center; padding: 0">
@@ -525,17 +529,17 @@
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
 
-      let inscrip_rechazados_last_week = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
-      let ismn_rechazados_last_week = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
+      let inscrip_rechazados_lately = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
+      let ismn_rechazados_lately = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
       let labels_meses = months_label({{ solicitudes_rechazadas.last.created_at.month }})
-        console.log(labels_meses)
+
 
       const data = {
           labels: labels_meses,
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: inscrip_rechazados_last_week,
+                data: inscrip_rechazados_lately,
                 borderColor: [
                   'rgb(56,56,56)'
                 ],
@@ -545,7 +549,7 @@
               },
               {
                 label: 'Solicitudes ISMN',
-                data: ismn_rechazados_last_week,
+                data: ismn_rechazados_lately,
                 borderColor: [
                   'rgb(0,84,168)'
                 ],
@@ -602,10 +606,6 @@
           plugins: {
               legend: {
                   position: 'bottom'
-              },
-              title: {
-                display: true,
-                text: 'Solicitudes rechazadas en el último semestre.'
               }
           },
           responsive: true
@@ -635,6 +635,16 @@
           options: options2
       });
 
-      addData(ChartLines, 'Mayo', [0,2])
+      const addButton = document.getElementById('add_data');
+      const rmvButton = document.getElementById('remove_data');
+
+        addButton.addEventListener('click', function () {
+          addData(ChartLines, [1,2]);
+      });
+
+        rmvButton.addEventListener('click', function () {
+           removeData(ChartLines);
+        });
+
     </script>
 {% endblock statistics-modal %}
