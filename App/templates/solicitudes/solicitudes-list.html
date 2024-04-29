@@ -287,13 +287,23 @@
                 <li class="page-item disabled"></li>
             {% endif %}
 
+            {% if solicitudes.number|add:'-2' > 1 %}
+                <li><a class="page-link" href="?page={{ solicitudes.number|add:'-2' }}">&hellip;</a></li>
+            {% endif %}
+
             {% for i in solicitudes.paginator.page_range %}
                 {% if solicitudes.number == i %}
                     <li class="page-item active"><span class="page-link">{{ i }}<span class="sr-only"></span></span></li>
-                {% else %}
+                {% elif i > solicitudes.number|add:'-2' and i < solicitudes.number|add:'2' %}
                     <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
                 {% endif %}
             {% endfor %}
+
+            {% if solicitudes.paginator.num_pages > solicitudes.number|add:'2' %}
+                <li><a class="page-link" href="?page={{ solicitudes.number|add:'-2' }}">&hellip;</a></li>
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+                <li><a class="page-link" href="?page={{ solicitudes.paginator.num_pages }}">{{ solicitudes.paginator.num_pages }}</a></li>
+            {% endif %}
 
             {% if solicitudes.has_next %}
                 <li class="page-item"><a class="page-link" href="?page={{ solicitudes.next_page_number }}"><i class="fas fa-angle-double-right"></i></a></li>
@@ -380,10 +390,10 @@
             <h1 class="display-6 text-primary-emphasis mb-3 pl-3 fs-2">Solicitudes, Reportes y Estadísticas</h1>
             <div class="border-bottom border-4 mb-4"></div>
             <div class="row mb-2">
-                <div class="col-lg-6 col-md-12" style="min-width: 450px; height: 490px; flex-grow: 1; flex-basis: 0">
+                <div class="col-lg-6 col-md-12" style="min-width: 450px; height: 500px; flex-grow: 1; flex-basis: 0">
                     <div class="d-flex justify-content-start">
-                        <button type="button" id="add_data" class="btn btn-sm btn-outline-primary mb-1" style="margin-left: 35px"><i class="fas fa-plus"></i>&nbsp;&nbsp;Más datos</button>
-                        <button type="button" id="remove_data" class="btn btn-sm btn-outline-secondary mb-1" style="margin-left: 10px"><i class="fa fa-close"></i>&nbsp;&nbsp;Menos datos</button>
+                        <button type="button" id="add_data_line_chart" class="btn btn-sm btn-outline-primary mb-1" style="margin-left: 35px"><i class="fas fa-plus"></i>&nbsp;&nbsp;Más datos</button>
+                        <button type="button" id="remove_data_line_chart" class="btn btn-sm btn-outline-secondary mb-1" style="margin-left: 10px"><i class="fa fa-minus"></i>&nbsp;&nbsp;Menos datos</button>
                     </div>
                     <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart"></canvas>
                 </div>
@@ -400,19 +410,23 @@
                     <b class="display-5 fs-5 text-center text-primary-emphasis">Total: {{ solicitudes_rechazadas.count }}.</b>
                 </div>
             </div>
-            <hr>
+            <hr class="mb-3">
             <div class="row mb-2">
                 <div class="col-lg-6">
-                    <div class="d-flex justify-content-center flex-wrap mt-1 mb-2">
+                    <div class="d-flex justify-content-center mb-4 flex-wrap mt-1 mb-2">
                         <i class="fa-solid fa-envelope-square text-primary-emphasis fs-1"></i>
                         <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis mt-auto">
                             &nbsp;&nbsp;Solicitudes recibidas.
                         </h4>
                     </div>
+                    <div class="d-flex justify-content-start">
+                        <button type="button" id="add_data_bar_chart" class="btn btn-sm btn-outline-primary mb-1" style="margin-left: 22px"><i class="fas fa-plus"></i>&nbsp;&nbsp;Más datos</button>
+                        <button type="button" id="remove_data_bar_chart" class="btn btn-sm btn-outline-secondary mb-1" style="margin-left: 10px"><i class="fa fa-minus"></i>&nbsp;&nbsp;Menos datos</button>
+                    </div>
                     <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart2"></canvas>
                 </div>
                 <div class="col-lg-1" style="max-width: 10px">
-                    <div class="border-start border-1 text-dark" style="height: 400px"></div>
+                    <div class="border-start border-1 text-dark" style="height: 450px"></div>
                 </div>
                 <div class="col-lg-5">
                     <div class="d-flex justify-content-center flex-wrap mt-1 mb-3">
@@ -525,13 +539,19 @@
           {% endif %}
       {% endfor %}
 
-      // Datos para Chart.js
+      // Datos b para Chart.js
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
 
       let inscrip_rechazados_lately = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
       let ismn_rechazados_lately = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
-      let labels_meses = months_label({{ solicitudes_rechazadas.last.created_at.month }})
+      let labels_meses = months_label({{ solicitudes_rechazadas.last.created_at.month }});
+
+      function cantidad_solicitudes_per_day(ismn_solicitudes_lis, inscrip_solicitudes_list){
+          let total = ismn_solicitudes_lis.reduce((total, numero) => total + numero, 0);
+          total += inscrip_solicitudes_list.reduce((total, numero) => total + numero);
+          return total
+      }
 
 
       const data = {
@@ -561,20 +581,18 @@
         };
 
       const data2 = {
-          labels: [
-              'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'
-          ],
+          labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: [],
+                data: Object.values(inscrip_enviados).slice(-7),
                 backgroundColor: 'rgb(140,140,140)',
                 hoverOffset: 4,
                 stack: 'Stack 0'
               },
               {
                 label: 'Solicitudes ISMN',
-                data: [],
+                data: Object.values(ismn_enviados).slice(-7),
                 backgroundColor: 'rgb(99,177,255)',
                 hoverOffset: 4,
                 stack: 'Stack 0'
@@ -602,6 +620,8 @@
           }))
         };
 
+        let total_solicitudes_enviadas = cantidad_solicitudes_per_day(data2.datasets[0].data, data2.datasets[1].data)
+
       const options = {
           plugins: {
               legend: {
@@ -617,7 +637,7 @@
               },
               title: {
                 display: true,
-                text: 'Total: {{ solicitudes_enviadas_semana.count }}.',
+                text: `Total: ${total_solicitudes_enviadas}.`,
                   position: 'bottom'
               }
           },
@@ -635,14 +655,16 @@
           options: options2
       });
 
-      const addButton = document.getElementById('add_data');
-      const rmvButton = document.getElementById('remove_data');
+      const addButtonLineChart = document.getElementById('add_data_line_chart');
+      const rmvButtonLineChart = document.getElementById('remove_data_line_chart');
+      const addButtonBarChart = document.getElementById('add_data_bar_chart');
+      const rmvButtonBarChart = document.getElementById('remove_data_bar_chart');
 
-        addButton.addEventListener('click', function () {
-          addData(ChartLines, [1,2]);
+        addButtonLineChart.addEventListener('click', function () {
+          addData(ChartLines, inscrip_rechazados, ismn_rechazados);
       });
 
-        rmvButton.addEventListener('click', function () {
+        rmvButtonLineChart.addEventListener('click', function () {
            removeData(ChartLines);
         });
 

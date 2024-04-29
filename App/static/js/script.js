@@ -151,7 +151,7 @@ $(document).ready(function (){
 
 // 7) Validate Image Extension
 $(document).ready(function() {
-    $("input[name*='imagenProfile'], input[name*='publication_image']").on('change', function() {
+    $("input[name*='image']").on('change', function() {
 
         var filePath = $(this).val();
         var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.jfif)$/i;
@@ -165,7 +165,7 @@ $(document).ready(function() {
 
 // 8) Validate Letter Estension
 $(document).ready(function () {
-    $("input[name*='publication_letter']").on('change', function () {
+    $("input[name='publication_letter']").on('change', function () {
         var filePath = $(this).val();
         var allowedExtensions = /(\.pdf|\.docx|\.txt)/i;
         if (!allowedExtensions.exec(filePath)) {
@@ -213,6 +213,14 @@ let verify = $("#chk_td").length;
 if (verify === 0) {
     $("#no-data").text("No se ha encontrado");
 }
+
+// 12) Script to allow only numbers in ID Tribute
+$("#idTribute").keyup(function () {
+    if(!/^[0-9]*$/.test(this.value)) {
+        this.value = this.value.split(/[^0-9]/).join('');
+    }
+
+});
 
 // 16 Toggle Password Visibility
 function toggleFunction(){
