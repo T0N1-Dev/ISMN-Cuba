@@ -509,13 +509,6 @@
             return diccionario;
         }
 
-        function sumar_solicitud_enviada(diccionario, date) {
-          if (!(date in diccionario)) {
-                diccionario[date] = 0;
-            }
-            diccionario[date]++;
-            return diccionario;
-        }
 
         // Inicializar los datos de los gráficos
       let ismn_rechazados = {}
@@ -531,12 +524,15 @@
           {% endif %}
       {% endfor %}
 
-      {% for solicitud_e in solicitudes_enviadas %}
-          {% if solicitud_e.tipo == 'Solicitud-ISMN' %}
-              sumar_solicitud_enviada(ismn_enviados, '{{ solicitud_e.created_at|date:'Y/m/d' }}')
-          {% else %}
-              sumar_solicitud_enviada(inscrip_enviados, '{{ solicitud_e.created_at|date:'Y/m/d' }}')
-          {% endif %}
+
+      {% for key, value in solicitudes_enviadas.items %}
+          {% for clave, valor in value.items %}
+              {% if clave == 'Solicitud-Inscripción' %}
+                  inscrip_enviados["{{ key.year }}/{{ key.month }}/{{ key.day }}"] = {{ valor }};
+              {% else %}
+                  ismn_enviados["{{ key.year }}/{{ key.month }}/{{ key.day }}"] = {{ valor }};
+              {% endif %}
+          {% endfor %}
       {% endfor %}
 
       // Datos b para Chart.js
@@ -552,7 +548,6 @@
           total += inscrip_solicitudes_list.reduce((total, numero) => total + numero);
           return total
       }
-
 
       const data = {
           labels: labels_meses,
@@ -605,20 +600,8 @@
 
         // Reorganizar los días en los labels y data
         const reorderedLabels = data2.labels.slice(currentDay).concat(data2.labels.slice(0, currentDay));
-        const reorderedData = data2.datasets.map(dataset => {
-          const dataSlice1 = dataset.data.slice(currentDay);
-          const dataSlice2 = dataset.data.slice(0, currentDay);
-          return dataSlice1.concat(dataSlice2);
-        });
 
-        // Crear el objeto de datos reordenados
-        const reorderedData2 = {
-          labels: reorderedLabels,
-          datasets: data2.datasets.map((dataset, index) => ({
-            ...dataset,
-            data: reorderedData[index]
-          }))
-        };
+        data2.labels = reorderedLabels
 
         let total_solicitudes_enviadas = cantidad_solicitudes_per_day(data2.datasets[0].data, data2.datasets[1].data)
 
@@ -649,9 +632,9 @@
                               data: data,
                               options: options
                           });
-      new Chart(ctx2, {
+      const ChartBar = new Chart(ctx2, {
           type: 'bar',
-          data: reorderedData2,
+          data: data2,
           options: options2
       });
 
@@ -660,13 +643,22 @@
       const addButtonBarChart = document.getElementById('add_data_bar_chart');
       const rmvButtonBarChart = document.getElementById('remove_data_bar_chart');
 
-        addButtonLineChart.addEventListener('click', function () {
-          addData(ChartLines, inscrip_rechazados, ismn_rechazados);
+      addButtonLineChart.addEventListener('click', function () {
+          addDataLineChart(ChartLines, inscrip_rechazados, ismn_rechazados);
       });
 
-        rmvButtonLineChart.addEventListener('click', function () {
-           removeData(ChartLines);
-        });
+      rmvButtonLineChart.addEventListener('click', function () {
+          removeDataLineChart(ChartLines);
+      });
+
+      addButtonBarChart.addEventListener('click', function (){
+          addDataBarChart(ChartBar, inscrip_enviados, ismn_enviados);
+      });
+
+      rmvButtonBarChart.addEventListener('click', function (){
+          removeDataBarChart(ChartBar);
+      });
+
 
     </script>
 {% endblock statistics-modal %}

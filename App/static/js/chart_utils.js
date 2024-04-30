@@ -18,10 +18,8 @@ const Meses_django = ['ene', 'feb', 'mar', 'abr', 'may', 'jun',
 
 
 let indiceMes = 11;
-
-function capitalizeWord(word) {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-}
+let indiceLabel = 1;
+let indiceDataBarChart = 8;
 
 function inicializar_meses(){
     const diccionario = {};
@@ -43,8 +41,22 @@ function extraer_organizar_datos(mes, inscrip_rechazados, ismn_rechazados){
     return [inscrip_rechazados_mes_anterior, ismn_rechazados_mes_anterior];
 }
 
+function cantidad_solicitudes_per_day(ismn_solicitudes_lis, inscrip_solicitudes_list){
+  let total = ismn_solicitudes_lis.reduce((total, numero) => total + numero, 0);
+  total += inscrip_solicitudes_list.reduce((total, numero) => total + numero);
+  return total
+}
 
-function addData(chart, inscrip_rechazados, ismn_rechazados) {
+function agregarUltimoLabelAlPrincipio(listaOriginal) {
+    let ultimo_elemento = listaOriginal[listaOriginal.length-indiceLabel];
+    indiceLabel++;
+    let newLabel = listaOriginal;
+    newLabel.unshift(ultimo_elemento)
+    return newLabel
+}
+
+
+function addDataLineChart(chart, inscrip_rechazados, ismn_rechazados) {
     let newData = extraer_organizar_datos(indiceMes, inscrip_rechazados, ismn_rechazados)
     if (chart.data.labels.length < 14){
         chart.data.labels.unshift(Meses_Label[indiceMes]);
@@ -55,7 +67,7 @@ function addData(chart, inscrip_rechazados, ismn_rechazados) {
     chart.update();
 }
 
-function removeData(chart) {
+function removeDataLineChart(chart) {
     if (chart.data.labels.length > 4){
         chart.data.labels.shift();
         chart.data.datasets.forEach((dataset) => {
@@ -66,3 +78,28 @@ function removeData(chart) {
     chart.update();
 }
 
+function addDataBarChart(chart, inscrip_enviados, ismn_enviados){
+    let newInscripData = Object.values(inscrip_enviados).slice(-indiceDataBarChart);
+    let newISMNData = Object.values(ismn_enviados).slice(-indiceDataBarChart);
+    if (chart.data.labels.length < 30){
+        chart.data.labels = agregarUltimoLabelAlPrincipio(chart.data.labels);
+        chart.data.datasets[0].data = newInscripData;
+        chart.data.datasets[1].data = newISMNData;
+        indiceDataBarChart++;
+        chart.options.plugins.title.text = `Total: ${cantidad_solicitudes_per_day(newInscripData, newISMNData)}.`;
+    }
+    chart.update();
+}
+
+function removeDataBarChart(chart){
+     if (chart.data.labels.length > 7){
+        chart.data.labels.shift();
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.shift();
+        });
+        indiceDataBarChart--;
+        indiceLabel--;
+        chart.options.plugins.title.text = `Total: ${}.`;
+    }
+    chart.update();
+}

@@ -323,7 +323,7 @@ def backend_solicitudes(request, order):
         all_solicitudes = paginator.get_page(page)
         solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
         solicitudes_rechazadas = Solicitud.return_deleted()
-        solicitudes_enviadas = Solicitud.objects.all().order_by('created_at')
+        solicitudes_enviadas = Solicitud.solicitudes_enviadas_total()
         return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes, 'flag': flag,
                                                                      "solicitudes_pendientes": solicitudes_pendientes,
                                                                      "solicitudes_rechazadas": solicitudes_rechazadas,
