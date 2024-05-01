@@ -324,10 +324,13 @@ def backend_solicitudes(request, order):
         solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
         solicitudes_rechazadas = Solicitud.return_deleted()
         solicitudes_enviadas = Solicitud.solicitudes_enviadas_total()
+        # Solo me interesan las últimas 30 que representan un mes
+        solicitudes_aceptadas = dict(list(Solicitud.return_accepted().items())[-31:])
         return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes, 'flag': flag,
                                                                      "solicitudes_pendientes": solicitudes_pendientes,
                                                                      "solicitudes_rechazadas": solicitudes_rechazadas,
-                                                                     "solicitudes_enviadas": solicitudes_enviadas})
+                                                                     "solicitudes_enviadas": solicitudes_enviadas,
+                                                                     "solicitudes_aceptadas": solicitudes_aceptadas})
 
 
 def guardar_imagen_base64(base64_string, name):

@@ -21,6 +21,16 @@ let indiceMes = 11;
 let indiceLabel = 1;
 let indiceDataBarChart = 8;
 
+function sumaElementos(arreglo1, arreglo2) {
+    let sumaTotal = 0;
+
+    for (let i = 0; i < arreglo1.length; i++) {
+        sumaTotal += arreglo1[i] + arreglo2[i];
+    }
+    return sumaTotal;
+}
+
+
 function inicializar_meses(){
     const diccionario = {};
     Meses_django.forEach(mes => {
@@ -39,12 +49,6 @@ function extraer_organizar_datos(mes, inscrip_rechazados, ismn_rechazados){
     let inscrip_rechazados_mes_anterior = inscrip_rechazados['2023'][Meses_django[mes]];
     let ismn_rechazados_mes_anterior = ismn_rechazados['2023'][Meses_django[mes]];
     return [inscrip_rechazados_mes_anterior, ismn_rechazados_mes_anterior];
-}
-
-function cantidad_solicitudes_per_day(ismn_solicitudes_lis, inscrip_solicitudes_list){
-  let total = ismn_solicitudes_lis.reduce((total, numero) => total + numero, 0);
-  total += inscrip_solicitudes_list.reduce((total, numero) => total + numero);
-  return total
 }
 
 function agregarUltimoLabelAlPrincipio(listaOriginal) {
@@ -86,20 +90,21 @@ function addDataBarChart(chart, inscrip_enviados, ismn_enviados){
         chart.data.datasets[0].data = newInscripData;
         chart.data.datasets[1].data = newISMNData;
         indiceDataBarChart++;
-        chart.options.plugins.title.text = `Total: ${cantidad_solicitudes_per_day(newInscripData, newISMNData)}.`;
+        chart.options.plugins.title.text = `Total: ${sumaElementos(newInscripData, newISMNData)}.`;
     }
     chart.update();
 }
 
 function removeDataBarChart(chart){
-     if (chart.data.labels.length > 7){
+    if (chart.data.labels.length > 7) {
         chart.data.labels.shift();
         chart.data.datasets.forEach((dataset) => {
             dataset.data.shift();
         });
         indiceDataBarChart--;
         indiceLabel--;
-        chart.options.plugins.title.text = `Total: ${}.`;
+        let total = sumaElementos(chart.data.datasets[0].data, chart.data.datasets[1].data);
+        chart.options.plugins.title.text = `Total: ${total}.`;
     }
     chart.update();
 }

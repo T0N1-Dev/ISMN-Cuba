@@ -416,88 +416,80 @@
                     <div class="d-flex justify-content-center mb-4 flex-wrap mt-1 mb-2">
                         <i class="fa-solid fa-envelope-square text-primary-emphasis fs-1"></i>
                         <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis mt-auto">
-                            &nbsp;&nbsp;Solicitudes recibidas.
+                            &nbsp;&nbsp;Solicitudes recibidas. Último días.
                         </h4>
                     </div>
                     <div class="d-flex justify-content-start">
                         <button type="button" id="add_data_bar_chart" class="btn btn-sm btn-outline-primary mb-1" style="margin-left: 22px"><i class="fas fa-plus"></i>&nbsp;&nbsp;Más datos</button>
                         <button type="button" id="remove_data_bar_chart" class="btn btn-sm btn-outline-secondary mb-1" style="margin-left: 10px"><i class="fa fa-minus"></i>&nbsp;&nbsp;Menos datos</button>
                     </div>
-                    <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart2"></canvas>
+                    <canvas role="graphics-object" width="450" height="400" aria-label="Bar Charts Solicitudes" id="myChart2"></canvas>
                 </div>
                 <div class="col-lg-1" style="max-width: 10px">
                     <div class="border-start border-1 text-dark" style="height: 450px"></div>
                 </div>
-                <div class="col-lg-5">
+                <div class="col-lg-5" style="width: 400px">
                     <div class="d-flex justify-content-center flex-wrap mt-1 mb-3">
                         <i class="fa-solid fa-check-circle text-primary-emphasis fs-1"></i>
                         <h4 class="display-6 font-weight-light fs-5 text-primary-emphasis mt-auto">
-                            &nbsp;&nbsp;Solicitudes aceptadas.
+                            &nbsp;&nbsp;Solicitudes aceptadas. Último mes.
                         </h4>
                     </div>
-                    <table class="table table-hover table-striped table-sm">
-                      <thead>
-                        <tr class="table-primary">
-                          <th scope="col" class="text-center">&nbsp;Fecha</th>
-                          <th scope="col" class="text-center">&nbsp;Tipo</th>
-                          <th scope="col" class="text-center">&nbsp;Cantidad</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <th scope="row">14/4</th>
-                          <td>Solicitud-ISMN</td>
-                          <td>10</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">-</th>
-                          <td>Solicitud-Inscripción</td>
-                          <td>1</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">15/4</th>
-                          <td>Solicitud-ISMN</td>
-                          <td>7</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">-</th>
-                          <td>Solicitud-Inscripción</td>
-                          <td>0</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">16/4</th>
-                          <td>Solicitud-ISMN</td>
-                          <td>12</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">-</th>
-                          <td>Solicitud-Inscripción</td>
-                          <td>1</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">17/4</th>
-                          <td>Solicitud-ISMN</td>
-                          <td>8</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">-</th>
-                          <td>Solicitud-Inscripción</td>
-                          <td>2</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">18/4</th>
-                          <td>Total</td>
-                          <td id="sol_accept_total">45</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <div style="max-height: 400px; width: border-box; overflow-y: auto">
+                        <table class="table table-hover table-striped table-sm" >
+                          <thead>
+                            <tr class="table-primary">
+                              <th scope="col" class="text-center">&nbsp;Fecha</th>
+                              <th scope="col" class="text-center">&nbsp;Tipo</th>
+                              <th scope="col" class="text-center">&nbsp;Cantidad</th>
+                            </tr>
+                          </thead>
+                          <tbody id="tabla">
+                          </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Tabla
+        let tbody = document.getElementById('tabla');
+        let html = '';
+        let total = 0;
 
+        {% for clave, valor in solicitudes_aceptadas.items %}
+            {% for key, value in valor.items %}
+                console.log("{{ clave|date:"Y/m/d" }} - {{ key }}: {{ value }}")
+                {% if key == 'Solicitud-ISMN' %}
+                    html = `<tr>
+                                <th scope="row">{{ clave|date:'d/m' }}</th>
+                                <td>Solicitud-ISMN</td>
+                                <td>{{ value }}</td>
+                            </tr>`
+                    tbody.insertAdjacentHTML('beforeend', html);
+                    total += {{ value }};
+                {% else %}
+                    html = `<tr>
+                                <th scope="row">-</th>
+                                <td>Solicitud-Inscripción</td>
+                                <td>{{ value }}</td>
+                            </tr>`;
+                    tbody.insertAdjacentHTML('beforeend', html);
+                    total += {{ value }};
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+        html = `<tr>
+                    <th></th>
+                    <td><b>Total</b></td>
+                    <td>${total}</td>
+                </tr>`;
+        tbody.insertAdjacentHTML('beforeend', html);
+
+        // Charts
         function sumar_rechazo_mes(diccionario, year, mes) {
             if (!(year in diccionario)) {
                 diccionario[year] = inicializar_meses();
