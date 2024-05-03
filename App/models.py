@@ -300,9 +300,12 @@ class Solicitud(models.Model):
         # Truncar la fecha mínima para obtener solo la fecha (sin hora)
         fecha_minima = fecha_minima.date()
 
-        # Inicializar el diccionario de resultados con todas las fechas desde la mínima hasta la actual
-        resultados = {fecha_minima + datetime.timedelta(days=d): {'Solicitud-Inscripción': 0, 'Solicitud-ISMN': 0} for d
-                      in range((fecha_actual - fecha_minima).days + 1)}
+        # Inicializar el diccionario de resultados con las últimas 30 fechas
+        resultados = {}
+        fecha_iter = fecha_actual
+        for _ in range(30):
+            resultados[fecha_iter] = {'Solicitud-Inscripción': 0, 'Solicitud-ISMN': 0}
+            fecha_iter -= datetime.timedelta(days=1)
 
         # Contar las solicitudes por fecha y actualizar el diccionario de resultados
         solicitudes_por_fecha_tipo = cls.objects.annotate(fecha=TruncDate('created_at')).values('fecha',
@@ -315,7 +318,41 @@ class Solicitud(models.Model):
             if fecha in resultados:
                 resultados[fecha][tipo] = total
 
-        return resultados
+        # Imprimir resultados
+        resultados_descendente = dict(reversed(list(resultados.items())))
+        print(resultados_descendente)
+        return resultados_descendente
+    # @classmethod
+    # def solicitudes_enviadas_total(cls):
+    #     # Obtener la fecha mínima en la que se creó una solicitud
+    #     fecha_minima = cls.objects.aggregate(Min('created_at'))['created_at__min']
+    #     print(fecha_minima, type(fecha_minima))
+    #
+    #     # Si no hay solicitudes, retornar un diccionario vacío
+    #     if not fecha_minima:
+    #         return {}
+    #
+    #     # Obtener la fecha actual
+    #     fecha_actual = timezone.now().date()
+    #
+    #     # Truncar la fecha mínima para obtener solo la fecha (sin hora)
+    #     fecha_minima = fecha_minima.date()
+    #
+    #     # Inicializar el diccionario de resultados con todas las fechas desde la mínima hasta la actual
+    #     resultados = {fecha_minima + datetime.timedelta(days=d): {'Solicitud-Inscripción': 0, 'Solicitud-ISMN': 0} for d
+    #                   in range((fecha_actual - fecha_minima).days + 1)}
+    #
+    #     # Contar las solicitudes por fecha y actualizar el diccionario de resultados
+    #     solicitudes_por_fecha_tipo = cls.objects.annotate(fecha=TruncDate('created_at')).values('fecha',
+    #                                                                                             'tipo').annotate(
+    #         total=Count('id'))
+    #     for solicitud in solicitudes_por_fecha_tipo:
+    #         fecha = solicitud['fecha']
+    #         tipo = solicitud['tipo']
+    #         total = solicitud['total']
+    #         if fecha in resultados:
+    #             resultados[fecha][tipo] = total
+    #     return resultados
 
     # Retorna todas las solicitude pendientes
     @classmethod

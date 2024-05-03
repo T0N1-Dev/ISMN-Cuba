@@ -192,7 +192,7 @@
                       </div>
 
                       <div class="modal-footer justify-content-center">
-                        <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal" id="btn-accept">
+                        <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal">
                             <a href="{% url 'accept_inscription' solicitud.id %}" type="button" class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Aceptar</a>
                         </button>
                       </div>
@@ -257,7 +257,7 @@
                           </div>
                       </div>
                       <div class="modal-footer justify-content-center">
-                        <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal" id="btn-accept">
+                        <button type="button" style="border: transparent; background-color: transparent" data-bs-dismiss="modal">
                             <a href="{% url 'accept_ismn_application' solicitud.id %}" type="button"
                                class="btn btn-outline-dark"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Aceptar</a>
                         </button>
@@ -461,7 +461,6 @@
 
         {% for clave, valor in solicitudes_aceptadas.items %}
             {% for key, value in valor.items %}
-                console.log("{{ clave|date:"Y/m/d" }} - {{ key }}: {{ value }}")
                 {% if key == 'Solicitud-ISMN' %}
                     html = `<tr>
                                 <th scope="row">{{ clave|date:'d/m' }}</th>
@@ -501,7 +500,6 @@
             return diccionario;
         }
 
-
         // Inicializar los datos de los gráficos
       let ismn_rechazados = {}
       let inscrip_rechazados = {}
@@ -531,8 +529,8 @@
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
 
-      let inscrip_rechazados_lately = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
-      let ismn_rechazados_lately = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);
+      {#let inscrip_rechazados_lately = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);#}
+      {#let ismn_rechazados_lately = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);#}
       let labels_meses = months_label({{ solicitudes_rechazadas.last.created_at.month }});
 
       function cantidad_solicitudes_per_day(ismn_solicitudes_lis, inscrip_solicitudes_list){
@@ -546,7 +544,7 @@
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: inscrip_rechazados_lately,
+                data: [],
                 borderColor: [
                   'rgb(56,56,56)'
                 ],
@@ -556,7 +554,7 @@
               },
               {
                 label: 'Solicitudes ISMN',
-                data: ismn_rechazados_lately,
+                data: [],
                 borderColor: [
                   'rgb(0,84,168)'
                 ],
@@ -567,19 +565,23 @@
           ]
         };
 
+      let inscrip_enviados_data = Object.values(inscrip_enviados).slice(-7);
+      let ismn_enviados_data = Object.values(ismn_enviados).slice(-7);
+
+      console.log("{{ solicitudes_enviadas }}")
       const data2 = {
           labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: Object.values(inscrip_enviados).slice(-7),
+                data: inscrip_enviados_data,
                 backgroundColor: 'rgb(140,140,140)',
                 hoverOffset: 4,
                 stack: 'Stack 0'
               },
               {
                 label: 'Solicitudes ISMN',
-                data: Object.values(ismn_enviados).slice(-7),
+                data: ismn_enviados_data,
                 backgroundColor: 'rgb(99,177,255)',
                 hoverOffset: 4,
                 stack: 'Stack 0'

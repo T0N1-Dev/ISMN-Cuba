@@ -163,6 +163,7 @@ def register_user(request):
         username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
+        id_tribute = request.POST['idTribute']
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/login')
@@ -171,6 +172,9 @@ def register_user(request):
             return HttpResponseRedirect('/login')
         elif Registered_Data.objects.filter(user_name=username).exists():
             messages.error(request, "Este nombre de usuario ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
+            messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
             return HttpResponseRedirect('/login')
         # ===========================
         else:

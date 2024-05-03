@@ -30,7 +30,6 @@ function sumaElementos(arreglo1, arreglo2) {
     return sumaTotal;
 }
 
-
 function inicializar_meses(){
     const diccionario = {};
     Meses_django.forEach(mes => {
