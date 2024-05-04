@@ -1,10 +1,14 @@
 import base64
+import json
 import os
 from datetime import datetime
 from email import encoders
 from email.mime.base import MIMEBase
 from random import randint
 from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
+
+import bs4
+import requests
 from PIL import Image as PILImage
 from barcode import EAN13
 from barcode.writer import ImageWriter
@@ -24,7 +28,7 @@ from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEdi
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect  # Redirect the page after submit
+from django.http import HttpResponseRedirect, JsonResponse  # Redirect the page after submit
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
@@ -1638,8 +1642,18 @@ def export_catalogo_peliculas(request, musical_publication_id):
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"CATÁLOGO_DE_PELICULAS_{titulo_catalogo}.pdf")
 
-def prueba(request):
-    if request.user.is_authenticated:
-        return render(request, 'prueba_admin.html')
+
+def crear_report_statistics_sol(buffer):
+    return
+
+
+def export_statistics(request):
+    if request.method == 'POST':
+        buffer = io.BytesIO()
+        data = json.loads(request.body)
+        image_data = data.get('image_data')
+        crear_report_statistics_sol(buffer)
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename=f"Solicitudes_lista.pdf")
     else:
-        return HttpResponseRedirect('admin/login.html')
+        return JsonResponse({'error': 'Método no permitido.'}, status=405)

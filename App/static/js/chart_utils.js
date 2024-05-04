@@ -107,3 +107,23 @@ function removeDataBarChart(chart){
     }
     chart.update();
 }
+
+
+function saveChart(){
+    let canvas = document.getElementById('myChart');
+    let dataURL = canvas.toDataURL(); // Obtiene la representación base64 de la imagen
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    // Envía la imagen al servidor
+    fetch('http://127.0.0.1:8000/export_statistics', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({ image_data: dataURL }),
+    }).then(response => {
+        console.log(`Imagen guardada con éxito ${response}`);
+    }).catch(error => {
+        console.error('Error al guardar la imagen:', error);
+    });
+}

@@ -395,7 +395,7 @@
                         <button type="button" id="add_data_line_chart" class="btn btn-sm btn-outline-primary mb-1" style="margin-left: 35px"><i class="fas fa-plus"></i>&nbsp;&nbsp;Más datos</button>
                         <button type="button" id="remove_data_line_chart" class="btn btn-sm btn-outline-secondary mb-1" style="margin-left: 10px"><i class="fa fa-minus"></i>&nbsp;&nbsp;Menos datos</button>
                     </div>
-                    <canvas role="graphics-object" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart"></canvas>
+                    <canvas role="img" width="450" height="400" aria-label="Line Charts Solicitudes" id="myChart"></canvas>
                 </div>
                 <div class="col-lg-6 col-md-12" style="flex-basis: 300px; align-content: center; padding: 0">
                     <div class="d-flex justify-content-start flex-wrap" style="margin-top: -70px">
@@ -423,7 +423,7 @@
                         <button type="button" id="add_data_bar_chart" class="btn btn-sm btn-outline-primary mb-1" style="margin-left: 22px"><i class="fas fa-plus"></i>&nbsp;&nbsp;Más datos</button>
                         <button type="button" id="remove_data_bar_chart" class="btn btn-sm btn-outline-secondary mb-1" style="margin-left: 10px"><i class="fa fa-minus"></i>&nbsp;&nbsp;Menos datos</button>
                     </div>
-                    <canvas role="graphics-object" width="450" height="400" aria-label="Bar Charts Solicitudes" id="myChart2"></canvas>
+                    <canvas role="img" width="450" height="400" aria-label="Bar Charts Solicitudes" id="myChart2"></canvas>
                 </div>
                 <div class="col-lg-1" style="max-width: 10px">
                     <div class="border-start border-1 text-dark" style="height: 450px"></div>
@@ -655,3 +655,7 @@
 
     </script>
 {% endblock statistics-modal %}
+
+{% block statistics-button %}
+    <button type="button" onclick="saveChart()" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</button>
+{% endblock statistics-button %}

@@ -51,9 +51,12 @@ urlpatterns = [
     # ========================== EXPORT DOCUMENTS ==========================
     # Path to export a single musical publication
     path('export_musical_publication/<str:musical_publication_id>', views.export_musical_publication, name="export_publication"),
+    # Tables
     path('export_publications_list/', views.export_publications_list, name='export_publications_list'),
     path('export_editores_list/', views.export_editores_list, name='export_editores_list'),
     path('export_solicitudes_list/', views.export_solicitudes_list, name='export_solicitudes_list'),
+    # Statistics
+    path('export_statistics', views.export_statistics, name='export_statistics'),
 
     # ========================== SEND EMAIL ==========================
     # Path to send confirmation-code

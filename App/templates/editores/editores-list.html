@@ -372,7 +372,10 @@
                         {% endblock statistics-modal %}
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</button>
+                          {% block statistics-button %}
+                              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar</button>
+                          {% endblock statistics-button %}
+
                       </div>
                     </div>
                   </div>

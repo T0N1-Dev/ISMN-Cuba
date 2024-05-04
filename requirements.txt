@@ -1,4 +1,4 @@
-django~=4.2.5
+django~=5.0
 django-jazzmin
 pillow~=10.0.0
 coverage
@@ -6,3 +6,4 @@ django-bootstrap-v5
 reportlab~=4.0.9
 python-barcode
 crispy-bootstrap5
+selenium
