@@ -749,8 +749,11 @@ def delete_solicitud(request, solicitud_id):
     if solicitud.tipo == 'Solicitud-ISMN':
         if solicitud.temporal['publication_image']:
             os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
-        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
-    solicitud.deleted = True
+        try:
+            os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
+        except FileNotFoundError:
+            pass
+    solicitud.soft_delete()
     solicitud.save()
     messages.success(request, "Solicitud eliminada correctamente !")
     return HttpResponseRedirect('/backend_solicitudes/list_dsc')
@@ -823,7 +826,7 @@ def generar_ismn(editor):
     valor_prefijo_public = determinar_valor_prefijo_publicacion(editor.musical_publication_set.exists(),
                                                                 editor.solicitud_set.filter(
                                                                     tipo='Solicitud-ISMN').filter(
-                                                                    status='Pendiente').exists())
+                                                                    status='Pendiente', deleted=False).exists())
     prefijo_publicacion = formatear_prefijo(str(valor_prefijo_public), cant_digitos_prefijo_editor)
 
     #   En el excepcional caso que el prefijo del editor necesite un cero delante

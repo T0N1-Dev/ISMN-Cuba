@@ -508,9 +508,9 @@
 
       {% for solicitud_r in solicitudes_rechazadas %}
           {% if solicitud_r.tipo == 'Solicitud-ISMN' %}
-              sumar_rechazo_mes(ismn_rechazados, {{ solicitud_r.created_at.year }}, '{{ solicitud_r.created_at|date:'b' }}')
+              sumar_rechazo_mes(ismn_rechazados, {{ solicitud_r.deleted_at.year }}, '{{ solicitud_r.deleted_at|date:'b' }}')
           {% else %}
-              sumar_rechazo_mes(inscrip_rechazados, {{ solicitud_r.created_at.year }}, '{{ solicitud_r.created_at|date:'b' }}')
+              sumar_rechazo_mes(inscrip_rechazados, {{ solicitud_r.deleted_at.year }}, '{{ solicitud_r.deleted_at|date:'b' }}')
           {% endif %}
       {% endfor %}
 
@@ -529,9 +529,9 @@
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
 
-      {#let inscrip_rechazados_lately = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);#}
-      {#let ismn_rechazados_lately = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.created_at.year }}]);#}
-      let labels_meses = months_label({{ solicitudes_rechazadas.last.created_at.month }});
+      let inscrip_rechazados_lately = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.deleted_at.year }}]);
+      let ismn_rechazados_lately = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.deleted_at.year }}]);
+      let labels_meses = months_label({{ solicitudes_rechazadas.last.deleted_at.month }});
 
       function cantidad_solicitudes_per_day(ismn_solicitudes_lis, inscrip_solicitudes_list){
           let total = ismn_solicitudes_lis.reduce((total, numero) => total + numero, 0);
@@ -544,7 +544,7 @@
           datasets: [
               {
                 label: 'Solicitudes de Inscripción',
-                data: [],
+                data: inscrip_rechazados_lately,
                 borderColor: [
                   'rgb(56,56,56)'
                 ],
@@ -554,7 +554,7 @@
               },
               {
                 label: 'Solicitudes ISMN',
-                data: [],
+                data: ismn_rechazados_lately,
                 borderColor: [
                   'rgb(0,84,168)'
                 ],
@@ -568,7 +568,6 @@
       let inscrip_enviados_data = Object.values(inscrip_enviados).slice(-7);
       let ismn_enviados_data = Object.values(ismn_enviados).slice(-7);
 
-      console.log("{{ solicitudes_enviadas }}")
       const data2 = {
           labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
           datasets: [

@@ -14,7 +14,7 @@ fechas = []
 editor = Solicitud.objects.all()[1].editor
 temporal = {}
 tipo = ['Solicitud-Inscripción', 'Solicitud-ISMN']
-for dia in range(1, 31):
+for dia in range(5, 31):
     fechas.append(datetime(2024, 4, dia))
 
 status = 'Atendido'
@@ -31,6 +31,8 @@ for fecha in fechas:
         else:
             contador += 1
         solicitud.status = status
+        solicitud.save()
         solicitud.created_at = fecha
         solicitud.save()
+
 

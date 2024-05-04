@@ -61,7 +61,7 @@ function agregarUltimoLabelAlPrincipio(listaOriginal) {
 
 function addDataLineChart(chart, inscrip_rechazados, ismn_rechazados) {
     let newData = extraer_organizar_datos(indiceMes, inscrip_rechazados, ismn_rechazados)
-    if (chart.data.labels.length < 14){
+    if (chart.data.labels.length < 17){
         chart.data.labels.unshift(Meses_Label[indiceMes]);
         chart.data.datasets[0].data.unshift(newData[0]);
         chart.data.datasets[1].data.unshift(newData[1]);
@@ -71,12 +71,12 @@ function addDataLineChart(chart, inscrip_rechazados, ismn_rechazados) {
 }
 
 function removeDataLineChart(chart) {
-    if (chart.data.labels.length > 4){
+    if (chart.data.labels.length > 5){
         chart.data.labels.shift();
         chart.data.datasets.forEach((dataset) => {
             dataset.data.shift();
         });
-        indiceMes++;
+        indiceMes = (indiceMes +1 + Meses_Label.length) % Meses_Label.length;
     }
     chart.update();
 }

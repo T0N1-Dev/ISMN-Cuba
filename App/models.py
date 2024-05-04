@@ -1,4 +1,5 @@
 import datetime
+from collections import defaultdict
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -235,6 +236,7 @@ class Solicitud(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=ESTATUS)
     deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'solicitudes'
@@ -266,39 +268,70 @@ class Solicitud(models.Model):
         solicitudes_por_fecha_tipo = cls.objects.filter(status='Atendido').order_by('created_at'). \
             annotate(fecha=TruncDate('created_at')).values('fecha', 'tipo').annotate(total=Count('id'))
 
+        print(solicitudes_por_fecha_tipo)
+
         for solicitud in solicitudes_por_fecha_tipo:
             fecha = solicitud['fecha']
             tipo = solicitud['tipo']
             total = solicitud['total']
             if fecha in resultados:
-                resultados[fecha][tipo] = total
+                resultados[fecha][tipo] += total
         return resultados
 
     # Retorna todas las solicitudes que han sido eliminadas o rechazadas
     @classmethod
     def return_deleted(cls):
-        return cls.objects.filter(deleted=True).order_by('created_at')
+        return cls.objects.filter(deleted=True).order_by('deleted_at')
 
     # Retorna todas las solicitudes que no han sido rechazadas, es decir, las aceptadas y las pendientes
     @classmethod
     def return_active(cls):
         return cls.objects.filter(deleted=False).order_by('created_at')
 
+    # Retorna las solicitudes rechazadas el último año
+    @classmethod
+    def solicitudes_eliminadas_ultimo_anio(cls):
+        # Obtener la fecha actual y la fecha de hace un año
+        fecha_actual = timezone.now()
+        fecha_hace_un_anio = fecha_actual - timezone.timedelta(days=365)
+
+        # Crear un diccionario para almacenar el recuento de solicitudes eliminadas por mes
+        diccionario_solicitudes_eliminadas = {}
+
+        # Llenar el diccionario con todos los meses del último año, inicializados a 0
+        fecha_mes = fecha_hace_un_anio.replace(day=1)
+        while fecha_mes <= fecha_actual:
+            nombre_mes = fecha_mes.strftime('%B')
+            diccionario_solicitudes_eliminadas[nombre_mes] = defaultdict(int)
+            fecha_mes = fecha_mes + timezone.timedelta(days=31)
+
+        # Obtener todas las solicitudes eliminadas en el último año
+        solicitudes_eliminadas = cls.objects.filter(deleted=True, deleted_at__gte=fecha_hace_un_anio)
+
+        # Iterar sobre todas las solicitudes eliminadas
+        for solicitud in solicitudes_eliminadas:
+            mes = solicitud.deleted_at.strftime('%B')
+            tipo_solicitud = solicitud.tipo
+            diccionario_solicitudes_eliminadas[mes][tipo_solicitud] += 1
+
+        # Extraer el primer elemento
+        primer_elemento = next(iter(diccionario_solicitudes_eliminadas.items()))
+
+        # Eliminar el primer elemento del diccionario
+        del diccionario_solicitudes_eliminadas[primer_elemento[0]]
+
+        # Insertar el primer elemento al final
+        diccionario_solicitudes_eliminadas[primer_elemento[0]] = primer_elemento[1]
+
+        return diccionario_solicitudes_eliminadas
+
+
     # Retorna un diccionario con las solicitudes enviadas en cada fecha hasta el dia de hoy
     @classmethod
     def solicitudes_enviadas_total(cls):
-        # Obtener la fecha mínima en la que se creó una solicitud
-        fecha_minima = cls.objects.aggregate(Min('created_at'))['created_at__min']
-
-        # Si no hay solicitudes, retornar un diccionario vacío
-        if not fecha_minima:
-            return {}
 
         # Obtener la fecha actual
         fecha_actual = timezone.now().date()
-
-        # Truncar la fecha mínima para obtener solo la fecha (sin hora)
-        fecha_minima = fecha_minima.date()
 
         # Inicializar el diccionario de resultados con las últimas 30 fechas
         resultados = {}
@@ -320,41 +353,15 @@ class Solicitud(models.Model):
 
         # Imprimir resultados
         resultados_descendente = dict(reversed(list(resultados.items())))
-        print(resultados_descendente)
         return resultados_descendente
-    # @classmethod
-    # def solicitudes_enviadas_total(cls):
-    #     # Obtener la fecha mínima en la que se creó una solicitud
-    #     fecha_minima = cls.objects.aggregate(Min('created_at'))['created_at__min']
-    #     print(fecha_minima, type(fecha_minima))
-    #
-    #     # Si no hay solicitudes, retornar un diccionario vacío
-    #     if not fecha_minima:
-    #         return {}
-    #
-    #     # Obtener la fecha actual
-    #     fecha_actual = timezone.now().date()
-    #
-    #     # Truncar la fecha mínima para obtener solo la fecha (sin hora)
-    #     fecha_minima = fecha_minima.date()
-    #
-    #     # Inicializar el diccionario de resultados con todas las fechas desde la mínima hasta la actual
-    #     resultados = {fecha_minima + datetime.timedelta(days=d): {'Solicitud-Inscripción': 0, 'Solicitud-ISMN': 0} for d
-    #                   in range((fecha_actual - fecha_minima).days + 1)}
-    #
-    #     # Contar las solicitudes por fecha y actualizar el diccionario de resultados
-    #     solicitudes_por_fecha_tipo = cls.objects.annotate(fecha=TruncDate('created_at')).values('fecha',
-    #                                                                                             'tipo').annotate(
-    #         total=Count('id'))
-    #     for solicitud in solicitudes_por_fecha_tipo:
-    #         fecha = solicitud['fecha']
-    #         tipo = solicitud['tipo']
-    #         total = solicitud['total']
-    #         if fecha in resultados:
-    #             resultados[fecha][tipo] = total
-    #     return resultados
 
     # Retorna todas las solicitude pendientes
     @classmethod
     def filter_pending_not_deleted_ordered(cls):
         return cls.objects.filter(status='Pendiente', deleted=False).order_by('-created_at')
+
+    # "Borrar"
+    def soft_delete(self):
+        if not self.deleted:
+            self.deleted = True
+            self.deleted_at = timezone.now()
