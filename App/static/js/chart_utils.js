@@ -110,19 +110,34 @@ function removeDataBarChart(chart){
 
 
 function saveChart(){
-    let canvas = document.getElementById('myChart');
-    let dataURL = canvas.toDataURL(); // Obtiene la representación base64 de la imagen
+    let canvas_line_chart = document.getElementById('myChart');
+    let canvas_bar_chart = document.getElementById('myChart2');
+    let dataURL_lineChart = canvas_line_chart.toDataURL(); // Obtiene la representación base64 de la imagen
+    let dataURL_barChart = canvas_bar_chart.toDataURL();
     var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     // Envía la imagen al servidor
-    fetch('http://127.0.0.1:8000/export_statistics', {
+    fetch('http://127.0.0.1:8000/export_statistics_solicitud', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': csrftoken
         },
-        body: JSON.stringify({ image_data: dataURL }),
+        body: JSON.stringify({ image_data_lineChart: dataURL_lineChart,  image_data_barChart: dataURL_barChart}),
     }).then(response => {
-        console.log(`Imagen guardada con éxito ${response}`);
+        if (response.ok) {
+            response.blob().then(blob => {
+                // Crea un objeto URL para el archivo blob y lo descarga
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Estadísticas_solicitudes.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+        } else {
+            console.error('Error al guardar la imagen:', response.statusText);
+        }
     }).catch(error => {
         console.error('Error al guardar la imagen:', error);
     });

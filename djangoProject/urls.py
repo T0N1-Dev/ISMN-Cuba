@@ -56,7 +56,7 @@ urlpatterns = [
     path('export_editores_list/', views.export_editores_list, name='export_editores_list'),
     path('export_solicitudes_list/', views.export_solicitudes_list, name='export_solicitudes_list'),
     # Statistics
-    path('export_statistics', views.export_statistics, name='export_statistics'),
+    path('export_statistics_solicitud', views.export_statistics_solicitud, name='export_statistics_solicitud'),
 
     # ========================== SEND EMAIL ==========================
     # Path to send confirmation-code

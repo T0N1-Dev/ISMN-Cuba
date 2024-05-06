@@ -268,8 +268,6 @@ class Solicitud(models.Model):
         solicitudes_por_fecha_tipo = cls.objects.filter(status='Atendido').order_by('created_at'). \
             annotate(fecha=TruncDate('created_at')).values('fecha', 'tipo').annotate(total=Count('id'))
 
-        print(solicitudes_por_fecha_tipo)
-
         for solicitud in solicitudes_por_fecha_tipo:
             fecha = solicitud['fecha']
             tipo = solicitud['tipo']

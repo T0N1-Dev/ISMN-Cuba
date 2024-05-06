@@ -22,6 +22,8 @@ from pathlib import Path
 
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics.widgets import signsandsymbols
 
 from App.forms import ChangePasswordForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
@@ -1514,146 +1516,180 @@ def save_temporal_doc_documentation(user, publication):
     return ruta
 
 
-def crear_listas():
-    lista_imagenes, lista_titulos, lista_descripciones = [], [], []
-    imagenes_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Animados')
-    descripcion_root = Path(Path.home(), 'Desktop\Caratulas Estrenos\Animados\Descripciones.txt')
-    lista_descripciones = open(descripcion_root, encoding='utf-8').readlines()
-    for img in Path(imagenes_root).glob("*.jpg"):
-        lista_imagenes.append(str(img))
-        lista_titulos.append(img.stem)
+def agregar_fondo_save(imagen_binaria, output_path):
+    # Abrir la imagen
+    imagen = PILImage.open(io.BytesIO(imagen_binaria))
 
-    return lista_imagenes, lista_titulos, lista_descripciones
+    # Crear una nueva imagen con fondo blanco del mismo tamaño que la original
+    imagen_con_fondo_blanco = PILImage.new("RGBA", imagen.size, (240, 240, 240))
+
+    # Pegar la imagen original en la imagen con fondo blanco
+    imagen_con_fondo_blanco.paste(imagen, (0, 0), imagen)
+
+    # Guardar la imagen con fondo blanco
+    imagen_con_fondo_blanco.save(output_path)
 
 
-def export_catalogo_peliculas(request, musical_publication_id):
+def crear_report_statistics(buffer, title):
+    # Importar las fuentes externas
     pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
-    pdfmetrics.registerFont(TTFont('Action', 'fonts/Super_Sedan.ttf'))
-    PAGE_WIDTH, PAGE_HEIGHT = letter
-    buffer = io.BytesIO()
-    img_list, title_list, description_list = crear_listas()
-    titulo_catalogo = 'Animados'
+    pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto-Italic', 'fonts/RobotoCondensed-Italic.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto', 'fonts/RobotoCondensed-Regular.ttf'))
+
+    PAGE_HEIGHT, PAGE_WIDTH = A4
+    style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")
 
     def myFirstPage(canvas, doc):
         canvas.saveState()
+        # Color de Fondo
+        canvas.setFillColorRGB(0.94, 0.94, 0.94)
+        canvas.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, fill=1)
+        # Barra de encabezado
+        canvas.setFillColorRGB(0.21, 0.25, 0.33)
+        canvas.rect(0, PAGE_HEIGHT - 31, PAGE_WIDTH, PAGE_HEIGHT, stroke=0, fill=1)
+        # Imprimir el Logo de la empresa
+        img_h = 110
+        img_w = 80
+        canvas.drawImage('media/logo.jpg', (PAGE_WIDTH - img_w) / 2, PAGE_HEIGHT - 155, img_w, img_h)
+        # Crear encabezado del reporte
+        publication_info_textobject = canvas.beginText()
+        texto_encabezado = 'REPORTES Y ESTADÍSTICAS'
+        width_texto_encabezado = canvas.stringWidth(texto_encabezado, 'RobotoCondensed-Bold', 15)
+        origin_start = (PAGE_WIDTH - width_texto_encabezado) / 2
+        publication_info_textobject.setTextOrigin(origin_start, PAGE_HEIGHT - 175)
+        publication_info_textobject.setFont('RobotoCondensed-Bold', 15)
+        publication_info_textobject.setFillColorRGB(0.21, 0.25, 0.33)
+        publication_info_textobject.setCharSpace(0.4)
+        publication_info_textobject.textLine(texto_encabezado)
+        # Titulo del listado
+        width_title_publicaction = canvas.stringWidth(title, 'RobotoSlab', 30)
+        origin_start = (PAGE_WIDTH - width_title_publicaction) / 2
+        publication_info_textobject.setTextOrigin(origin_start, PAGE_HEIGHT - 215)
+        publication_info_textobject.setFont('RobotoSlab', 30)
+        publication_info_textobject.setFillColorRGB(0.49, 0.30, 0.34)
+        publication_info_textobject.textLine(title)
+        canvas.drawText(publication_info_textobject)
+        # Raya separadora inicial
+        w_rect = 740
+        h_rect = 4
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 241, w_rect, h_rect, stroke=0, fill=1)
+        # Chart 1
+        img_h = 300
+        img_w = 350
+        canvas.drawImage('media/temp/linechart_solicitudes.png', PAGE_WIDTH - 790, PAGE_HEIGHT - img_h - 255, img_w, img_h)
+        # Text from Chart 1
+        # Icon
+        d = Drawing(100, 100)
+        icon = signsandsymbols.NotAllowed()
+        icon.fillColor = colors.Color(0.94, 0.94, 0.94)
+        icon.strokeColor = colors.Color(0.21, 0.25, 0.33)
+        icon.size = 40
+        d.add(icon)
+        d.drawOn(canvas, PAGE_WIDTH - 400, PAGE_HEIGHT - 345)
+        # Title
+        solicitudes_declined = canvas.beginText()
+        solicitudes_declined_title = 'Solicitudes rechazadas.'
+        origin_start = PAGE_WIDTH - 355
+        solicitudes_declined.setTextOrigin(origin_start, PAGE_HEIGHT - 333)
+        solicitudes_declined.setFont('RobotoSlab', 20)
+        solicitudes_declined.setFillColorRGB(0.21, 0.25, 0.33)
+        solicitudes_declined.setCharSpace(0.4)
+        solicitudes_declined.textLine(solicitudes_declined_title)
+        canvas.drawText(solicitudes_declined)
+        # Paragraph
+        style_description_chart1 = ParagraphStyle(name='description_style_chart1')
+        text_info = Paragraph(f'<font name="Roboto-Italic" size=15 color={colors.Color(0.49, 0.30, 0.34)}>'
+                              f'Esta gráfica muestra la cantidad de solicitudes<br/>'
+                              f'rechazadas en los últimos meses según su tipo<br/>'
+                              f'(ISMN ó Inscripción).</font>',
+                              style_description_chart1)
+        w, h = text_info.wrapOn(canvas, 300, 200)
+        text_info.drawOn(canvas, origin_start, PAGE_HEIGHT - h - 340)
+        # Total
+        solicitudes_declined_total = canvas.beginText()
+        solicitudes_declined_total_title = f'Total: {Solicitud.return_deleted().count()}'
+        solicitudes_declined_total.setTextOrigin(origin_start, PAGE_HEIGHT - h - 380)
+        solicitudes_declined_total.setFont('RobotoSlab', 20)
+        solicitudes_declined_total.setFillColorRGB(0.21, 0.25, 0.33)
+        solicitudes_declined_total.setCharSpace(0.4)
+        solicitudes_declined_total.textLine(solicitudes_declined_total_title)
+        canvas.drawText(solicitudes_declined_total)
 
-        def draw(x=0, y=0, counter=0):
-            if y < PAGE_HEIGHT:
-                if x < PAGE_WIDTH:
-                    canvas.drawImage(img_list[counter], x, y, 100, 120)
-                    counter += 1
-                    x += 100
-                    draw(x, y, counter)
-                else:
-                    y += 120
-                    x = 0
-                    draw(x, y, counter)
-            else:
-                return
-
-        draw()
-
-        font_size = 90
-        style_title1 = ParagraphStyle(name='style_title1', fontName='Action', fontSize=font_size,
-                                      textColor=colors.red)
-        title = Paragraph(titulo_catalogo, style_title1)
-        w_title, h_title = title.wrapOn(canvas, PAGE_WIDTH, PAGE_HEIGHT)
-        canvas.rotate(45)
-        canvas.setFillColorRGB(1, 1, 1)
-        canvas.rect(260, 200, w_title - 65, -90, stroke=0, fill=1)
-        title.drawOn(canvas, 270, 200)
-        canvas.rotate(-45)
+        # Raya separadora final
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 570, w_rect, h_rect, stroke=0, fill=1)
         canvas.restoreState()
 
     def myLaterPage(canvas, doc):
         canvas.saveState()
+        # Color de Fondo
+        canvas.setFillColorRGB(0.94, 0.94, 0.94)
+        canvas.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, fill=1)
+        # Barra de encabezado
+        canvas.setFillColorRGB(0.21, 0.25, 0.33)
+        canvas.rect(0, PAGE_HEIGHT - 31, PAGE_WIDTH, PAGE_HEIGHT, stroke=0, fill=1)
 
-        canvas.drawString(inch, 0.75 * inch, "Page %s" % (doc.page - 1))
+        # Imprimir el Logo de la empresa transparente
+        img_h = 440
+        img_w = 320
+        canvas.drawImage('media/logo_transparent.png', (PAGE_WIDTH - img_w) / 2, (PAGE_HEIGHT - img_h) / 2, img_w,
+                         img_h, mask='auto')
+        # Raya separadora inicial
+        w_rect = 740
+        h_rect = 4
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 65, w_rect, h_rect, stroke=0, fill=1)
+        # Numeracion de Paginas
+        page_number = canvas.beginText()
+        page_number.setTextOrigin(inch, 0.90 * inch)
+        page_number.setFont('RobotoSlab', 10)
+        page_number.setFillColorRGB(0.49, 0.30, 0.34)
+        page_number.textLine("Página %s" % doc.page)
+        canvas.drawText(page_number)
+        # Raya separadora final
+        canvas.setFillColorRGB(0.49, 0.30, 0.34)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 550, w_rect, h_rect, stroke=0, fill=1)
         canvas.restoreState()
 
     def build_doc(pbuffer):
         # Datos para conformar el documento
-        doc = SimpleDocTemplate(pbuffer)
-        story = [Spacer(0, 8 * inch)]
-        # Datos para la tabla
-        datas = []
-        counter = 0
-        fila_title = 0
-        fila1_imagen = 0
-        fila2_imagen = 1
-        fila3_imagen = 2
-        fila4_imagen = 3
-        fila1_description = 1
-        fila2_description = 2
-        fila3_description = 3
-        style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                            ('INNERGRID', (1, 0), (1, -1), 1, colors.black),
-                            ('BOX', (1, 0), (1, -1), 1, colors.black)
-                            ])
-        style_title = ParagraphStyle(name='style_title', fontName='RobotoCondensed-Bold',
-                                     fontSize=14, alignment=1)
-        style_description = ParagraphStyle(name='style_descrption', fontName='Helvetica-Bold',
-                                           fontSize=12, alignment=4)
-
-        # For para llenar los datos de la tabla
-        for img in img_list:
-            title = Paragraph(title_list[counter].upper(), style_title)
-            descripcion = Paragraph(description_list[counter], style_description)
-            # Matriz de Datos para la tabla
-            datas.append([Image(img, 150, 155), title])
-            datas.append(['', descripcion])
-            datas.append(['', ''])
-            datas.append(['', ''])
-            counter += 1
-            # Style Table
-            # Title
-            style.add('VALIGN', (1, fila_title), (1, fila_title), 'MIDDLE')
-            style.add('BACKGROUND', (1, fila_title), (1, fila_title), colors.lightsteelblue)
-            # Imagen
-            style.add('VALIGN', (0, fila1_imagen), (0, fila1_imagen), 'TOP')
-            style.add('SPAN', (0, fila1_imagen), (0, fila2_imagen))
-            style.add('SPAN', (0, fila1_imagen), (0, fila3_imagen))
-            style.add('SPAN', (0, fila1_imagen), (0, fila4_imagen))
-            style.add('TOPPADDING', (0, fila1_imagen), (0, fila1_imagen), 0)
-
-            # Description
-            style.add('SPAN', (1, fila1_description), (1, fila2_description))
-            style.add('SPAN', (1, fila1_description), (1, fila3_description))
-            style.add('VALIGN', (1, fila1_description), (1, fila1_description), 'TOP')
-            style.add('ALIGN', (1, fila1_description), (1, fila1_description), 'LEFT')
-            style.add('LEADING', (1, fila1_description), (1, fila1_description), 17)
-            # Siguientes filas de la tabla
-            fila_title += 4
-            fila1_imagen += 4
-            fila2_imagen += 4
-            fila3_imagen += 4
-            fila4_imagen += 4
-            fila1_description += 4
-            fila2_description += 4
-            fila3_description += 4
-
-        # TABLE
-        table = Table(datas, colWidths=(170, 335))
-        table.setStyle(style)
-        story.append(table)
+        doc = SimpleDocTemplate(pbuffer, pagesize=landscape(A4))
+        story = [Spacer(PAGE_WIDTH - 545, PAGE_HEIGHT - 400)]
+        # ====--- Content ----====
+        story.append(Image('media/temp/barchart_solicitudes.png', width=350, height=300))
         doc.build(story, onFirstPage=myFirstPage, onLaterPages=myLaterPage)
 
     build_doc(buffer)
-    buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename=f"CATÁLOGO_DE_PELICULAS_{titulo_catalogo}.pdf")
 
 
-def crear_report_statistics_sol(buffer):
-    return
+def save_image_from_base64(request):
+    data = json.loads(request.body)
+    linechart_image_base64 = data.get('image_data_lineChart')
+    barchart_image_base64 = data.get('image_data_barChart')
+    image_data_linechart = linechart_image_base64.split(',')[1]
+    image_data_barchart = barchart_image_base64.split(',')[1]
+    image_binary_linechart = base64.b64decode(image_data_linechart)
+    image_binary_barchart = base64.b64decode(image_data_barchart)
+    ruta = Path(MEDIA_ROOT) / 'temp'
+    agregar_fondo_save(image_binary_linechart, ruta / 'linechart_solicitudes.png')
+    agregar_fondo_save(image_binary_barchart, ruta / 'barchart_solicitudes.png')
 
 
-def export_statistics(request):
+def export_statistics_solicitud(request):
     if request.method == 'POST':
+        # Almacenando los graficos en imagenes
+        save_image_from_base64(request)
+
+        # Datos para la tabla
+        solicitudes_aceptadas = dict(list(Solicitud.return_accepted().items())[-31:])
+
         buffer = io.BytesIO()
-        data = json.loads(request.body)
-        image_data = data.get('image_data')
-        crear_report_statistics_sol(buffer)
+        # Contenido del reporte
+        crear_report_statistics(buffer, 'Solicitudes')
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename=f"Solicitudes_lista.pdf")
-    else:
-        return JsonResponse({'error': 'Método no permitido.'}, status=405)
+        return FileResponse(buffer, as_attachment=True, filename=f"Solicitud_estadisticas.pdf")
+
+
+
