@@ -1530,7 +1530,23 @@ def agregar_fondo_save(imagen_binaria, output_path):
     imagen_con_fondo_blanco.save(output_path)
 
 
-def crear_report_statistics(buffer, title):
+def conformar_tabla_reportlab_solicitudes_aceptadas(solicites):
+    data = [['FECHA', 'TIPO', 'CANTIDAD']]
+    total = 0
+
+    for fecha, tipos in solicites.items():
+        fecha_str = fecha.strftime('%d/%m')
+        for tipo, cantidad in tipos.items():
+            if tipo == 'Solicitud-ISMN':
+                data.append([fecha_str, tipo, cantidad])
+            else:
+                data.append(['-', tipo, cantidad])
+            total += cantidad
+    data.append(['', 'TOTAL', total])
+    return data
+
+
+def crear_report_statistics(buffer, title, total_solicitudes_enviadas, user):
     # Importar las fuentes externas
     pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
     pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
@@ -1539,6 +1555,11 @@ def crear_report_statistics(buffer, title):
 
     PAGE_HEIGHT, PAGE_WIDTH = A4
     style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")
+
+    # Datos para la tabla de reportlab
+    solicitudes_enviadas = dict(list(Solicitud.return_accepted().items())[-7:])
+
+    data = conformar_tabla_reportlab_solicitudes_aceptadas(solicitudes_enviadas)
 
     def myFirstPage(canvas, doc):
         canvas.saveState()
@@ -1592,21 +1613,21 @@ def crear_report_statistics(buffer, title):
         solicitudes_declined = canvas.beginText()
         solicitudes_declined_title = 'Solicitudes rechazadas.'
         origin_start = PAGE_WIDTH - 355
-        solicitudes_declined.setTextOrigin(origin_start, PAGE_HEIGHT - 333)
+        solicitudes_declined.setTextOrigin(origin_start, PAGE_HEIGHT - 330)
         solicitudes_declined.setFont('RobotoSlab', 20)
         solicitudes_declined.setFillColorRGB(0.21, 0.25, 0.33)
         solicitudes_declined.setCharSpace(0.4)
         solicitudes_declined.textLine(solicitudes_declined_title)
         canvas.drawText(solicitudes_declined)
         # Paragraph
-        style_description_chart1 = ParagraphStyle(name='description_style_chart1')
-        text_info = Paragraph(f'<font name="Roboto-Italic" size=15 color={colors.Color(0.49, 0.30, 0.34)}>'
+        style_description_chart1 = ParagraphStyle(name='description_style_chart1', leading=17)
+        text_info = Paragraph(f'<font name="Roboto-Italic" size=12 color={colors.Color(0.49, 0.30, 0.34)}>'
                               f'Esta gráfica muestra la cantidad de solicitudes<br/>'
                               f'rechazadas en los últimos meses según su tipo<br/>'
                               f'(ISMN ó Inscripción).</font>',
                               style_description_chart1)
         w, h = text_info.wrapOn(canvas, 300, 200)
-        text_info.drawOn(canvas, origin_start, PAGE_HEIGHT - h - 340)
+        text_info.drawOn(canvas, origin_start, PAGE_HEIGHT - h - 337)
         # Total
         solicitudes_declined_total = canvas.beginText()
         solicitudes_declined_total_title = f'Total: {Solicitud.return_deleted().count()}'
@@ -1630,27 +1651,107 @@ def crear_report_statistics(buffer, title):
         # Barra de encabezado
         canvas.setFillColorRGB(0.21, 0.25, 0.33)
         canvas.rect(0, PAGE_HEIGHT - 31, PAGE_WIDTH, PAGE_HEIGHT, stroke=0, fill=1)
-
-        # Imprimir el Logo de la empresa transparente
-        img_h = 440
-        img_w = 320
-        canvas.drawImage('media/logo_transparent.png', (PAGE_WIDTH - img_w) / 2, (PAGE_HEIGHT - img_h) / 2, img_w,
-                         img_h, mask='auto')
         # Raya separadora inicial
         w_rect = 740
         h_rect = 4
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
         canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 65, w_rect, h_rect, stroke=0, fill=1)
+        # Imprimir el CHART 2
+        im_width = 350
+        im_height = 300
+        im = Image('media/temp/barchart_solicitudes.png', width=im_width, height=im_height)
+        im.drawOn(canvas, PAGE_WIDTH - 790, (PAGE_HEIGHT - im_height)/2 + 50)
+        # Title Chart 2
+        solicitudes_enviadas = canvas.beginText()
+        solicitudes_enviadas_title = 'Solicitudes Enviadas.'
+        solicitudes_enviadas.setTextOrigin(inch, PAGE_HEIGHT - im_height - 120)
+        solicitudes_enviadas.setFont('RobotoSlab', 20)
+        solicitudes_enviadas.setFillColorRGB(0.21, 0.25, 0.33)
+        solicitudes_enviadas.setCharSpace(0.4)
+        solicitudes_enviadas.textLine(solicitudes_enviadas_title)
+        canvas.drawText(solicitudes_enviadas)
+        # Paragraph
+        style_description_chart1 = ParagraphStyle(name='description_style_chart1', leading=17)
+        text_info = Paragraph(f'<font name="Roboto-Italic" size=12 color={colors.Color(0.49, 0.30, 0.34)}>'
+                              f'Esta gráfica muestra la cantidad de solicitudes<br/>'
+                              f'enviadas en el último mes.</font>',
+                              style_description_chart1)
+        w, h = text_info.wrapOn(canvas, 300, 200)
+        text_info.drawOn(canvas, inch, PAGE_HEIGHT - im_height - h - 130)
+        # Total
+        solicitudes_declined_total = canvas.beginText()
+        solicitudes_declined_total_title = f'Total: {total_solicitudes_enviadas}'
+        solicitudes_declined_total.setTextOrigin(inch, PAGE_HEIGHT - im_height - h - 170)
+        solicitudes_declined_total.setFont('RobotoSlab', 20)
+        solicitudes_declined_total.setFillColorRGB(0.21, 0.25, 0.33)
+        solicitudes_declined_total.setCharSpace(0.4)
+        solicitudes_declined_total.textLine(solicitudes_declined_total_title)
+        canvas.drawText(solicitudes_declined_total)
+        # Table Solicitudes Aceptadas
+        table_style = TableStyle(
+            [('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+             ('FONTNAME', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
+             ('FONTNAME', (1, 0), (-1, 0), 'RobotoCondensed-Bold'),
+             ('FONTNAME', (1, 1), (-1, -1), 'Roboto'),
+             ('FONTNAME', (1, -1), (-1, -1), 'RobotoCondensed-Bold'),
+             ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
+             ('GRID', (0, 0), (-1, -1), 0.5, colors.Color(0, 0, 0, alpha=0.1)),
+             ]
+        )
+        table = Table(data, colWidths=[80, 140, 80], style=table_style)
+        w, h = table.wrapOn(canvas, 300, 800)
+        table.drawOn(canvas, PAGE_WIDTH + im_width - 770, (PAGE_HEIGHT-h)/2 + 52)
+        # Title Table Solicitudes Aceptadas
+        solicitudes_aceptadas = canvas.beginText()
+        solicitudes_aceptadas_title = 'Solicitudes Aceptadas.'
+        solicitudes_aceptadas.setTextOrigin(PAGE_WIDTH + im_width - 770, PAGE_HEIGHT - im_height - 120)
+        solicitudes_aceptadas.setFont('RobotoSlab', 20)
+        solicitudes_aceptadas.setFillColorRGB(0.21, 0.25, 0.33)
+        solicitudes_aceptadas.setCharSpace(0.4)
+        solicitudes_aceptadas.textLine(solicitudes_aceptadas_title)
+        canvas.drawText(solicitudes_aceptadas)
+        # Paragraph
+        style_description_chart1 = ParagraphStyle(name='description_style_chart1', leading=17)
+        text_info = Paragraph(f'<font name="Roboto-Italic" size=12 color={colors.Color(0.49, 0.30, 0.34)}>'
+                              f'Esta tabla muestra la cantidad de solicitudes<br/>'
+                              f'aceptadas en la última semana.</font>',
+                              style_description_chart1)
+        w, h = text_info.wrapOn(canvas, 300, 200)
+        text_info.drawOn(canvas, PAGE_WIDTH + im_width - 770, PAGE_HEIGHT - im_height - h - 130)
+        # Tabla de Reportado por:
+        # Datos
+        if user.especialista:
+            departamento = 'Informatica - CCL'
+        else:
+            departamento = '-'
+        data_table_report_by = [
+            ['REPORTADO POR:', ''],
+            ['Nombre:', user.first_name],
+            ['Fecha:', datetime.today().date()],
+            ['Departamento:', departamento]
+        ]
+        report_by_style = TableStyle(
+            [('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+             ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+             ('FONTNAME', (0, 0), (0, -1), 'RobotoCondensed-Bold'),
+             ('FONTNAME', (1, 0), (1, -1), 'Roboto'),
+             ('TEXTCOLOR', (0, 0), (-1, -1), colors.Color(0.21, 0.25, 0.33)),
+             ('BOX', (0, 0), (-1, -1), 1, colors.Color(0.49, 0.30, 0.34))]
+        )
+        table_report_by = Table(data_table_report_by, colWidths=[100, 140], style=report_by_style)
+        w, h = table_report_by.wrapOn(canvas, 400, 200)
+        table_report_by.drawOn(canvas, PAGE_WIDTH - w - 60, PAGE_HEIGHT - im_height - h - 195)
+
         # Numeracion de Paginas
         page_number = canvas.beginText()
-        page_number.setTextOrigin(inch, 0.90 * inch)
+        page_number.setTextOrigin(inch, PAGE_HEIGHT - 560)
         page_number.setFont('RobotoSlab', 10)
         page_number.setFillColorRGB(0.49, 0.30, 0.34)
         page_number.textLine("Página %s" % doc.page)
         canvas.drawText(page_number)
         # Raya separadora final
         canvas.setFillColorRGB(0.49, 0.30, 0.34)
-        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 550, w_rect, h_rect, stroke=0, fill=1)
+        canvas.rect(PAGE_WIDTH - 790, PAGE_HEIGHT - 580, w_rect, h_rect, stroke=0, fill=1)
         canvas.restoreState()
 
     def build_doc(pbuffer):
@@ -1658,7 +1759,8 @@ def crear_report_statistics(buffer, title):
         doc = SimpleDocTemplate(pbuffer, pagesize=landscape(A4))
         story = [Spacer(PAGE_WIDTH - 545, PAGE_HEIGHT - 400)]
         # ====--- Content ----====
-        story.append(Image('media/temp/barchart_solicitudes.png', width=350, height=300))
+        story.append(PageBreak())
+        story.append(Spacer(PAGE_WIDTH - 545, PAGE_HEIGHT - 400))
         doc.build(story, onFirstPage=myFirstPage, onLaterPages=myLaterPage)
 
     build_doc(buffer)
@@ -1687,7 +1789,9 @@ def export_statistics_solicitud(request):
 
         buffer = io.BytesIO()
         # Contenido del reporte
-        crear_report_statistics(buffer, 'Solicitudes')
+        data = json.loads(request.body)
+        total_solicitudes_enviadas = data.get('total_image_data_barChart')
+        crear_report_statistics(buffer, 'Solicitudes', total_solicitudes_enviadas, request.user)
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename=f"Solicitud_estadisticas.pdf")
 

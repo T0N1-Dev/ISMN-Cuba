@@ -20,6 +20,7 @@ const Meses_django = ['ene', 'feb', 'mar', 'abr', 'may', 'jun',
 let indiceMes = 11;
 let indiceLabel = 1;
 let indiceDataBarChart = 8;
+let barChart_total = 0;
 
 function sumaElementos(arreglo1, arreglo2) {
     let sumaTotal = 0;
@@ -89,7 +90,8 @@ function addDataBarChart(chart, inscrip_enviados, ismn_enviados){
         chart.data.datasets[0].data = newInscripData;
         chart.data.datasets[1].data = newISMNData;
         indiceDataBarChart++;
-        chart.options.plugins.title.text = `Total: ${sumaElementos(newInscripData, newISMNData)}.`;
+        barChart_total = sumaElementos(newInscripData, newISMNData)
+        chart.options.plugins.title.text = `Total: ${barChart_total}.`;
     }
     chart.update();
 }
@@ -102,8 +104,8 @@ function removeDataBarChart(chart){
         });
         indiceDataBarChart--;
         indiceLabel--;
-        let total = sumaElementos(chart.data.datasets[0].data, chart.data.datasets[1].data);
-        chart.options.plugins.title.text = `Total: ${total}.`;
+        barChart_total = sumaElementos(chart.data.datasets[0].data, chart.data.datasets[1].data);
+        chart.options.plugins.title.text = `Total: ${barChart_total}.`;
     }
     chart.update();
 }
@@ -122,7 +124,8 @@ function saveChart(){
             'Content-Type': 'application/json',
             'X-CSRFToken': csrftoken
         },
-        body: JSON.stringify({ image_data_lineChart: dataURL_lineChart,  image_data_barChart: dataURL_barChart}),
+        body: JSON.stringify({ image_data_lineChart: dataURL_lineChart, image_data_barChart: dataURL_barChart,
+                                    total_image_data_barChart: barChart_total}),
     }).then(response => {
         if (response.ok) {
             response.blob().then(blob => {
