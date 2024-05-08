@@ -7,8 +7,6 @@ from email.mime.base import MIMEBase
 from random import randint
 from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 
-import bs4
-import requests
 from PIL import Image as PILImage
 from barcode import EAN13
 from barcode.writer import ImageWriter
@@ -30,7 +28,7 @@ from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEdi
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect, JsonResponse  # Redirect the page after submit
+from django.http import HttpResponseRedirect  # Redirect the page after submit
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
@@ -42,11 +40,11 @@ from django.http import FileResponse
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle, Image, Frame, PageTemplate, PageBreak
+from reportlab.platypus import Table, TableStyle, Image, PageBreak
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.lib.pagesizes import A4, letter, landscape
+from reportlab.lib.pagesizes import A4, landscape
 
 # ================= VARIABLES TEMPORALES =================
 from djangoProject.settings import MEDIA_ROOT, BASE_DIR

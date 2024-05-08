@@ -114,7 +114,11 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-            <a href="{% url 'logout' %}" type="button" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
+              <form id="logout-form" method="post" action="{% url 'logout' %}">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Cerrar Sesión</button>
+              </form>
+{#            <a href="{% url 'logout' %}" type="button" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>#}
           </div>
         </div>
       </div>
