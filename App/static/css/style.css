@@ -316,3 +316,38 @@ th.th_button {
 .dropdown-cuenta:last-child {
     font-size: smaller;
 }
+
+.profile-image-container {
+    position: relative;
+    display: inline;
+}
+
+#profile-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+#file-input-label {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#file-input {
+    display: none;
+}
+
+form {
+    scrollbar-color: #007bff #fff;
+    scrollbar-width: thin;
+}

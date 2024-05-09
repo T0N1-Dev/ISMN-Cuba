@@ -501,10 +501,10 @@
         }
 
         // Inicializar los datos de los gráficos
-      let ismn_rechazados = {}
-      let inscrip_rechazados = {}
-      let ismn_enviados = {}
-      let inscrip_enviados = {}
+        let ismn_rechazados = {};
+        let inscrip_rechazados = {};
+        let ismn_enviados = {};
+        let inscrip_enviados = {};
 
       {% for solicitud_r in solicitudes_rechazadas %}
           {% if solicitud_r.tipo == 'Solicitud-ISMN' %}
@@ -529,9 +529,25 @@
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
 
-      let inscrip_rechazados_lately = Object.values(inscrip_rechazados[{{ solicitudes_rechazadas.last.deleted_at.year }}]);
-      let ismn_rechazados_lately = Object.values(ismn_rechazados[{{ solicitudes_rechazadas.last.deleted_at.year }}]);
-      let labels_meses = months_label({{ solicitudes_rechazadas.last.deleted_at.month }});
+      let year = '{{ solicitudes_rechazadas.last.deleted_at.year }}';
+      let currentYear = new Date().getFullYear();
+      let inscrip_rechazados_lately;
+      let ismn_rechazados_lately;
+      let currentMonth = new Date().getMonth() + 1;
+      let labels_meses = months_label(currentMonth);
+
+      if (Object.keys(ismn_rechazados).length !== 0) {
+          ismn_rechazados_lately = Object.values(ismn_rechazados[year]);
+      }
+      else {
+            ismn_rechazados_lately = [currentYear.toString()];
+      }
+      if (Object.keys(inscrip_rechazados).length !== 0){
+          inscrip_rechazados_lately = Object.values(inscrip_rechazados[year]);
+      }
+      else {
+          ismn_rechazados_lately = [currentYear.toString()];
+      }
 
       function cantidad_solicitudes_per_day(ismn_solicitudes_lis, inscrip_solicitudes_list){
           let total = ismn_solicitudes_lis.reduce((total, numero) => total + numero, 0);

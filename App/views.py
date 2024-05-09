@@ -23,7 +23,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.widgets import signsandsymbols
 
-from App.forms import ChangePasswordForm
+from App.forms import ChangePasswordForm, EditProfileForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
@@ -79,7 +79,28 @@ def change_password(request):
             return HttpResponseRedirect('/')
     else:
         form = ChangePasswordForm(request.user)
-    return render(request, 'registration/change_password.html', {"form": form})
+    return render(request, 'registration/change_password.html', {"form": form})\
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def edit_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            if hasattr(user, 'especialista') and request.FILES.get('imageProfile'):
+                user.especialista.image_profile = request.FILES.get('imageProfile')
+                user.especialista.save()
+            elif hasattr(user, 'editor') and request.FILES.get('imageProfile'):
+                user.editor.image_profile = request.FILES.get('imageProfile')
+                user.editor.save()
+            form.save()
+            messages.success(request, f"Se ha cambiado su informacón de usuario exitosamente.")
+            return HttpResponseRedirect('/')
+    else:
+        form = EditProfileForm(instance=request.user)
+    return render(request, 'registration/perfil.html', {"form": form})
 
 
 # ================= SECCIÓN DE CREACIÓN DE RANGOS Y PREFIJOS =================
@@ -543,7 +564,7 @@ def add_editor(request):
                 messages.success(request, "Editor añadido correctamente !")
                 return HttpResponseRedirect('/backend/list_dsc')
     elif request.method == 'GET':
-        if Solicitud.objects.filter(status='Pendiente').filter(tipo='Solicitud-Inscripción').exists():
+        if Solicitud.objects.filter(status='Pendiente', deleted=False).filter(tipo='Solicitud-Inscripción').exists():
             messages.error(request, 'No es posible añadir un editor en este momento. '
                                     'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
             return HttpResponseRedirect('/backend/list_dsc')
@@ -570,7 +591,7 @@ def delete_editor(request, editor_id):
 @login_required(login_url="login")
 def editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
-    solicitud_inscripcion = Solicitud.objects.filter(tipo='Solicitud-Inscripción').filter(status='Pendiente').exists()
+    solicitud_inscripcion = Solicitud.objects.filter(tipo='Solicitud-Inscripción', deleted=False).filter(status='Pendiente').exists()
     if editor:
         if solicitud_inscripcion:
             messages.error(request, 'No es posible editar un editor en este momento. '
@@ -672,7 +693,7 @@ def add_musical_publication(request):
             messages.success(request, "Publicación musical añadida correctamente !")
             return HttpResponseRedirect('/backend_publicaciones/list_dsc')
     elif request.method == 'GET':
-        if Solicitud.objects.filter(status='Pendiente').exists():
+        if Solicitud.objects.filter(status='Pendiente', deleted=False).exists():
             messages.error(request, 'No es posible añadir una publicación en estos momentos. '
                                     'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
             return HttpResponseRedirect('/backend_publicaciones/list_dsc')
@@ -751,10 +772,11 @@ def delete_musical_publication(request, musical_publication_id):
 def delete_solicitud(request, solicitud_id):
     solicitud = Solicitud.objects.get(id=solicitud_id)
     if solicitud.tipo == 'Solicitud-ISMN':
-        if solicitud.temporal['publication_image']:
+        if 'publication_image' in solicitud.temporal.keys():
             os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
         try:
-            os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
+            if 'publication_letra' in solicitud.temporal.keys():
+                os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
         except FileNotFoundError:
             pass
     solicitud.soft_delete()
@@ -1786,6 +1808,7 @@ def export_statistics_solicitud(request):
         solicitudes_aceptadas = dict(list(Solicitud.return_accepted().items())[-31:])
 
         buffer = io.BytesIO()
+        print(request.user.first_name)
         # Contenido del reporte
         data = json.loads(request.body)
         total_solicitudes_enviadas = data.get('total_image_data_barChart')

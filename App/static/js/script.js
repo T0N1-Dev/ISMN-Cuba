@@ -163,7 +163,7 @@ $(document).ready(function() {
     });
 });
 
-// 8) Validate Letter Estension
+// 8) Validate Letter Extension
 $(document).ready(function () {
     $("input[name='publication_letter']").on('change', function () {
         var filePath = $(this).val();
@@ -221,6 +221,17 @@ $("#idTribute").keyup(function () {
     }
 
 });
+
+// 15 Reload Image Profile
+function previewImage(event) {
+    let input = event.target;
+    let reader = new FileReader();
+    reader.onload = function(){
+        let img = document.getElementById("profile-image");
+        img.src = reader.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+}
 
 // 16 Toggle Password Visibility
 function toggleFunction(){

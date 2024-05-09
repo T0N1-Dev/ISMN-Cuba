@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+<!-- Title on tab browser -->
+{% block title %} Mi Perfil {% endblock title %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-user"></i>&nbsp;&nbsp; Mi Perfil
+{% endblock navbar-content %}
+
+<!-- Button on navbar -->
+{% block nav-btn %}
+    <a href="{% url 'frontend' %}" style="float: right" class="btn text-light btn-sn" id="btn-nav"><i
+            class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
+{% endblock nav-btn %}
+
+<!-- Page content -->
+{% block content %}
+    <div class="container mt-5 border-dark" style="max-width: 700px; max-height: 500px;">
+        <div class="p-3">
+            <form method="POST" autocomplete="off" enctype="multipart/form-data" class="card p-3 mt-3 form-register">
+                {% csrf_token %}
+                <div class="d-flex justify-content-center">
+                    <a class="btn mt-3 mb-4" style="border: solid rgba(0, 0, 0, 0.1) 1px; width: 100%;">
+                        <i class="fa fa-lock"></i>&nbsp;&nbsp;INFORMACIÓN DE USUARIO
+                    </a>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="profile-image-container">
+                        <img id="profile-image" src="{{ form.instance.especialista.image_profile.url }}" alt="Imagen de perfil">
+                        <label for="file-input" id="file-input-label">
+                            <i class="fas fa-camera"></i> Cambiar foto
+                        </label>
+                        <input type="file" id="file-input" name="imageProfile" accept="image/*" onchange="previewImage(event)">
+                    </div>
+                </div>
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary btn-sm mt-4 mb-3 w-100" id="btn-add">
+                    <i class="fas fa-save">&nbsp;&nbsp;</i>&nbsp;&nbsp;Guardar
+                </button>
+            </form>
+        </div>
+    </div> <!-- END // container -->
+{% endblock content %}
+
+{% block Offcanvas %}
+    <a href="{% url 'musical_colections' %}" class="btn btn-dark text-white"><i class="fas fa-music"></i>&nbsp;&nbsp;Colecciones Musicales</a>
+    <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>
+    <hr>
+    <a href="#" class="btn btn-dark">
+        <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
+    </a>
+{% endblock Offcanvas %}

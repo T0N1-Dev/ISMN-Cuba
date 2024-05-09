@@ -46,6 +46,7 @@ function months_label(mes_actual) {
 /* Funcion para devolver una lista con la cantidad de ismn o inscrip rechazadas
 de acorde al mes donde se encuentre el chart */
 function extraer_organizar_datos(mes, inscrip_rechazados, ismn_rechazados){
+    console.log(inscrip_rechazados, ismn_rechazados)
     let inscrip_rechazados_mes_anterior = inscrip_rechazados['2023'][Meses_django[mes]];
     let ismn_rechazados_mes_anterior = ismn_rechazados['2023'][Meses_django[mes]];
     return [inscrip_rechazados_mes_anterior, ismn_rechazados_mes_anterior];

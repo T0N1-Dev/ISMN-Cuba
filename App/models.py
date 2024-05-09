@@ -279,7 +279,7 @@ class Solicitud(models.Model):
     # Retorna todas las solicitudes que han sido eliminadas o rechazadas
     @classmethod
     def return_deleted(cls):
-        return cls.objects.filter(deleted=True).order_by('deleted_at')
+        return cls.objects.filter(deleted=True, status='Pendiente').order_by('deleted_at')
 
     # Retorna todas las solicitudes que no han sido rechazadas, es decir, las aceptadas y las pendientes
     @classmethod

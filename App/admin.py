@@ -19,6 +19,12 @@ class CustomUserAdminForm(forms.ModelForm):
             raise forms.ValidationError("El nombre no puede contener nada que no sea letras.")
         return first_name
 
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if not last_name.isalpha():
+            raise forms.ValidationError("El apellido no puede contener nada que no sea letras.")
+        return last_name
+
 
 class CustomUserAdmin(UserAdmin):
     def has_delete_permission(self, request, obj=None):
