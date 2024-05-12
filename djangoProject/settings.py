@@ -138,6 +138,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/"media"
 
 # EMAIL SERVER (GMAIL)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'antoniocruzglez24@gmail.com'
@@ -152,6 +153,17 @@ JAZZMIN_SETTINGS = {
     "login_logo": "img/ismnlogo.png",
     "welcome_sign": "Bienvenido a la administración ISMN-CUBA",
     "copyright": "Cámara Cubana del Libro. Departamento ISMN",
+    "topmenu_links": [
+            {"name": "Inicio",  "url": "admin:index", "permissions": ["auth.view_user"]},
+            {"name": "Ayuda", "url": "https://www.filhcuba.cu/mision-y-vision", "new_window": True},
+            {"model": "auth.User"},
+            {"name": "Trazas",  "url": "http://127.0.0.1:8000/trazas/", "permissions": ["auth.view_user"]},
+    ],
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "litera",
+    "dark_mode_theme": "darkly",
 }
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

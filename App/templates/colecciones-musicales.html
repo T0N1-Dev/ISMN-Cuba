@@ -9,11 +9,10 @@
     <!-- FontAwesome -->
     <script src="https://kit.fontawesome.com/9cb60abd78.js" crossorigin="anonymous"></script>
      <!-- Logo -->
-    <link rel="icon" type="image/ico" href={% static "img/logo.ico" %}>
+    <link rel="icon" type="image/ico" href={% static "img/cuba.png" %}>
     <!-- Static CSS-->
     <link rel="stylesheet" href="{% static 'css/colecciones_musicales.css' %}">
     <title>Colecciones Musicales</title>
-    <script src="https://cdn.jsdelivr.net/npm/flip.js"></script>
 </head>
 <body>
     <header>
@@ -30,7 +29,7 @@
     <section>
         {% for publicacion in publicaciones_musicales %}
             <div class="container-public">
-                <img id="imagen" src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}" >
+                <img class="imagen" src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}" >
                 <div id="info" class="details-public">
                     <h2>{{ publicacion.name }}</h2>
                     <h3>Por: &nbsp; {{ publicacion.autor }}</h3>
@@ -59,15 +58,19 @@
     </footer>
 
     <script>
-        var image = document.getElementById('imagen')
-        var info = document.getElementById('info')
+        let imagenes = document.querySelectorAll(".container-public");
 
-        image.addEventListener('click', flipImage)
-        // JavaScript
-        function flipImage() {
-          var flip = new Flip(document.getElementById('imagen'), document.getElementById('info'));
-          flip.toggle();
+        function flipImageWithCSS(event){
+            let img = event.target;
+            if (img.style.transform.indexOf("scaleX") != -1) {
+              img.style.transform = img.style.transform.replace("scaleX(-1)","");
+            }else{
+              img.style.transform = img.style.transform + "scaleX(-1)";
+            }
         }
+         imagenes.forEach(function(imagen){
+             imagen.addEventListener('click', flipImageWithCSS);
+         })
       </script>
 
 </body>

@@ -13,8 +13,19 @@ from django.contrib.auth.models import User
 
 
 def validate_date(value):
-    if value > timezone.now():
-        raise ValidationError('La fecha no puede ser en el futuro.')
+    if value > timezone.now().date() or value.year < 1900:
+        raise ValidationError('Error en la fecha.')
+
+
+def validate_image_extension(value):
+    if not value.name.endswith(('.jpg', '.jpeg', '.png')):
+        raise ValidationError('Solo se permiten archivos con extensiones .jpg, .jpeg o .png')
+
+
+def validate_phone(value):
+    if not all(char.isdigit() or char in ['+', '-'] for char in value):
+        raise ValidationError("El teléfono solo puede contener números, '+' y '-'.")
+
 
 
 # Prevent duplicated emails
@@ -126,14 +137,15 @@ class Editor(models.Model):
         (EDITOR_INDEPENDIENTE, 'Independiente'),
     }
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20)
-    birthday = models.DateTimeField(validators=[validate_date], blank=True, null=True)
+    phone = models.CharField(unique=True, max_length=14, validators=[validate_phone])
+    birthday = models.DateField(validators=[validate_date], blank=True, null=True)
     prefijo = models.OneToOneField(PrefijoEditor, on_delete=models.PROTECT)
-    type = models.CharField(max_length=100, null=True, choices=TYPE)
-    image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png")
+    type = models.CharField(max_length=100, choices=TYPE)
+    image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png",
+                                      validators=[validate_image_extension])
     note = models.TextField(blank=True)
     directions = models.CharField(max_length=150)
-    id_tribute = models.PositiveBigIntegerField(unique=True)
+    id_tribute = models.PositiveSmallIntegerField(unique=True)
     state = models.BooleanField(default=True)
 
     class Meta:
@@ -148,9 +160,10 @@ class Editor(models.Model):
 
 class Especialista(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(unique=True, max_length=14, validators=[validate_phone])
     note = models.TextField(blank=True)
-    image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png")
+    image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png",
+                                      validators=[validate_image_extension])
     directions = models.CharField(max_length=150)
 
     class Meta:

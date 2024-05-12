@@ -127,7 +127,7 @@
                   <h4 class="display-6 mb-3">{{ solicitud }}</h4>
                   {% if solicitud.tipo == 'Solicitud-Inscripción' %}
                       <div class="container_img mb-4" style="background-color: transparent;">
-                          <img class="card-img img_detail" src="{{ solicitud.temporal.imagenProfile }}" alt="imagen del solicitante">
+                          <img class="card-img img_detail w-50" src="{{ solicitud.temporal.imagenProfile }}" alt="imagen del solicitante">
                       </div>
                       <div class="container-fluid" style="font-size: large; text-align: left">
                           <div class="row mb-1">
@@ -199,7 +199,7 @@
                   {% elif solicitud.tipo == 'Solicitud-ISMN' %}
                       <h4 class="display-6 mb-3">{{ solicitud.temporal.tipo }}</h4>
                       <div class="container_img mb-4" style="background-color: transparent;">
-                          <img class="card-img img_detail" src="{{ solicitud.temporal.publication_image|default:'/media/default.jpg' }}" alt="imagen musical">
+                          <img class="card-img img_detail w-50" src="{{ solicitud.temporal.publication_image|default:'/media/default.jpg' }}" alt="imagen musical">
                       </div>
                       <div class="container-fluid" style="font-size: large; text-align: left">
                           <div class="row mb-1">

@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
-from App.models import (Editor, Musical_Publication, Especialista, Registered_Data, Rango_Prefijo_Editor,
-                        Rango_Prefijo_Publicacion, PrefijoEditor, PrefijoPublicacion, Solicitud)
+from App.models import (Editor, Especialista, Registered_Data, Rango_Prefijo_Editor,
+                        Rango_Prefijo_Publicacion)
 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -40,11 +42,48 @@ class EditorInline(admin.StackedInline):
     verbose_name_plural = "editores"
 
 
-@admin.register(Editor)
+class CustomEditorAdminForm(forms.ModelForm):
+    class Meta:
+        model = Editor
+        fields = '__all__'
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+
+        if not all(char.isdigit() or char in ['+', '-'] for char in phone):
+            raise ValidationError("El teléfono solo puede contener números, '+' y '-'.")
+
+        if len(phone) > 14:
+            raise ValidationError("El teléfono no puede tener más de 14 caracteres.")
+
+        return phone
+
+    def clean_id_tribute(self):
+        id_tribute = self.cleaned_data.get('id_tribute')
+
+        if len(str(id_tribute)) > 14:
+            raise ValidationError("El ID Tributario no puede tener más de 14 caracteres.")
+
+        return id_tribute
+
+    def clean_birthday(self):
+        birthday = self.cleaned_data.get('birthday')
+
+        if birthday:
+            if birthday > timezone.now().date():
+                raise ValidationError("La fecha de nacimiento no puede ser en el futuro.")
+
+            if birthday.year < 1900:
+                raise ValidationError("La fecha de nacimiento no puede ser anterior a 1900.")
+
+        return birthday
+
+
 class EditorAdmin(admin.ModelAdmin):
     list_display = ['user', 'phone', 'prefijo']
-    search_fields = ['user', 'phone', 'prefijo']
+    search_fields = ['user__first_name', 'phone', 'prefijo']
     list_per_page = 8
+    form = CustomEditorAdminForm
 
 
 class EspecialistaInline(admin.StackedInline):
@@ -55,33 +94,14 @@ class EspecialistaInline(admin.StackedInline):
 @admin.register(Especialista)
 class EspecialistaAdmin(admin.ModelAdmin):
     list_display = ['user', 'phone', 'directions']
-    search_fields = ['user', 'phone', 'directions']
-    list_per_page = 8
-
-
-class Musical_Publication_Admin(admin.ModelAdmin):
-    list_display = ['name', 'autor', 'editor', 'ismn', 'imagen', 'gender']
-    search_fields = ['name', 'autor', 'editor', 'ismn', 'gender']
-    list_per_page = 8
-
-
-class Prefijo_Editor_Admin(admin.ModelAdmin):
-    list_display = ['value', 'lote', 'rango']
-
-
-class SolicitudAdmin(admin.ModelAdmin):
-    list_display = ['editor', 'tipo', 'created_at', 'status']
-    search_fields = ['editor', 'tipo', 'created_at', 'status']
+    search_fields = ['user__first_name', 'phone', 'directions']
     list_per_page = 8
 
 
 admin.site.register(Registered_Data)
-admin.site.register(Musical_Publication, Musical_Publication_Admin)
 admin.site.register(Rango_Prefijo_Editor)
 admin.site.register(Rango_Prefijo_Publicacion)
-admin.site.register(PrefijoEditor, Prefijo_Editor_Admin)
-admin.site.register(PrefijoPublicacion)
-admin.site.register(Solicitud, SolicitudAdmin)
+admin.site.register(Editor, EditorAdmin)
 # Desregistras el UserAdmin predeterminado
 admin.site.unregister(User)
 

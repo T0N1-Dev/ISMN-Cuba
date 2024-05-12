@@ -160,6 +160,9 @@ $(document).ready(function() {
             $(this).val('');
             return false;
         }
+        else {
+            previewImage(event);
+        }
     });
 });
 

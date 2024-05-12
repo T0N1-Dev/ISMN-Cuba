@@ -1,20 +1,32 @@
 from django.contrib import admin
-from django.urls import path
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
+    PasswordResetCompleteView
+from django.urls import path, reverse_lazy
 from App import views
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('trazas/', views.trazas, name='trazas'),
     # Path to render the Homepage
     path('', views.frontend, name="frontend"),
     # Path Login/Logout/Register
-    path('login/', views.MyLoginView.as_view(), name='login'),
+    path('accounts/login/', views.MyLoginView.as_view(), name='login'),
     path('logout/', views.MyLogoutView.as_view(), name='logout'),
     path('change_password/', views.change_password, name='change_password'),
+    # Reset Password
+    path('reset_password/', PasswordResetView.as_view(), name='reset_password'),
+    path('reset_password/done/', PasswordResetDoneView.as_view(), name='password_reset_done'),
+    # # Aquí está la vista para la confirmación
+    path('reset_password/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset_password/complete/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    # Edit profile
     path('edit_profile/', views.edit_profile, name='edit_profile'),
+    # Register User
     path('register_user/', views.register_user, name='register_user'),
+    # Email Confirmation
     path('email_confirmation/', views.email_confirmation, name='email_confirmation'),
     # ===============
     # BACKEND SECTION

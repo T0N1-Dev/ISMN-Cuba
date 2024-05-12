@@ -23,17 +23,18 @@ from django.utils.datastructures import MultiValueDictKeyError
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.widgets import signsandsymbols
 
-from App.forms import ChangePasswordForm, EditProfileForm
+from App.forms import ChangePasswordForm, EditProfileForm, ResetPasswordForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect  # Redirect the page after submit
+from django.http import HttpResponseRedirect, HttpResponse  # Redirect the page after submit
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
 from django.template import loader  # Render templates on email body
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordResetCompleteView, \
+    PasswordResetView
 import io
 from django.http import FileResponse
 # REPORTLAB
@@ -69,6 +70,12 @@ class MyLogoutView(LogoutView):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
+def trazas(request):
+    return render(request, 'admin/trazas_list.html')
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
 def change_password(request):
     if request.method == 'POST':
         form = ChangePasswordForm(request.user, request.POST)
@@ -79,7 +86,7 @@ def change_password(request):
             return HttpResponseRedirect('/')
     else:
         form = ChangePasswordForm(request.user)
-    return render(request, 'registration/change_password.html', {"form": form})\
+    return render(request, 'registration/change_password.html', {"form": form})
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
