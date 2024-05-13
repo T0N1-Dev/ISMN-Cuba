@@ -23,21 +23,28 @@
                 <button><i class="fas fa-search"></i></button>
             </div>
         </form>
-        <a class="back" href="{% url 'frontend' %}"><i class="fa fa-arrow-left"></i></a>
+        <a class="back_arrow" href="{% url 'frontend' %}"><i class="fa fa-arrow-left"></i></a>
     </header>
 
     <section>
         {% for publicacion in publicaciones_musicales %}
             <div class="container-public">
-                <img class="imagen" src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}" >
-                <div id="info" class="details-public">
-                    <h2>{{ publicacion.name }}</h2>
-                    <h3>Por: &nbsp; {{ publicacion.autor }}</h3>
+                <div class="thecard">
+                    <div class="front">
+                        <img class="imagen" src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}" onclick="toogleFlip(this)">
+                        <div class="details-public">
+                            <h2>{{ publicacion.name }}</h2>
+                            <h3>Por: &nbsp; {{ publicacion.autor }}</h3>
+                        </div>
+                    </div>
+                    <div class="back" hidden>
+                        <img src="{{ publicacion.barcode.url }}" alt="barcode de {{ publicacion }}" >
+                    </div>
                 </div>
-
             </div>
         {% endfor %}
     </section>
+
 
     <!-- FOOTER -->
     <footer>
@@ -58,20 +65,27 @@
     </footer>
 
     <script>
-        let imagenes = document.querySelectorAll(".container-public");
+        function toogleFlip(element) {
+            console.log(element)
+            let isFlipped = element.classList.contains('flip');
+            let barcode = element.parentNode.nextElementSibling;
 
-        function flipImageWithCSS(event){
-            let img = event.target;
-            if (img.style.transform.indexOf("scaleX") != -1) {
-              img.style.transform = img.style.transform.replace("scaleX(-1)","");
-            }else{
-              img.style.transform = img.style.transform + "scaleX(-1)";
+            if (isFlipped) {
+                element.classList.remove('flip');
+                barcode.hidden = true;
+            } else {
+                let flippedImages = document.querySelectorAll('.imagen.flip');
+
+                flippedImages.forEach(function(img) {
+                    img.classList.remove('flip');
+                    img.parentNode.nextElementSibling.hidden = true;
+                });
+
+                element.classList.add('flip');
+                barcode.hidden = false;
             }
         }
-         imagenes.forEach(function(imagen){
-             imagen.addEventListener('click', flipImageWithCSS);
-         })
-      </script>
+    </script>
 
 </body>
 </html>

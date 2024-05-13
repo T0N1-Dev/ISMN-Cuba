@@ -700,7 +700,7 @@ def add_musical_publication(request):
             messages.success(request, "Publicación musical añadida correctamente !")
             return HttpResponseRedirect('/backend_publicaciones/list_dsc')
     elif request.method == 'GET':
-        if Solicitud.objects.filter(status='Pendiente', deleted=False).exists():
+        if Solicitud.objects.filter(tipo='Solicitud-ISMN', status='Pendiente', deleted=False).exists():
             messages.error(request, 'No es posible añadir una publicación en estos momentos. '
                                     'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
             return HttpResponseRedirect('/backend_publicaciones/list_dsc')

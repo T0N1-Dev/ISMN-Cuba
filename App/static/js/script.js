@@ -94,7 +94,7 @@ $(document).ready(function (){
     // Only letter
     $('#first_name, #last_name, #autor').keyup(function () {
         var letter = $(this).val();
-        var allow = letter.replace(/[^a-zA-Záéíóú _]/g, '');
+        var allow = letter.replace(/[^a-zA-ZáéíóúñÑ _]/g, '');
         $(this).val(allow);
     });
 
