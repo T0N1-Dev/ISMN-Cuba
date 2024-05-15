@@ -110,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'es-es'
+LANGUAGE_CODE = 'es-mx'
 
 TIME_ZONE = 'America/Havana'
 
@@ -158,6 +158,7 @@ JAZZMIN_SETTINGS = {
             {"name": "Ayuda", "url": "https://www.filhcuba.cu/mision-y-vision", "new_window": True},
             {"model": "auth.User"},
             {"name": "Trazas",  "url": "http://127.0.0.1:8000/trazas/", "permissions": ["auth.view_user"]},
+            {"name": "Salvas BD",  "url": "http://127.0.0.1:8000/salvasBD/", "permissions": ["auth.view_user"]},
     ],
 }
 

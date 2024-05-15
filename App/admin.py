@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from App.forms import CustomUserAdminForm
 from App.models import (Editor, Especialista, Registered_Data, Rango_Prefijo_Editor,
                         Rango_Prefijo_Publicacion)
 
@@ -10,31 +11,24 @@ from django.contrib.auth.models import User
 from django import forms
 
 
-class CustomUserAdminForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = '__all__'
-
-    def clean_first_name(self):
-        first_name = self.cleaned_data.get('first_name')
-        if not first_name.isalpha():
-            raise forms.ValidationError("El nombre no puede contener nada que no sea letras.")
-        return first_name
-
-    def clean_last_name(self):
-        last_name = self.cleaned_data.get('last_name')
-        if not last_name.isalpha():
-            raise forms.ValidationError("El apellido no puede contener nada que no sea letras.")
-        return last_name
-
-
 class CustomUserAdmin(UserAdmin):
+
+    form = CustomUserAdminForm
+    readonly_fields = ('last_login', 'date_joined')
+
+    # Puedes personalizar más opciones si lo necesitas
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Información Personal', {'fields': ('first_name', 'last_name', 'email')}),
+        ('Fechas Importantes', {'fields': ('last_login', 'date_joined')}),
+        ('Permisos', {'fields': ('is_active', 'is_staff', 'groups', 'user_permissions')}),
+    )
+
     def has_delete_permission(self, request, obj=None):
         if obj is None:
             return True
         else:
             return not obj.is_superuser
-    form = CustomUserAdminForm
 
 
 class EditorInline(admin.StackedInline):
@@ -98,7 +92,13 @@ class EspecialistaAdmin(admin.ModelAdmin):
     list_per_page = 8
 
 
-admin.site.register(Registered_Data)
+class RegisterDataAdmin(admin.ModelAdmin):
+    list_display = ['user_name', 'email', 'phone', 'id_tribute']
+    search_fields = ['user__first_name', 'phone', 'directions']
+    list_per_page = 8
+
+
+admin.site.register(Registered_Data, RegisterDataAdmin)
 admin.site.register(Rango_Prefijo_Editor)
 admin.site.register(Rango_Prefijo_Publicacion)
 admin.site.register(Editor, EditorAdmin)

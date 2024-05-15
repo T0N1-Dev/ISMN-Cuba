@@ -27,7 +27,6 @@ def validate_phone(value):
         raise ValidationError("El teléfono solo puede contener números, '+' y '-'.")
 
 
-
 # Prevent duplicated emails
 class Registered_Data(models.Model):
     user_name = models.CharField(max_length=100)
@@ -35,8 +34,11 @@ class Registered_Data(models.Model):
     phone = models.CharField(max_length=20)
     id_tribute = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        verbose_name_plural = "Registrados"
+
     def __str__(self):
-        return f"email: {self.email} \n phone: {self.phone}"
+        return f"email: {self.email}"
 
 
 # ==========MODELS TO MY BUSINESS==========

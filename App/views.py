@@ -76,6 +76,12 @@ def trazas(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
+def salvasBD(request):
+    return render(request, 'admin/salvasBD.html')
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
 def change_password(request):
     if request.method == 'POST':
         form = ChangePasswordForm(request.user, request.POST)
@@ -163,26 +169,27 @@ def generate_prefijo_editor(range):
 
 
 def generate_prefijo_publicacion(valor):
+    lote = '979-0'
     if valor.__len__() == 2:
-        prefijo = PrefijoPublicacion.objects.create(value=valor, lote='979-0',
+        prefijo = PrefijoPublicacion.objects.create(value=valor, lote=lote,
                                                     rango=Rango_Prefijo_Publicacion.objects.get(tipo='P-Menor'))
         return prefijo
     elif valor.__len__() == 3:
-        prefijo = PrefijoPublicacion.objects.create(value=valor, lote='979-0',
+        prefijo = PrefijoPublicacion.objects.create(value=valor, lote=lote,
                                                     rango=Rango_Prefijo_Publicacion.objects.get(
                                                         tipo='P-Inferior'))
         return prefijo
     elif valor.__len__() == 4:
-        prefijo = PrefijoPublicacion.objects.create(value=valor, lote='979-0',
+        prefijo = PrefijoPublicacion.objects.create(value=valor, lote=lote,
                                                     rango=Rango_Prefijo_Publicacion.objects.get(
                                                         tipo='P-Media_Inferior'))
         return prefijo
     elif valor.__len__() == 5:
-        prefijo = PrefijoPublicacion.objects.create(value=valor, lote='979-0',
+        prefijo = PrefijoPublicacion.objects.create(value=valor, lote=lote,
                                                     rango=Rango_Prefijo_Publicacion.objects.get(tipo='P-Media'))
         return prefijo
     else:
-        prefijo = PrefijoPublicacion.objects.create(value=valor, lote='979-0',
+        prefijo = PrefijoPublicacion.objects.create(value=valor, lote=lote,
                                                     rango=Rango_Prefijo_Publicacion.objects.get(
                                                         tipo='P-Superior'))
         return prefijo
@@ -300,6 +307,7 @@ def backend_editores(request, order):
         return render(request, 'editores/editores-list.html', {"editores": all_editor,
                                                                'solicitudes_pendientes': solicitudes_pendientes,
                                                                'usuario': usuario, 'flag': flag})
+
 
 # Function to render publication's lists
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -779,7 +787,7 @@ def delete_musical_publication(request, musical_publication_id):
 def delete_solicitud(request, solicitud_id):
     solicitud = Solicitud.objects.get(id=solicitud_id)
     if solicitud.tipo == 'Solicitud-ISMN':
-        if 'publication_image' in solicitud.temporal.keys():
+        if 'publication_image' in solicitud.temporal.keys() and solicitud.temporal['publication_image']:
             os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
         try:
             if 'publication_letra' in solicitud.temporal.keys():
@@ -798,6 +806,7 @@ def generar_ismn(editor):
         1- La cantidad de digitos que debe tener un ismn en total para Cuba son 13
         2- La cantidad de digitos que deben sumar los prefijos de publicacion y editor son 8
         3- El digito de control se calcula mediante este metodo http://www.grupoalquerque.es/mate_cerca/paneles_2012/168_ISBN2.pdf
+        4- El lote 979-0 es el comienzo de todo ISMN pues es lo que lo diferencia de otros estándares de codificación
     """
 
     # Funcion que formatea el prefijo_publicacion para que tenga el formato de ismn: 001,012,0002, etc
