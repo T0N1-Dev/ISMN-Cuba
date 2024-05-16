@@ -366,13 +366,15 @@ def backend_solicitudes(request, order):
         page = request.GET.get('page')
         all_solicitudes = paginator.get_page(page)
         solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
-        solicitudes_rechazadas = Solicitud.return_deleted()
+        inscripciones_rechazadas, ismn_rechazados, total_rechazados = Solicitud.return_deleted_last_year()
         solicitudes_enviadas = Solicitud.solicitudes_enviadas_total()
         # Solo me interesan las últimas 30 que representan un mes
         solicitudes_aceptadas = dict(list(Solicitud.return_accepted().items())[-31:])
         return render(request, 'solicitudes/solicitudes-list.html', {"solicitudes": all_solicitudes, 'flag': flag,
                                                                      "solicitudes_pendientes": solicitudes_pendientes,
-                                                                     "solicitudes_rechazadas": solicitudes_rechazadas,
+                                                                     "inscripciones_rechazadas": inscripciones_rechazadas,
+                                                                     "total_rechazados": total_rechazados,
+                                                                     "ismn_rechazados": ismn_rechazados,
                                                                      "solicitudes_enviadas": solicitudes_enviadas,
                                                                      "solicitudes_aceptadas": solicitudes_aceptadas})
 

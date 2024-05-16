@@ -291,10 +291,52 @@ class Solicitud(models.Model):
                 resultados[fecha][tipo] += total
         return resultados
 
-    # Retorna todas las solicitudes que han sido eliminadas o rechazadas
+    # Retorna todas las solicitudes que han sido eliminadas o rechazadas en los ultimos dos años, devuelve los datos en
+    # un diccionario para poder ser utilizado por el Chart.js y el total en un entero
     @classmethod
-    def return_deleted(cls):
-        return cls.objects.filter(deleted=True, status='Pendiente').order_by('deleted_at')
+    def return_deleted_last_year(cls):
+        now = timezone.now()
+        current_year = now.year
+        past_year = current_year - 1
+
+        meses_abreviados = {1: 'ene', 2: 'feb', 3: 'mar', 4: 'abr', 5: 'may', 6: 'jun', 7: 'jul', 8: 'ago', 9: 'sep',
+                            10: 'oct', 11: 'nov', 12: 'dic'}
+
+        solicitudes_inscrip = cls.objects.filter(
+            tipo='Solicitud-Inscripción',
+            deleted=True,
+            status='Pendiente',
+            deleted_at__gte= now - timezone.timedelta(days=365)
+        )
+
+        solicitudes_ismn = cls.objects.filter(
+            tipo='Solicitud-ISMN',
+            deleted=True,
+            status='Pendiente',
+            deleted_at__gte=now - timezone.timedelta(days=365)
+        )
+
+        total = cls.objects.filter(
+            deleted=True, status='Pendiente', deleted_at__gte = now - timezone.timedelta(days=365)
+        ).count()
+
+        inscripciones_rechz = {past_year: {}, current_year: {}}
+        ismn_rechz = {past_year: {}, current_year: {}}
+
+        for value in meses_abreviados.values():
+            inscripciones_rechz[past_year][value] = 0
+            inscripciones_rechz[current_year][value] = 0
+            ismn_rechz[past_year][value] = 0
+            ismn_rechz[current_year][value] = 0
+
+        for solicitud in solicitudes_inscrip:
+            inscripciones_rechz[solicitud.deleted_at.year][meses_abreviados[solicitud.deleted_at.month]] += 1
+
+        for solicitud in solicitudes_ismn:
+            ismn_rechz[solicitud.deleted_at.year][meses_abreviados[solicitud.deleted_at.month]] += 1
+
+        return inscripciones_rechz, ismn_rechz, total
+
 
     # Retorna todas las solicitudes que no han sido rechazadas, es decir, las aceptadas y las pendientes
     @classmethod

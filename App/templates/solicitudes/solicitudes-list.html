@@ -407,7 +407,7 @@
                     <p class=" display-6 fs-6" style="max-width: 200px; text-align: justify; margin-left: 50px">
                         Cantidad de solicitudes rechazadas según su tipo (ISMN ó Inscripción).
                     </p>
-                    <b class="display-5 fs-5 text-center text-primary-emphasis">Total: {{ solicitudes_rechazadas.count }}.</b>
+                    <b class="display-5 fs-5 text-center text-primary-emphasis">Total: {{ total_rechazados }}.</b>
                 </div>
             </div>
             <hr class="mb-3">
@@ -506,14 +506,27 @@
         let ismn_enviados = {};
         let inscrip_enviados = {};
 
-      {% for solicitud_r in solicitudes_rechazadas %}
-          {% if solicitud_r.tipo == 'Solicitud-ISMN' %}
-              sumar_rechazo_mes(ismn_rechazados, {{ solicitud_r.deleted_at.year }}, '{{ solicitud_r.deleted_at|date:'b' }}')
-          {% else %}
-              sumar_rechazo_mes(inscrip_rechazados, {{ solicitud_r.deleted_at.year }}, '{{ solicitud_r.deleted_at|date:'b' }}')
-          {% endif %}
+      {% for key, value in inscripciones_rechazadas.items %}
+          {% for clave, valor in value.items %}
+            if (!inscrip_rechazados.hasOwnProperty('{{ key }}')) {
+                inscrip_rechazados['{{ key }}'] = {};
+            }
+            {% for clave, valor in value.items %}
+                inscrip_rechazados['{{ key }}']['{{ clave }}'] = {{ valor }};
+            {% endfor %}
+          {% endfor %}
       {% endfor %}
 
+        {% for key, value in ismn_rechazados.items %}
+          {% for clave, valor in value.items %}
+            if (!ismn_rechazados.hasOwnProperty('{{ key }}')) {
+                ismn_rechazados['{{ key }}'] = {};
+            }
+            {% for clave, valor in value.items %}
+                ismn_rechazados['{{ key }}']['{{ clave }}'] = {{ valor }};
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
 
       {% for key, value in solicitudes_enviadas.items %}
           {% for clave, valor in value.items %}
@@ -525,11 +538,12 @@
           {% endfor %}
       {% endfor %}
 
-      // Datos b para Chart.js
+      // Datos para Chart.js
       const ctx = document.getElementById('myChart');
       const ctx2 = document.getElementById('myChart2');
 
-      let year = '{{ solicitudes_rechazadas.last.deleted_at.year }}';
+      let keys = Object.keys(ismn_rechazados)
+      let year = keys[keys.length -1];
       let currentYear = new Date().getFullYear();
       let inscrip_rechazados_lately;
       let ismn_rechazados_lately;
