@@ -46,7 +46,6 @@ function months_label(mes_actual) {
 /* Funcion para devolver una lista con la cantidad de ismn o inscrip rechazadas
 de acorde al mes donde se encuentre el chart */
 function extraer_organizar_datos(mes, inscrip_rechazados, ismn_rechazados){
-    console.log(inscrip_rechazados, ismn_rechazados)
     let inscrip_rechazados_mes_anterior = inscrip_rechazados['2023'][Meses_django[mes]];
     let ismn_rechazados_mes_anterior = ismn_rechazados['2023'][Meses_django[mes]];
     return [inscrip_rechazados_mes_anterior, ismn_rechazados_mes_anterior];
@@ -112,7 +111,7 @@ function removeDataBarChart(chart){
 }
 
 
-function saveChart(){
+function saveChart(pChartBar){
     let canvas_line_chart = document.getElementById('myChart');
     let canvas_bar_chart = document.getElementById('myChart2');
     let dataURL_lineChart = canvas_line_chart.toDataURL(); // Obtiene la representación base64 de la imagen
@@ -126,7 +125,7 @@ function saveChart(){
             'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({ image_data_lineChart: dataURL_lineChart, image_data_barChart: dataURL_barChart,
-                                    total_image_data_barChart: barChart_total}),
+                                    total_image_data_barChart: pChartBar.options.plugins.title.text}),
     }).then(response => {
         if (response.ok) {
             response.blob().then(blob => {

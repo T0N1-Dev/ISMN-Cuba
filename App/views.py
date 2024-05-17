@@ -1480,7 +1480,6 @@ def export_editores_list(request):
         'user__date_joined__gte': fecha_inscripcion_filter,
         'user__first_name__icontains': nombre_filter,
         'prefijo__rango__rango_superior': rango_filter,
-
     }
 
     # Lista completa de editores en orden LIFO
@@ -1497,6 +1496,7 @@ def export_editores_list(request):
     if cantidad_filter and len(list_editores) >= cantidad_filter:
         list_editores = list_editores.all()[:cantidad_filter]
 
+    # Funcion encargada de generar el reporte
     crear_report_list(list_editores, buffer)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"Editores_lista.pdf")
@@ -1667,8 +1667,9 @@ def crear_report_statistics(buffer, title, total_solicitudes_enviadas, user):
         w, h = text_info.wrapOn(canvas, 300, 200)
         text_info.drawOn(canvas, origin_start, PAGE_HEIGHT - h - 337)
         # Total
+        _, _, total_rechazos = Solicitud.return_deleted_last_year()
         solicitudes_declined_total = canvas.beginText()
-        solicitudes_declined_total_title = f'Total: {Solicitud.return_deleted().count()}'
+        solicitudes_declined_total_title = f'Total: {total_rechazos}'
         solicitudes_declined_total.setTextOrigin(origin_start, PAGE_HEIGHT - h - 380)
         solicitudes_declined_total.setFont('RobotoSlab', 20)
         solicitudes_declined_total.setFillColorRGB(0.21, 0.25, 0.33)
@@ -1718,7 +1719,7 @@ def crear_report_statistics(buffer, title, total_solicitudes_enviadas, user):
         text_info.drawOn(canvas, inch, PAGE_HEIGHT - im_height - h - 130)
         # Total
         solicitudes_declined_total = canvas.beginText()
-        solicitudes_declined_total_title = f'Total: {total_solicitudes_enviadas}'
+        solicitudes_declined_total_title = total_solicitudes_enviadas
         solicitudes_declined_total.setTextOrigin(inch, PAGE_HEIGHT - im_height - h - 170)
         solicitudes_declined_total.setFont('RobotoSlab', 20)
         solicitudes_declined_total.setFillColorRGB(0.21, 0.25, 0.33)
@@ -1826,7 +1827,6 @@ def export_statistics_solicitud(request):
         solicitudes_aceptadas = dict(list(Solicitud.return_accepted().items())[-31:])
 
         buffer = io.BytesIO()
-        print(request.user.first_name)
         # Contenido del reporte
         data = json.loads(request.body)
         total_solicitudes_enviadas = data.get('total_image_data_barChart')

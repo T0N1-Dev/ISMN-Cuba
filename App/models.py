@@ -289,6 +289,7 @@ class Solicitud(models.Model):
             total = solicitud['total']
             if fecha in resultados:
                 resultados[fecha][tipo] += total
+
         return resultados
 
     # Retorna todas las solicitudes que han sido eliminadas o rechazadas en los ultimos dos años, devuelve los datos en
