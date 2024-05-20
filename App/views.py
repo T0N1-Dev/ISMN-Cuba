@@ -28,7 +28,7 @@ from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEdi
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect, HttpResponse  # Redirect the page after submit
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound  # Redirect the page after submit
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
@@ -114,6 +114,10 @@ def edit_profile(request):
     else:
         form = EditProfileForm(instance=request.user)
     return render(request, 'registration/perfil.html', {"form": form})
+
+
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)
 
 
 # ================= SECCIÓN DE CREACIÓN DE RANGOS Y PREFIJOS =================
