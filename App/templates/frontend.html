@@ -6,6 +6,7 @@
     <div class="block-position">
         <h1 class="text-danger text-shadow"><span class="text-dark" id="element"></span>&nbsp;Cuba</h1>
     </div>
+
     <style>
         body {
             background-image: url("../static/img/home.jpg");
@@ -37,6 +38,9 @@
             <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista de Solicitudes</a>
         {% elif request.user.editor %}
             <a class="btn btn-dark" href="{% url 'solicitud-ismn' %}"><i class="fas fa-paper-plane"></i>&nbsp;&nbsp;Solicitud ISMN</a>
+            <a class="btn btn-dark" href="{% url 'edit_profile' %}"><img class="img-profile" src="{{ user.editor.image_profile.url }}" alt="imagen perfil"
+                    style="border-color: black">&nbsp;&nbsp;Información de Perfil</a>
+            <a class="btn btn-dark" href="{% url 'change_password' %}"><i class="fas fa-key"></i>&nbsp;&nbsp;Cambiar contraseña</a>
         {% endif %}
         <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
     {% else %}

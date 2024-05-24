@@ -116,10 +116,6 @@ def edit_profile(request):
     return render(request, 'registration/perfil.html', {"form": form})
 
 
-def custom_404(request, exception):
-    return render(request, '404.html', status=404)
-
-
 # ================= SECCIÓN DE CREACIÓN DE RANGOS Y PREFIJOS =================
 def generate_prefijo_editor(range):
     value = 0
@@ -569,7 +565,11 @@ def add_editor(request):
                 editor.user = user
                 editor.prefijo = generate_prefijo_editor(request.POST.get('editorPrefijo'))
                 editor.note = request.POST.get('note')
-                if request.FILES.get('imagenProfile'):
+                image_profile = request.FILES.get('image_profile')
+                if image_profile:
+                    if image_profile.size > 10 * 1024 * 1024:
+                        messages.error(request, "La imagen no puede ser mayor a 10 MB")
+                        return HttpResponseRedirect('/add_editor')
                     editor.image_profile = request.FILES.get('imagenProfile')
                 user.save()
                 editor.save()
@@ -1251,7 +1251,7 @@ def extraer_datos_model(modelo_list):
         contenido['ID'] = [publicacion.id for publicacion in modelo_list]
         contenido['Título'] = [publicacion.name for publicacion in modelo_list]
         contenido['Autor'] = [publicacion.autor for publicacion in modelo_list]
-        contenido['Editor'] = [publicacion.editor.user.first_name for publicacion in modelo_list]
+        contenido['Editor'] = [publicacion.editor.user.first_name if publicacion.editor else '-' for publicacion in modelo_list]
         contenido['ISMN'] = [publicacion.ismn for publicacion in modelo_list]
         contenido['Fecha'] = [publicacion.date_time.strftime('%Y-%m-%d') for publicacion in modelo_list]
         contenido['Género'] = [publicacion.gender for publicacion in modelo_list]
