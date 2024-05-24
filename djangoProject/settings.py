@@ -159,7 +159,8 @@ JAZZMIN_SETTINGS = {
             {"name": "Ayuda", "url": "https://www.filhcuba.cu/mision-y-vision", "new_window": True},
             {"model": "auth.User"},
             {"name": "Trazas",  "url": "http://127.0.0.1:8000/trazas/", "permissions": ["auth.view_user"]},
-            {"name": "Salvas BD",  "url": "http://127.0.0.1:8000/salvasBD/", "permissions": ["auth.view_user"]},
+            {"name": "Salvar BD",  "url": "http://127.0.0.1:8000/salvasBD/", "permissions": ["auth.view_user"]},
+            {"name": "Restaurar BD",  "url": "http://127.0.0.1:8000/restaurarBD/", "permissions": ["auth.view_user"]},
     ],
 }
 
@@ -171,3 +172,4 @@ JAZZMIN_UI_TWEAKS = {
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+

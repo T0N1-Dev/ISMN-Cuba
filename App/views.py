@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import shutil
 from datetime import datetime
 from email import encoders
 from email.mime.base import MIMEBase
@@ -10,6 +11,7 @@ from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 from PIL import Image as PILImage
 from barcode import EAN13
 from barcode.writer import ImageWriter
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from django.core.files import File
@@ -17,6 +19,11 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
+from django.core.management import call_command
+from io import StringIO
+import subprocess
+from datetime import datetime
+from django.http.response import JsonResponse
 
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
@@ -114,6 +121,37 @@ def edit_profile(request):
     else:
         form = EditProfileForm(instance=request.user)
     return render(request, 'registration/perfil.html', {"form": form})
+
+
+@staff_member_required
+def backup_database(request):
+    database_path = os.path.join(BASE_DIR, 'db.sqlite3')
+    backup_dir = os.path.join(BASE_DIR, 'backups')
+    backup_path = os.path.join(backup_dir, 'db_backup.sqlite3')
+
+    # Crear el directorio de backups si no existe
+    os.makedirs(backup_dir, exist_ok=True)
+
+    try:
+        shutil.copy2(database_path, backup_path)
+        messages.success(request, "Copia de seguridad de la Base de Datos almacenada correctamente.")
+    except Exception as e:
+        messages.error(request, f"Error al realizar la copia de seguridad: {str(e)}")
+    return HttpResponseRedirect('/admin')
+
+
+
+@login_required(login_url="login")
+def restore_database(request):
+    now = datetime.now()
+    date_time = now.strftime("%Y-%m-%d %H:%M:%S")  #Formatear la fecha y hora
+    input_stream = StringIO('yes/n')
+    process = subprocess.Popen(['python', 'manage.py', 'dbrestore'], stdin=subprocess.PIPE)
+    process.communicate(input=input_stream.getvalue().encode())
+    with open('restore_log.txt', 'a') as f:
+        f.write(f"Restauración realizada el {date_time}\n")
+    messages.success(request, "Base de Datos restaurada correctamente")
+    return HttpResponseRedirect('/admin')
 
 
 # ================= SECCIÓN DE CREACIÓN DE RANGOS Y PREFIJOS =================
