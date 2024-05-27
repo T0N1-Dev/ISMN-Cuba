@@ -1,0 +1,120 @@
+{% extends 'admin/index.html' %}
+
+{% block content %}
+    <style>
+        :root {
+            --vs-primary: 29 92 255;
+        }
+
+        /*Dialog Styles*/
+        dialog {
+            padding: 1rem 3rem;
+            background: white;
+            max-width: 550px;
+            padding-top: 2rem;
+            border-radius: 20px;
+            border: 0;
+            box-shadow: 0 5px 30px 0 rgb(0 0 0 / 10%);
+            animation: fadeIn 1s ease both;
+            &::backdrop {
+                animation: fadeIn 1s ease both;
+                background: rgb(255 255 255 / 40%);
+                z-index: 2;
+                backdrop-filter: blur(20px);
+            }
+            .x {
+                filter: grayscale(1);
+                border: none;
+                background: none;
+                position: absolute;
+                top: 15px;
+                right: 10px;
+                transition: ease filter, transform 0.3s;
+                cursor: pointer;
+                transform-origin: center;
+                &:hover {
+                    filter: grayscale(0);
+                    transform: scale(1.1);
+                }
+            }
+            h2 {
+                font-weight: 600;
+                font-size: 2rem;
+                padding-bottom: 1rem;
+            }
+            p {
+                font-size: 1rem;
+                line-height: 1.3rem;
+                padding: 0.5rem 0;
+                a {
+                    &:visited {
+                        color: rgb(var(--vs-primary));
+                    }
+                }
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+    </style>
+
+    <h2>Restaurar Base de Datos</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Usuario</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Estado</th>
+                <th style="width: 10%" colspan="2" class="th_button">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for copy in copiesDB %}
+            <tr>
+                <th scope="row">{{ copy.id }}</th>
+                <td>{{ copy.user }}</td>
+                <td>{{ copy.date }}</td>
+                <td>{{ copy.tipo }}</td>
+                <td class="text-success"><i class="fa fa-check"></i>&nbsp;{{ copy.state }}</td>
+                <td title="Restaurar Base de Datos">
+                    <button class="btn btn-success" onclick="openDialog({{ copy.id }});"
+                            name="{{ copy.id }}"><i class="fa fa-trash-restore"></i>
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <form id="modalForm" method="POST" class="form-floating">
+        {% csrf_token %}
+        <input type="hidden" id="copyID" name="copy_id">
+        <dialog id="dialog">
+            <h3 class="text-center">Restauración de Base de Datos</h3>
+            <p class="lead text-center">Al realizar la restauración de la Base de Datos perderá todos los cambios realizados.</p>
+            <p class="lead font-weight-bold text-center">¿Está seguro que desea continuar?</p>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-danger"><i class="fa fa-trash-restore"></i>&nbsp;&nbsp;Restaurar</button>
+            </div>
+            <button type="button" onclick="window.dialog.close();" aria-label="close" class="x">
+                <i style="font-size: 25px" class="fa fa-times"></i></button>
+        </dialog>
+    </form>
+
+    <script>
+        function openDialog(copyID) {
+            document.getElementById('copyID').value = copyID;
+            document.getElementById('dialog').showModal();
+        }
+    </script>
+
+{% endblock %}

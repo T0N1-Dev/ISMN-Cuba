@@ -2,15 +2,16 @@ import base64
 import json
 import os
 import shutil
-from datetime import datetime
 from email import encoders
 from email.mime.base import MIMEBase
 from random import randint
 from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
 
+import requests.utils
 from PIL import Image as PILImage
 from barcode import EAN13
 from barcode.writer import ImageWriter
+from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
@@ -19,31 +20,27 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
-from django.core.management import call_command
-from io import StringIO
-import subprocess
 from datetime import datetime
-from django.http.response import JsonResponse
 
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.widgets import signsandsymbols
 
-from App.forms import ChangePasswordForm, EditProfileForm, ResetPasswordForm
+from App.forms import ChangePasswordForm, EditProfileForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
-                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud)
+                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud, CopyDB)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound  # Redirect the page after submit
+from django.http import HttpResponseRedirect
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
 from django.template import loader  # Render templates on email body
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordResetCompleteView, \
-    PasswordResetView
+from django.contrib.auth.views import LoginView, LogoutView
 import io
 from django.http import FileResponse
+from django.db import connections
 # REPORTLAB
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -65,7 +62,7 @@ class MyLoginView(LoginView):
     def get_success_url(self):
         user = self.request.user
 
-        if user.is_superuser:
+        if user.is_staff:
             return '/admin/'
         else:
             return reverse('frontend')
@@ -79,12 +76,6 @@ class MyLogoutView(LogoutView):
 @login_required(login_url="login")
 def trazas(request):
     return render(request, 'admin/trazas_list.html')
-
-
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@login_required(login_url="login")
-def salvasBD(request):
-    return render(request, 'admin/salvasBD.html')
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -125,33 +116,49 @@ def edit_profile(request):
 
 @staff_member_required
 def backup_database(request):
+    time = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    name = f'db_backup_{time}.sqlite3'
+
     database_path = os.path.join(BASE_DIR, 'db.sqlite3')
     backup_dir = os.path.join(BASE_DIR, 'backups')
-    backup_path = os.path.join(backup_dir, 'db_backup.sqlite3')
+    backup_path = os.path.join(backup_dir, name)
 
     # Crear el directorio de backups si no existe
     os.makedirs(backup_dir, exist_ok=True)
 
     try:
         shutil.copy2(database_path, backup_path)
+        copyDB = CopyDB()
+        copyDB.user = request.user
+        copyDB.tipo = 'SQLite3'
+        copyDB.state = 'Correcto'
+        copyDB.name_BD = name
+        copyDB.rute_BD = backup_path
+        copyDB.save()
         messages.success(request, "Copia de seguridad de la Base de Datos almacenada correctamente.")
     except Exception as e:
         messages.error(request, f"Error al realizar la copia de seguridad: {str(e)}")
     return HttpResponseRedirect('/admin')
 
 
-
-@login_required(login_url="login")
+@staff_member_required
 def restore_database(request):
-    now = datetime.now()
-    date_time = now.strftime("%Y-%m-%d %H:%M:%S")  #Formatear la fecha y hora
-    input_stream = StringIO('yes/n')
-    process = subprocess.Popen(['python', 'manage.py', 'dbrestore'], stdin=subprocess.PIPE)
-    process.communicate(input=input_stream.getvalue().encode())
-    with open('restore_log.txt', 'a') as f:
-        f.write(f"Restauración realizada el {date_time}\n")
-    messages.success(request, "Base de Datos restaurada correctamente")
-    return HttpResponseRedirect('/admin')
+    if request.method == 'POST':
+        copyDB_id = request.POST['copy_id']
+        copyDB = CopyDB.objects.get(id=copyDB_id)
+        current_db_path = settings.DATABASES['default']['NAME']
+        connections.close_all()
+        try:
+            # Copiar el archivo de respaldo sobre la base de datos actual
+            shutil.copy(copyDB.rute_BD, current_db_path)
+            messages.success(request, "Se ha restaurado correctamente la Base de Datos")
+            return HttpResponseRedirect('/admin')
+        except Exception as e:
+            messages.error(request, f"Ha ocurrido {e} un error durante el proceso")
+            return HttpResponseRedirect('/admin')
+    else:
+        copiesDB = CopyDB.objects.all().order_by('-date')
+        return render(request, 'admin/restore_database.html', {'copiesDB': copiesDB})
 
 
 # ================= SECCIÓN DE CREACIÓN DE RANGOS Y PREFIJOS =================
@@ -769,7 +776,7 @@ def musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
     editores = Editor.objects.all()
     data = {"musical_publication": musical_publication, "editores": editores}
-    if Solicitud.objects.filter(status='Pendiente').filter(tipo='Solicitud-ISMN').exists():
+    if Solicitud.objects.filter(status='Pendiente', deleted=False).filter(tipo='Solicitud-ISMN').exists():
         messages.error(request, 'No es posible editar una publicación en estos momentos. '
                                 'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
         return HttpResponseRedirect('/backend_publicaciones/list_dsc')

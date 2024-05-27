@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     'django.contrib.staticfiles',
+    'easyaudit',
     'App',
 ]
 
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
     'App.middleware.Custom404Middleware',
 ]
 
@@ -143,7 +145,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'antoniocruzglez24@gmail.com'
-EMAIL_HOST_PASSWORD = 'apcvjrfblpnpjokn'
+EMAIL_HOST_PASSWORD = 'uebu vaun qsce mlqm'
 EMAIL_USE_TLS = True
 
 JAZZMIN_SETTINGS = {

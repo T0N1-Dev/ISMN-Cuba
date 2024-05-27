@@ -41,6 +41,15 @@ class Registered_Data(models.Model):
         return f"email: {self.email}"
 
 
+# Model to save and restore BD
+class CopyDB(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    tipo = models.CharField(max_length=20)
+    state = models.CharField(max_length=20)
+    name_BD = models.CharField(max_length=100)
+    rute_BD = models.CharField(max_length=600)
+
 # ==========MODELS TO MY BUSINESS==========
 
 # Models to manage the prefix numbers
