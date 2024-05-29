@@ -30,6 +30,22 @@ class CustomUserAdmin(UserAdmin):
         else:
             return not obj.is_superuser
 
+    def save_model(self, request, obj, form, change):
+        # Verificar si el usuario ya pertenece a más de un grupo específico
+        specific_groups = ['Editores', 'Especialistas', 'Administrador']
+        current_groups = obj.groups.filter(name__in=specific_groups)
+
+        # Verificar si se están realizando cambios en los grupos del usuario
+        if 'groups' in form.cleaned_data:
+            new_groups = form.cleaned_data['groups']
+            adding_specific_groups = new_groups.filter(name__in=specific_groups)
+
+            if adding_specific_groups.exists() and current_groups.count() > 1:
+                raise ValidationError(
+                    "El usuario no puede pertenecer a más de un grupo específico: Editor, Especialista o Administrador.")
+
+        super().save_model(request, obj, form, change)
+
 
 class EditorInline(admin.StackedInline):
     model = Editor
@@ -104,6 +120,5 @@ admin.site.register(Rango_Prefijo_Publicacion)
 admin.site.register(Editor, EditorAdmin)
 # Desregistras el UserAdmin predeterminado
 admin.site.unregister(User)
-
 # Registras tu UserAdmin personalizado
 admin.site.register(User, CustomUserAdmin)

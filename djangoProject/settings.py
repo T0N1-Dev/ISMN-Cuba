@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     'django.contrib.staticfiles',
     'easyaudit',
-    'App',
+    'App'
 ]
 
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
@@ -49,12 +49,14 @@ SESSION_ENGINE = "django.contrib.sessions.backends.file"
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
+    'App.middleware.TranslationMiddleware',
     'App.middleware.Custom404Middleware',
 ]
 
@@ -112,8 +114,19 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
+from django.utils.translation import gettext_lazy as _
 
-LANGUAGE_CODE = 'es-mx'
+LANGUAGE_CODE = 'es'
+
+LANGUAGES = [
+    ('es', 'Spanish'),
+    ('en', 'English'),
+    # Agrega otros idiomas que necesites
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 
 TIME_ZONE = 'America/Havana'
 
@@ -160,7 +173,6 @@ JAZZMIN_SETTINGS = {
             {"name": "Inicio",  "url": "admin:index", "permissions": ["auth.view_user"]},
             {"name": "Ayuda", "url": "https://www.filhcuba.cu/mision-y-vision", "new_window": True},
             {"model": "auth.User"},
-            {"name": "Trazas",  "url": "http://127.0.0.1:8000/trazas/", "permissions": ["auth.view_user"]},
             {"name": "Salvar BD",  "url": "http://127.0.0.1:8000/salvasBD/", "permissions": ["auth.view_user"]},
             {"name": "Restaurar BD",  "url": "http://127.0.0.1:8000/restaurarBD/", "permissions": ["auth.view_user"]},
     ],
@@ -170,6 +182,8 @@ JAZZMIN_UI_TWEAKS = {
     "theme": "litera",
     "dark_mode_theme": "darkly",
 }
+
+DJANGO_EASY_AUDIT_UNREGISTERED_CLASSES_EXTRA = ['App.CopyDB']
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 

@@ -41,6 +41,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 import io
 from django.http import FileResponse
 from django.db import connections
+from easyaudit.models import CRUDEvent, LoginEvent, RequestEvent
 # REPORTLAB
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -70,12 +71,6 @@ class MyLoginView(LoginView):
 
 class MyLogoutView(LogoutView):
     next_page = '/'
-
-
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@login_required(login_url="login")
-def trazas(request):
-    return render(request, 'admin/trazas_list.html')
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

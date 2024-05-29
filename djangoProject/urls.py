@@ -9,7 +9,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('trazas/', views.trazas, name='trazas'),
     path('salvasBD/', views.backup_database, name='salvasBD'),
     path('restaurarBD/', views.restore_database, name='restoreBD'),
     # Path to render the Homepage

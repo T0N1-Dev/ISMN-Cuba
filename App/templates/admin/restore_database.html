@@ -64,8 +64,7 @@
         }
 
     </style>
-
-    <h2>Restaurar Base de Datos</h2>
+    <h2>Listado de Copias de Seguridad de Base de Datos.</h2>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -99,7 +98,7 @@
         {% csrf_token %}
         <input type="hidden" id="copyID" name="copy_id">
         <dialog id="dialog">
-            <h3 class="text-center">Restauración de Base de Datos</h3>
+            <h3 class="text-center">Salvas de Base de Datos</h3>
             <p class="lead text-center">Al realizar la restauración de la Base de Datos perderá todos los cambios realizados.</p>
             <p class="lead font-weight-bold text-center">¿Está seguro que desea continuar?</p>
             <div class="d-flex justify-content-center">
@@ -111,6 +110,94 @@
     </form>
 
     <script>
+        let newListItem = `
+        <li class="nav-header">App</li>
+
+            <li class="nav-item">
+
+                <a href="/admin/App/editor/" class="nav-link active">
+                    <i class="nav-icon fas fa-circle"></i> <p>Editores</p>
+                </a>
+
+            </li>
+
+            <li class="nav-item">
+
+                <a href="/admin/App/especialista/" class="nav-link">
+                    <i class="nav-icon fas fa-circle"></i> <p>Especialistas</p>
+                </a>
+
+            </li>
+
+            <li class="nav-item">
+
+                <a href="/admin/App/rango_prefijo_publicacion/" class="nav-link">
+                    <i class="nav-icon fas fa-circle"></i> <p>Rango-Publicaciones</p>
+                </a>
+
+            </li>
+
+            <li class="nav-item">
+
+                <a href="/admin/App/rango_prefijo_editor/" class="nav-link">
+                    <i class="nav-icon fas fa-circle"></i> <p>Rangos-Editores</p>
+                </a>
+
+            </li>
+
+            <li class="nav-item">
+
+                <a href="/admin/App/registered_data/" class="nav-link">
+                    <i class="nav-icon fas fa-circle"></i> <p>Registrados</p>
+                </a>
+
+            </li>
+
+
+        <li class="nav-header">Autenticación y autorización</li>
+
+            <li class="nav-item">
+
+                <a href="/admin/auth/group/" class="nav-link">
+                    <i class="nav-icon fas fa-users"></i> <p>Grupos</p>
+                </a>
+
+            </li>
+
+            <li class="nav-item">
+
+                <a href="/admin/auth/user/" class="nav-link">
+                    <i class="nav-icon fas fa-user"></i> <p>Usuarios</p>
+                </a>
+
+            </li>
+        <li class="nav-header">Eventos de la Aplicación</li>
+            <li class="nav-item">
+                <a href="/admin/easyaudit/crudevent/" class="nav-link">
+                    <i class="nav-icon fas fa-circle"></i> <p>Eventos CRUD</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/easyaudit/loginevent/" class="nav-link">
+                    <i class="nav-icon fas fa-circle"></i> <p>Eventos de Sesiones</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/easyaudit/requestevent/" class="nav-link active">
+                    <i class="nav-icon fas fa-circle"></i> <p>Eventos de Acceso</p>
+                </a>
+            </li>
+        `;
+
+        // Localiza el elemento <ul> objetivo
+        let side_elements = document.querySelector('.nav.nav-pills.nav-sidebar.flex-column');
+        let title = document.querySelector('.h4.m-0.pr-3.mr-3.border-right');
+        let breadcrumb = document.querySelector('.breadcrumb');
+        let breadcrumb_item = breadcrumb.querySelector("li:last-child");
+        // Inserta el nuevo elemento <li> dentro del <ul>
+        side_elements.insertAdjacentHTML('beforeend', newListItem);
+        title.innerHTML = 'Restauración de Base de Datos';
+        breadcrumb_item.innerHTML = 'Restauración de Base de Datos';
         function openDialog(copyID) {
             document.getElementById('copyID').value = copyID;
             document.getElementById('dialog').showModal();
