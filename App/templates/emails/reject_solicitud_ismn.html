@@ -1,0 +1,14 @@
+{% extends 'emails/mail_confirmation_client.html' %}
+
+{% block title %}
+    <h1>Hola {{ nombre }} &#128400; <br> Su solicitud ISMN ha sido rechazada &#128542;</h1>
+{% endblock title %}
+
+{% block cuerpo %}
+    <section>
+        <p class="display-6" style="text-align: center">El adjunto de este correo contiene un documento de requerimientos
+            de la Agencia Cuabana del Libro.</p>
+        <p>Descripción del rechazo:</p>
+        <hr>
+    </section>
+{% endblock cuerpo %}

@@ -29,6 +29,8 @@ class TranslationMiddleware(MiddlewareMixin):
             content = content.replace("Can change", _("Puede cambiar"))
             content = content.replace("Can delete", _("Puede eliminar"))
             content = content.replace("Can view", _("Puede ver"))
+            content = content.replace("Versión de Jazzmin", _(""))
+            content = content.replace("3.0.0", _(""))
             response.content = content.encode('utf-8')
         return response
 

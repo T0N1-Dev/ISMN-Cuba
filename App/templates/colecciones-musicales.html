@@ -35,10 +35,11 @@
                         <div class="details-public">
                             <h2>{{ publicacion.name }}</h2>
                             <h3>Por: &nbsp; {{ publicacion.autor }}</h3>
+                            <h3>Editor: {{ publicacion.editor.user.first_name }}</h3>
                         </div>
                     </div>
                     <div class="back" hidden>
-                        <img src="{{ publicacion.barcode.url }}" alt="barcode de {{ publicacion }}" >
+                        <img style="max-height: 250px" src="{{ publicacion.barcode.url }}" alt="barcode de {{ publicacion }}" >
                     </div>
                 </div>
             </div>

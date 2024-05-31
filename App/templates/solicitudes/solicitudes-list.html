@@ -92,26 +92,46 @@
         <div class="modal fade" id="deleteModal{{ solicitud.id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar Solicitud</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body text-center">
-                <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
-                  <div class="text-center text-danger">
-                      <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA SOLICITUD ???</span>
-                      {% if solicitud.tipo == 'Solicitud-ISMN' %}
-                         <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.title|default:solicitud.editor }} </b></div>
-                      {% else %}
-                          <div class="text-dark mt-3 mb-2 "><b>{{ solicitud.tipo }}: {{ solicitud.temporal.first_name|default:solicitud.editor }} </b></div>
-                      {% endif %}
+            <form id="form-reject" method="post" action="{% url 'delete_solicitud' solicitud.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar Solicitud</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                  <a href="{% url 'delete_solicitud' solicitud.id %}" type="button"
-                     class="btn btn-outline-danger btn-sm">Eliminar</a>
-              </div>
+                <div class="modal-body text-center">
+                    <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
+                      <div class="text-center text-danger">
+                          <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA SOLICITUD ???</span>
+                          {% if solicitud.tipo == 'Solicitud-ISMN' %}
+                             <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.title|default:solicitud.editor }}</div>
+                          {% else %}
+                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.first_name|default:solicitud.editor }}</div>
+                          {% endif %}
+                          {% if solicitud.status == 'Pendiente' %}
+                              <div class="form-floating mb-3">
+                                  <textarea style="field-sizing: content; height: 100px" class="form-control text-dark-emphasis" name="note" placeholder="Escriba brevemente su criterio de rechazo"
+                                            rows="4" id="floatingTextarea3" required></textarea>
+                                  <label class="text-dark-emphasis" for="floatingTextarea3">Descripción de rechazo</label>
+                                  <div class="invalid-feedback">
+                                      Por favor, escriba los motivos de rechazo. Esta descripción no debe tener menos de 50 caracteres.
+                                  </div>
+                              </div>
+                          {% endif %}
+                      </div>
+                  </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    {% if solicitud.status == 'Pendiente' %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm" id="rejectButton">
+                            <i class="fas fa-times"></i>&nbsp;&nbsp;Rechazar
+                        </button>
+                    {% else %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-times"></i>&nbsp;&nbsp;Eliminar
+                        </button>
+                    {% endif %}
+                  </div>
+            </form>
             </div>
           </div>
         </div>
@@ -454,7 +474,7 @@
     </div>
 
     <script>
-        // Tabla
+                // Tabla
         let tbody = document.getElementById('tabla');
         let html = '';
         let total = 0;

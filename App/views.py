@@ -832,6 +832,11 @@ def delete_musical_publication(request, musical_publication_id):
 @login_required(login_url="login")
 def delete_solicitud(request, solicitud_id):
     solicitud = Solicitud.objects.get(id=solicitud_id)
+    mensaje = "Solicitud eliminada correctamente !"
+    if request.POST.get('note'):
+        descripcion = request.POST.get('note')
+        send_solicitud_ismn_reject(request.user, solicitud, descripcion)
+        mensaje = "Solicitud eliminada y rechazada correctamente, se le ha notificado los motivos al editor."
     if solicitud.tipo == 'Solicitud-ISMN':
         if 'publication_image' in solicitud.temporal.keys() and solicitud.temporal['publication_image']:
             os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
@@ -842,7 +847,7 @@ def delete_solicitud(request, solicitud_id):
             pass
     solicitud.soft_delete()
     solicitud.save()
-    messages.success(request, "Solicitud eliminada correctamente !")
+    messages.success(request, mensaje)
     return HttpResponseRedirect('/backend_solicitudes/list_dsc')
 
 
@@ -1018,6 +1023,47 @@ def send_solicitud_ismn_accepted(user, publicacion):
 
     # Generar el reporte y saber su ruta
     ruta = save_temporal_doc_documentation(user, publicacion)
+
+    # Leer el archivo PDF en modo binario
+    with open(ruta, "rb") as archivo_pdf:
+        contenido_pdf = archivo_pdf.read()
+
+    # Crear un objeto MIMEBase
+    archivo_adjunto = MIMEBase('application', 'octet-stream')
+    archivo_adjunto.set_payload(contenido_pdf)
+
+    # Codificar el archivo adjunto en base64
+    encoders.encode_base64(archivo_adjunto)
+
+    # Establecer las cabeceras del archivo adjunto
+    archivo_adjunto.add_header('Content-Disposition', f'attachment; filename="{ruta.name}"')
+
+    email.attach(archivo_adjunto)
+    try:
+        email.send()
+        return True
+    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError:
+        return False
+
+
+def send_solicitud_ismn_reject(user, titulo_solicitud, descripcion):
+    context = {
+        'nombre': user.first_name,
+        'titulo_solicitud': titulo_solicitud,
+        'descripcion': descripcion
+    }
+
+    message = loader.render_to_string('emails/reject_solicitud_ismn.html', context)
+
+    email = EmailMultiAlternatives(
+        "Solicitud ISMN rechazada", message,
+        "CCL de Cuba",
+        [user.email],
+    )
+    email.content_subtype = 'html'
+
+    # Generar el reporte y saber su ruta
+    ruta = Path(f"{BASE_DIR}/App/static/document/requisitos.pdf")
 
     # Leer el archivo PDF en modo binario
     with open(ruta, "rb") as archivo_pdf:

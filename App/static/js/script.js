@@ -225,6 +225,38 @@ $("#idTribute").keyup(function () {
 
 });
 
+// 13) Validate Description of the Reject
+$(document).ready(function(){
+    $('#rejectButton').click(function(event) {
+        // Prevenir el submit del formulario
+        event.preventDefault();
+
+        // Obtener el valor del textarea
+        let noteValue = $('#floatingTextarea3').val().trim();
+        // Verificar si el textarea está vacío
+        if(noteValue === "" || noteValue.length < 50) {
+            // Añadir la clase 'is-invalid' al textarea
+            $('#floatingTextarea3').addClass('is-invalid');
+        } else {
+            // Si no está vacío, enviar el formulario
+            $('#floatingTextarea3').removeClass('is-invalid');
+            $('#form-reject').submit();
+        }
+    });
+});
+
+// 14) Validate Description of the Reject
+$(document).ready(function() {
+    $('#floatingTextarea3').on('input', function() {
+        let textareaContent = $(this).val();
+        if (textareaContent.length >= 50) {
+            $(this).removeClass('is-invalid').addClass('is-valid');
+        } else {
+            $(this).removeClass('is-valid');
+        }
+    });
+});
+
 // 15 Reload Image Profile
 function previewImage(event) {
     let input = event.target;
