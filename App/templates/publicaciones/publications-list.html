@@ -11,9 +11,129 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 {% block btn-add %}
-    <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm "><i class="fas fa-plus"></i>&nbsp;&nbsp;Añadir Publicación</a>
+    <!-- Añadir publicación musical -->
+    <a href="{% url 'add_musical_publicaction' %}" class="btn btn-outline-primary btn-sm "><i class="fas fa-plus-circle"></i>&nbsp;&nbsp;Añadir Publicación</a>
+    <!-- Exportar Tabla Entera -->
     <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exporting_pModal">
                     <i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar Tabla</a>
+    <!-- Add Nomencladores -->
+    <div class="modal fade" id="genderModal" tabindex="-1" aria-labelledby="genderModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="genderModalLabel"><i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Agregar Nomencladores</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-12 ms-auto mb-3" style="text-align: left">
+                        <div class="form-floating">
+                          <input type="text" class="form-control" name="new_genero" id="floatingInput" placeholder="Genero">
+                          <label for="floatingInput">Nuevo género musical</label>
+                        </div>
+                    </div>
+                    <div class="col-12 ms-auto" style="text-align: left">
+                        <p>
+                          <a class="btn btn-info" data-bs-toggle="collapse" href="#genero" role="button" aria-expanded="false" aria-controls="genero">
+                            <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver géneros existentes.
+                          </a>
+                        </p>
+                        <div class="collapse" id="genero">
+                          <div class="card card-body">
+                            <ul>
+                              <li><a tabindex="0" class="btn btn-sm btn-light" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="Dismissible popover" data-bs-content="And here's some amazing content. It's very engaging. Right?">Fusión</a></li>
+                            </ul>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-2">
+                    <div class="col-12 ms-auto mb-3" style="text-align: left">
+                        <div class="form-floating">
+                          <input type="text" class="form-control" name="new_materia" id="floatingInput" placeholder="Materia">
+                          <label for="floatingInput">Nueva materia</label>
+                        </div>
+                    </div>
+                    <div class="col-12 ms-auto" style="text-align: left">
+                        <p>
+                          <a class="btn btn-info" data-bs-toggle="collapse" href="#materias" role="button" aria-expanded="false" aria-controls="materias">
+                            <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver materias existentes.
+                          </a>
+                        </p>
+                        <div class="collapse" id="materias">
+                          <div class="card card-body">
+                            <ul>
+                              <li>Música</li>
+                              <li>Filosofía y teoría de la música</li>
+                              <li>Tratamiento histórico de personalidades</li>
+                            </ul>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-2">
+                    <div class="col-12 ms-auto mb-3" style="text-align: left">
+                        <div class="form-floating">
+                          <input type="text" class="form-control" name="new_encuadernacion" id="floatingInput" placeholder="Encuadernacion">
+                          <label for="floatingInput">Nuevo tipo de encuadernación</label>
+                        </div>
+                    </div>
+                    <div class="col-12 ms-auto" style="text-align: left">
+                        <p>
+                          <a class="btn btn-info" data-bs-toggle="collapse" href="#encuadernacion" role="button" aria-expanded="false" aria-controls="encuadernacion">
+                            <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver tipos de encuadernacion existentes.
+                          </a>
+                        </p>
+                        <div class="collapse" id="encuadernacion">
+                          <div class="card card-body">
+                            <ul>
+                              <li>Espiral</li>
+                              <li>Grapas wire binding</li>
+                              <li>Lujo</li>
+                            </ul>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-2">
+                    <div class="col-12 ms-auto mb-3" style="text-align: left">
+                        <div class="form-floating">
+                          <input type="text" class="form-control" name="new_medio_digital" id="floatingInput" placeholder="Medio Digital">
+                          <label for="floatingInput">Nuevo tipo de medio digital</label>
+                        </div>
+                    </div>
+                    <div class="col-12 ms-auto" style="text-align: left">
+                        <p>
+                          <a class="btn btn-info" data-bs-toggle="collapse" href="#mediodigital" role="button" aria-expanded="false" aria-controls="mediodigital">
+                            <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver tipos de medio digital existentes.
+                          </a>
+                        </p>
+                        <div class="collapse" id="mediodigital">
+                          <div class="card card-body">
+                            <ul>
+                              <li>AudioLibro</li>
+                              <li>CD Audio</li>
+                              <li>Digitalización (Obra digitalizada)</li>
+                            </ul>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp;Agregar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#genderModal">
+    <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Agregar Nomencladores</a>
 {% endblock btn-add %}
 
 {% block search_bar_link %}

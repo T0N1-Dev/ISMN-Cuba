@@ -24,13 +24,20 @@ class TranslationMiddleware(MiddlewareMixin):
             content = content.replace("login events", _("Eventos de Sesiones"))
             content = content.replace("Request events", _("Accesos"))
             content = content.replace("request events", _("Registo de Accesos"))
-            content = content.replace("Purge", _("Eliminar"))
+            content = content.replace("Purge", _(""))
             content = content.replace("Can add", _("Puede añadir"))
             content = content.replace("Can change", _("Puede cambiar"))
             content = content.replace("Can delete", _("Puede eliminar"))
             content = content.replace("Can view", _("Puede ver"))
+            content = content.replace('/admin/easyaudit/crudevent/purge/', _("/admin/easyaudit/crudevent/"))
+            content = content.replace('/admin/easyaudit/loginevent/purge/', _("/admin/easyaudit/loginevent/"))
+            content = content.replace('/admin/easyaudit/requestevent/purge/', _("/admin/easyaudit/requestevent/"))
             content = content.replace("Versión de Jazzmin", _(""))
             content = content.replace("3.0.0", _(""))
+            content = content.replace("Please correct the error below", _("Existe un error en el formulario"))
+            content = content.replace("No se ha establecido la clave.", _("********"))
+            content = content.replace("First, enter a username and password. Then, you'll be able to edit more user options.",
+                                      _("Primero, inserte el nombre de usuario y su contraseña. Luego estará listo para editar más opciones de usuario."))
             response.content = content.encode('utf-8')
         return response
 

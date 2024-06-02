@@ -9,6 +9,31 @@ from App.models import (Editor, Especialista, Registered_Data, Rango_Prefijo_Edi
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django import forms
+from django.contrib import messages
+
+
+class CustomUserChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        groups = cleaned_data.get('groups', [])
+
+        # Los nombres de los grupos que deseas restringir
+        restricted_groups = {'Editores', 'Especialistas', 'Administrador'}
+
+        # Obtener los nombres de los grupos seleccionados
+        selected_group_names = set(group.name for group in groups)
+
+        # Verificar intersección entre los grupos restringidos
+        if len(selected_group_names.intersection(restricted_groups)) > 1:
+            raise forms.ValidationError(
+                "El usuario solo puede pertenecer a uno de los grupos: Editores, Especialistas, o Administrador."
+            )
+
+        return cleaned_data
 
 
 class CustomUserAdmin(UserAdmin):
@@ -30,19 +55,18 @@ class CustomUserAdmin(UserAdmin):
         else:
             return not obj.is_superuser
 
+    form = CustomUserChangeForm
+
     def save_model(self, request, obj, form, change):
-        # Verificar si el usuario ya pertenece a más de un grupo específico
-        specific_groups = ['Editores', 'Especialistas', 'Administrador']
-        current_groups = obj.groups.filter(name__in=specific_groups)
+        if change:
+            groups = form.cleaned_data.get('groups', [])
+            restricted_groups = {'Editores', 'Especialistas', 'Administrador'}
+            selected_group_names = set(group.name for group in groups)
 
-        # Verificar si se están realizando cambios en los grupos del usuario
-        if 'groups' in form.cleaned_data:
-            new_groups = form.cleaned_data['groups']
-            adding_specific_groups = new_groups.filter(name__in=specific_groups)
-
-            if adding_specific_groups.exists() and current_groups.count() > 1:
-                raise ValidationError(
-                    "El usuario no puede pertenecer a más de un grupo específico: Editor, Especialista o Administrador.")
+            if len(selected_group_names.intersection(restricted_groups)) > 1:
+                messages.error(request,
+                               "El usuario solo puede pertenecer a uno de los grupos: Editores, Especialistas, o Administrador.")
+                return
 
         super().save_model(request, obj, form, change)
 

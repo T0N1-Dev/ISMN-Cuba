@@ -1,0 +1,1499 @@
+[
+  {
+    "model": "App.provincia",
+    "pk": 1,
+    "fields": {
+      "nombre": "Pinar del Río"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 2,
+    "fields": {
+      "nombre": "Artemisa"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 3,
+    "fields": {
+      "nombre": "Mayabeque"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 4,
+    "fields": {
+      "nombre": "La Habana"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 5,
+    "fields": {
+      "nombre": "Matanzas"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 6,
+    "fields": {
+      "nombre": "Cienfuegos"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 7,
+    "fields": {
+      "nombre": "Villa Clara"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 8,
+    "fields": {
+      "nombre": "Sancti Spíritus"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 9,
+    "fields": {
+      "nombre": "Ciego de Ávila"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 10,
+    "fields": {
+      "nombre": "Camagüey"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 11,
+    "fields": {
+      "nombre": "Las Tunas"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 12,
+    "fields": {
+      "nombre": "Holguín"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 13,
+    "fields": {
+      "nombre": "Santiago de Cuba"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 14,
+    "fields": {
+      "nombre": "Guantánamo"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 15,
+    "fields": {
+      "nombre": "Isla de la Juventud"
+    }
+  },
+  {
+    "model": "App.provincia",
+    "pk": 16,
+    "fields": {
+      "nombre": "Granma"
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 1,
+    "fields": {
+      "nombre": "Consolación del Sur",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 2,
+    "fields": {
+      "nombre": "Guane",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 3,
+    "fields": {
+      "nombre": "La Palma",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 4,
+    "fields": {
+      "nombre": "Los Palacios",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 5,
+    "fields": {
+      "nombre": "Mantua",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 6,
+    "fields": {
+      "nombre": "Minas de Matahambre",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 7,
+    "fields": {
+      "nombre": "Pinar del Río",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 8,
+    "fields": {
+      "nombre": "San Juan y Martínez",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 9,
+    "fields": {
+      "nombre": "San Luis",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 10,
+    "fields": {
+      "nombre": "Sandino",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 11,
+    "fields": {
+      "nombre": "Viñales",
+      "provincia": 1
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 12,
+    "fields": {
+      "nombre": "Alquízar",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 13,
+    "fields": {
+      "nombre": "Artemisa",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 14,
+    "fields": {
+      "nombre": "Bauta",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 15,
+    "fields": {
+      "nombre": "Caimito",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 16,
+    "fields": {
+      "nombre": "Guanajay",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 17,
+    "fields": {
+      "nombre": "Güira de Melena",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 18,
+    "fields": {
+      "nombre": "Mariel",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 19,
+    "fields": {
+      "nombre": "San Antonio de los Baños",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 20,
+    "fields": {
+      "nombre": "Bahía Honda",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 21,
+    "fields": {
+      "nombre": "San Cristóbal",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 22,
+    "fields": {
+      "nombre": "Candelaria",
+      "provincia": 2
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 23,
+    "fields": {
+      "nombre": "Batabanó",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 24,
+    "fields": {
+      "nombre": "Bejucal",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 25,
+    "fields": {
+      "nombre": "Güines",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 26,
+    "fields": {
+      "nombre": "Jaruco",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 27,
+    "fields": {
+      "nombre": "Madruga",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 28,
+    "fields": {
+      "nombre": "Melena del Sur",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 29,
+    "fields": {
+      "nombre": "Nueva Paz",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 30,
+    "fields": {
+      "nombre": "Quivicán",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 31,
+    "fields": {
+      "nombre": "San José de las Lajas",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 32,
+    "fields": {
+      "nombre": "San Nicolás de Bari",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 33,
+    "fields": {
+      "nombre": "Santa Cruz del Norte",
+      "provincia": 3
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 34,
+    "fields": {
+      "nombre": "Arroyo Naranjo",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 35,
+    "fields": {
+      "nombre": "Boyeros",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 36,
+    "fields": {
+      "nombre": "Centro Habana",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 37,
+    "fields": {
+      "nombre": "Cerro",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 38,
+    "fields": {
+      "nombre": "Cotorro",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 39,
+    "fields": {
+      "nombre": "Diez de Octubre",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 40,
+    "fields": {
+      "nombre": "Guanabacoa",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 41,
+    "fields": {
+      "nombre": "Habana del Este",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 42,
+    "fields": {
+      "nombre": "Habana Vieja",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 43,
+    "fields": {
+      "nombre": "La Lisa",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 44,
+    "fields": {
+      "nombre": "Marianao",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 45,
+    "fields": {
+      "nombre": "Playa",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 46,
+    "fields": {
+      "nombre": "Plaza",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 47,
+    "fields": {
+      "nombre": "Regla",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 48,
+    "fields": {
+      "nombre": "San Miguel del Padrón",
+      "provincia": 4
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 49,
+    "fields": {
+      "nombre": "Calimete",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 50,
+    "fields": {
+      "nombre": "Cárdenas",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 51,
+    "fields": {
+      "nombre": "Ciénaga de Zapata",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 52,
+    "fields": {
+      "nombre": "Colón",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 53,
+    "fields": {
+      "nombre": "Jagüey Grande",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 54,
+    "fields": {
+      "nombre": "Jovellanos",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 55,
+    "fields": {
+      "nombre": "Limonar",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 56,
+    "fields": {
+      "nombre": "Los Arabos",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 57,
+    "fields": {
+      "nombre": "Martí",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 58,
+    "fields": {
+      "nombre": "Matanzas",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 59,
+    "fields": {
+      "nombre": "Pedro Betancourt",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 60,
+    "fields": {
+      "nombre": "Perico",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 61,
+    "fields": {
+      "nombre": "Unión de Reyes",
+      "provincia": 5
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 62,
+    "fields": {
+      "nombre": "Abreus",
+      "provincia": 6
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 63,
+    "fields": {
+      "nombre": "Aguada de Pasajeros",
+      "provincia": 6
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 64,
+    "fields": {
+      "nombre": "Cienfuegos",
+      "provincia": 6
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 65,
+    "fields": {
+      "nombre": "Cruces",
+      "provincia": 6
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 66,
+    "fields": {
+      "nombre": "Cumanayagua",
+      "provincia": 6
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 67,
+    "fields": {
+      "nombre": "Palmira",
+      "provincia": 6
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 68,
+    "fields": {
+      "nombre": "Rodas",
+      "provincia": 6
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 69,
+    "fields": {
+      "nombre": "Santa Isabel de las Lajas",
+      "provincia": 6
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 70,
+    "fields": {
+      "nombre": "Caibarién",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 71,
+    "fields": {
+      "nombre": "Camajuaní",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 72,
+    "fields": {
+      "nombre": "Cifuentes",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 73,
+    "fields": {
+      "nombre": "Corralillo",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 74,
+    "fields": {
+      "nombre": "Encrucijada",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 75,
+    "fields": {
+      "nombre": "Manicaragua",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 76,
+    "fields": {
+      "nombre": "Placetas",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 77,
+    "fields": {
+      "nombre": "Quemado de Güines",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 78,
+    "fields": {
+      "nombre": "Ranchuelo",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 79,
+    "fields": {
+      "nombre": "Remedios",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 80,
+    "fields": {
+      "nombre": "Sagua la Grande",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 81,
+    "fields": {
+      "nombre": "Santa Clara",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 82,
+    "fields": {
+      "nombre": "Santo Domingo",
+      "provincia": 7
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 83,
+    "fields": {
+      "nombre": "Cabaigúan",
+      "provincia": 8
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 84,
+    "fields": {
+      "nombre": "Fomento",
+      "provincia": 8
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 85,
+    "fields": {
+      "nombre": "Jatibonico",
+      "provincia": 8
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 86,
+    "fields": {
+      "nombre": "La Sierpe",
+      "provincia": 8
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 87,
+    "fields": {
+      "nombre": "Sancti Spíritus",
+      "provincia": 8
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 88,
+    "fields": {
+      "nombre": "Taguasco",
+      "provincia": 8
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 89,
+    "fields": {
+      "nombre": "Trinidad",
+      "provincia": 8
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 90,
+    "fields": {
+      "nombre": "Yaguajay",
+      "provincia": 8
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 91,
+    "fields": {
+      "nombre": "Ciro Redondo",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 92,
+    "fields": {
+      "nombre": "Baraguá",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 93,
+    "fields": {
+      "nombre": "Bolivia",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 94,
+    "fields": {
+      "nombre": "Chambas",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 95,
+    "fields": {
+      "nombre": "Ciego de Ávila",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 96,
+    "fields": {
+      "nombre": "Florencia",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 97,
+    "fields": {
+      "nombre": "Majagua",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 98,
+    "fields": {
+      "nombre": "Morón",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 99,
+    "fields": {
+      "nombre": "Primero de Enero",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 100,
+    "fields": {
+      "nombre": "Venezuela",
+      "provincia": 9
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 101,
+    "fields": {
+      "nombre": "Camagüey",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 102,
+    "fields": {
+      "nombre": "Carlos Manuel de Céspedes",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 103,
+    "fields": {
+      "nombre": "Esmeralda",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 104,
+    "fields": {
+      "nombre": "Florida",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 105,
+    "fields": {
+      "nombre": "Guaimaro",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 106,
+    "fields": {
+      "nombre": "Jimagüayú",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 107,
+    "fields": {
+      "nombre": "Minas",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 108,
+    "fields": {
+      "nombre": "Najasa",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 109,
+    "fields": {
+      "nombre": "Nuevitas",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 110,
+    "fields": {
+      "nombre": "Santa Cruz del Sur",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 111,
+    "fields": {
+      "nombre": "Sibanicú",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 112,
+    "fields": {
+      "nombre": "Sierra de Cubitas",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 113,
+    "fields": {
+      "nombre": "Vertientes",
+      "provincia": 10
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 114,
+    "fields": {
+      "nombre": "Amancio Rodríguez",
+      "provincia": 11
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 115,
+    "fields": {
+      "nombre": "Colombia",
+      "provincia": 11
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 116,
+    "fields": {
+      "nombre": "Jesús Menéndez",
+      "provincia": 11
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 117,
+    "fields": {
+      "nombre": "Jobabo",
+      "provincia": 11
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 118,
+    "fields": {
+      "nombre": "Las Tunas",
+      "provincia": 11
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 119,
+    "fields": {
+      "nombre": "Majibacoa",
+      "provincia": 11
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 120,
+    "fields": {
+      "nombre": "Manatí",
+      "provincia": 11
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 121,
+    "fields": {
+      "nombre": "Puerto Padre",
+      "provincia": 11
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 122,
+    "fields": {
+      "nombre": "Baguanos",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 123,
+    "fields": {
+      "nombre": "Banes",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 124,
+    "fields": {
+      "nombre": "Cacocum",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 125,
+    "fields": {
+      "nombre": "Calixto García",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 126,
+    "fields": {
+      "nombre": "Cueto",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 127,
+    "fields": {
+      "nombre": "Frank País",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 128,
+    "fields": {
+      "nombre": "Gibara",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 129,
+    "fields": {
+      "nombre": "Holguín",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 130,
+    "fields": {
+      "nombre": "Mayarí",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 131,
+    "fields": {
+      "nombre": "Moa",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 132,
+    "fields": {
+      "nombre": "Rafael Freyre",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 133,
+    "fields": {
+      "nombre": "Sagua de Tánamo",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 134,
+    "fields": {
+      "nombre": "Urbano Noris",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 135,
+    "fields": {
+      "nombre": "Antilla",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 136,
+    "fields": {
+      "nombre": "Báguanos",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 137,
+    "fields": {
+      "nombre": "Báguano",
+      "provincia": 12
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 138,
+    "fields": {
+      "nombre": "Campechuela",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 139,
+    "fields": {
+      "nombre": "Cauto Cristo",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 140,
+    "fields": {
+      "nombre": "Granma",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 141,
+    "fields": {
+      "nombre": "Guisa",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 142,
+    "fields": {
+      "nombre": "Jiguaní",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 143,
+    "fields": {
+      "nombre": "Manzanillo",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 144,
+    "fields": {
+      "nombre": "Media Luna",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 145,
+    "fields": {
+      "nombre": "Niquero",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 146,
+    "fields": {
+      "nombre": "Pilón",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 147,
+    "fields": {
+      "nombre": "Río Cauto",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 148,
+    "fields": {
+      "nombre": "Yara",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 149,
+    "fields": {
+      "nombre": "Bayamo",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 150,
+    "fields": {
+      "nombre": "Buey Arriba",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 151,
+    "fields": {
+      "nombre": "Bartolomé Masó",
+      "provincia": 13
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 152,
+    "fields": {
+      "nombre": "Alto Songo",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 153,
+    "fields": {
+      "nombre": "Contramaestre",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 154,
+    "fields": {
+      "nombre": "Guamá",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 155,
+    "fields": {
+      "nombre": "Julio Antonio Mella",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 156,
+    "fields": {
+      "nombre": "Mella",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 157,
+    "fields": {
+      "nombre": "Palma Soriano",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 158,
+    "fields": {
+      "nombre": "San Luis",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 159,
+    "fields": {
+      "nombre": "Segundo Frente",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 160,
+    "fields": {
+      "nombre": "Songo La Maya",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 161,
+    "fields": {
+      "nombre": "Tercer Frente",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 162,
+    "fields": {
+      "nombre": "Santiago de Cuba",
+      "provincia": 14
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 163,
+    "fields": {
+      "nombre": "Guantánamo",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 164,
+    "fields": {
+      "nombre": "Caimanera",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 165,
+    "fields": {
+      "nombre": "Baracoa",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 166,
+    "fields": {
+      "nombre": "Maisí",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 167,
+    "fields": {
+      "nombre": "Imías",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 168,
+    "fields": {
+      "nombre": "San Antonio del Sur",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 169,
+    "fields": {
+      "nombre": "Yateras",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 170,
+    "fields": {
+      "nombre": "El Salvador",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 171,
+    "fields": {
+      "nombre": "Niceto Pérez",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 172,
+    "fields": {
+      "nombre": "Manuel Tames",
+      "provincia": 15
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 173,
+    "fields": {
+      "nombre": "Yateras",
+      "provincia": 15
+    }
+  }
+]
+

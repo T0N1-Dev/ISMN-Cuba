@@ -138,26 +138,94 @@ class PrefijoPublicacion(models.Model):
         return f'{self.value}'
 
 
-# Modelos que representan a los actores del sistema
-class Editor(models.Model):
-    COMPANY_EDITOR = 'Compañia'
-    EDITOR_INDEPENDIENTE = 'Independiente'
+class Provincia(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
 
-    TYPE = {
-        (COMPANY_EDITOR, 'Compañia'),
-        (EDITOR_INDEPENDIENTE, 'Independiente'),
-    }
+    def __str__(self):
+        return self.nombre
+
+
+class Municipio(models.Model):
+    nombre = models.CharField(max_length=100)
+    provincia = models.ForeignKey(Provincia, on_delete=models.CASCADE, related_name='municipios')
+
+    def __str__(self):
+        return self.nombre
+
+
+# Direccion donde radican los Editores o editoriales
+class Ubicacion(models.Model):
+    direccion = models.CharField(max_length=150)
+    provincia = models.OneToOneField(Provincia, models.PROTECT)
+    municipio = models.OneToOneField(Municipio, models.PROTECT)
+
+    class Meta:
+        verbose_name_plural = "ubicaciones"
+
+    def __str__(self):
+        return self.direccion
+
+
+# Solo para Editoriales
+class Caracterizacion(models.Model):
+
+    ACTIVIDADES = [
+        ('E', 'Editorial'),
+        ('EUOU', 'Editorial Universitaria o Universidad'),
+        ('EOENE', 'Empresa o Entidad no Editorial'),
+        ('IEDU', 'Institución Educativa diferente a Universidad'),
+        ('IR', 'Institución Religiosa')
+    ]
+
+    NATURALEZA = [
+        ('EM', 'Empresa Mixta'),
+        ('A', 'Asociación'),
+        ('ECE', 'Empresa Comercial del Estado'),
+        ('M', 'Ministerio')
+    ]
+
+    fecha_fundacion = models.DateField(validators=[validate_date])
+    actividad_principal = models.CharField(max_length=45, choices=ACTIVIDADES)
+    naturaleza_juridica = models.CharField(max_length=50, choices=NATURALEZA)
+
+
+class Editorial(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(unique=True, max_length=14, validators=[validate_phone])
+    prefijo = models.OneToOneField(PrefijoEditor, on_delete=models.PROTECT)
+    image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png",
+                                      validators=[validate_image_extension])
+    id_tribute = models.PositiveSmallIntegerField(unique=True)
+    state = models.BooleanField(default=True)
+    ubicacion = models.OneToOneField(Ubicacion, models.CASCADE)
+    caracterizacion = models.ForeignKey(Caracterizacion, models.CASCADE, null=True, blank=True)
+    sigla = models.CharField(max_length=10, null=True, blank=True)
+    nombre_sello = models.CharField(max_length=100)
+    nombre_responsable = models.CharField(max_length=50)
+    apellidos_responsable = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name_plural = "editoriales"
+
+    def __str__(self):
+        return self.user.username
+
+    def get_state_display(self):
+        return 'Activo' if self.state else 'Inactivo'
+
+
+# Modelo que representa a los Autores-Editores
+class Editor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(unique=True, max_length=14, validators=[validate_phone])
     birthday = models.DateField(validators=[validate_date], blank=True, null=True)
     prefijo = models.OneToOneField(PrefijoEditor, on_delete=models.PROTECT)
-    type = models.CharField(max_length=100, choices=TYPE)
     image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png",
                                       validators=[validate_image_extension])
-    note = models.TextField(blank=True)
-    directions = models.CharField(max_length=150)
     id_tribute = models.PositiveSmallIntegerField(unique=True)
     state = models.BooleanField(default=True)
+    CI = models.PositiveSmallIntegerField(unique=True, null=True, blank=True)
+    ubicacion = models.OneToOneField(Ubicacion, models.CASCADE)
 
     class Meta:
         verbose_name_plural = "editores"
@@ -176,6 +244,7 @@ class Especialista(models.Model):
     image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png",
                                       validators=[validate_image_extension])
     directions = models.CharField(max_length=150)
+    CI = models.PositiveSmallIntegerField(unique=True)
 
     class Meta:
         verbose_name_plural = "especialistas"
@@ -184,38 +253,133 @@ class Especialista(models.Model):
         return self.user.first_name
 
 
+# Modelo perteneciente a la Publicacion Musical.
+class Genero(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(max_length=1000)
+
+    class Meta:
+        verbose_name_plural = "géneros"
+
+    def __str__(self):
+        return self.nombre
+
+
+#
+class Materia(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(max_length=1000)
+
+    class Meta:
+        verbose_name_plural = "materias"
+
+    def __str__(self):
+        return self.nombre
+
+
+class EncuadernacionType(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(max_length=1000)
+
+    class Meta:
+        verbose_name_plural = "encuadernaciones"
+
+    def __str__(self):
+        return self.nombre
+
+
+class DigitalMediaType(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(max_length=1000)
+
+    class Meta:
+        verbose_name_plural = "medios digitales"
+
+    def __str__(self):
+        return self.nombre
+
+
+class Tema(models.Model):
+
+    TIPOS_PUBLICACION = [
+        ('P', 'Partitura'),
+        ('PO', 'Partitura de Orquesta'),
+        ('RP', 'Reducción para Piano')
+    ]
+
+    IDIOMA = {
+        ('ES', 'Español'),
+        ('EN', 'Inglés'),
+        ('RU', 'Ruso')
+    }
+
+    coleccion = models.CharField(max_length=100, null=True, blank=True)
+    numero_coleccion = models.PositiveSmallIntegerField(null=True, blank=True)
+    tipo_publicacion = models.CharField(max_length=50, choices=TIPOS_PUBLICACION)
+    idioma = models.CharField(max_length=50, choices=IDIOMA)
+
+    class Meta:
+        verbose_name_plural = "temas"
+
+    def __str__(self):
+        return self.coleccion
+
+
+class Autor(models.Model):
+
+    PAIS = [
+        ('CUB', 'Cuba'),
+        ('ITA', 'Italia'),
+        ('EUA', 'Estados Unidos')
+    ]
+
+    ROL = [
+        ('AUT', 'Autor'),
+        ('ADP', 'Adaptador'),
+        ('EDM', 'Editor Musical'),
+        ('ARR', 'Arreglista')
+    ]
+    nombre = models.CharField(max_length=50)
+    apellido = models.CharField(max_length=50)
+    nacionalidad = models.CharField(max_length=50, choices=PAIS)
+    Rol = models.CharField(max_length=50, choices=ROL)
+
+    class Meta:
+        verbose_name_plural = "autores"
+
+    def __str__(self):
+        return self.nombre
+
 # Modelo que representa a cada publicación musical
 class Musical_Publication(models.Model):
-    BOLERO_GENDER = 'Bolero'
-    FUSION = 'Fusion'
-    POPULAR_BAILABLE_GENDER = 'Popular Bailable'
-    MAMBO_GENDER = 'Mambo'
-    CHACHACHA_GENDER = 'Chachacha'
-    RUMBA_GENDER = 'Rumba'
-    DANZON_GENDER = 'Danzón'
 
-    MUSICAL_GENDER = [
-        (BOLERO_GENDER, "BL"),
-        (FUSION, 'FS'),
-        (POPULAR_BAILABLE_GENDER, "PB"),
-        (MAMBO_GENDER, "MB"),
-        (CHACHACHA_GENDER, "CH"),
-        (RUMBA_GENDER, "RB"),
-        (DANZON_GENDER, "DZ"),
+    SUSTRATO = [
+        ('PI', 'Publicación Impresa'),
+        ('PE', 'Publicacion Electrónica')
     ]
 
     name = models.CharField(max_length=50)
+    subtitulo = models.CharField(max_length=50, null=True, blank=True)
     autor = models.CharField(max_length=100)
-    editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True, blank=True)
+    editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True)
+    editorial = models.ForeignKey(Editorial, on_delete=models.SET_NULL, null=True)
     prefijo = models.OneToOneField(PrefijoPublicacion, on_delete=models.CASCADE)
     ismn = models.CharField(max_length=20, unique=True)
     barcode = models.ImageField(upload_to="publications/barcodes")
     letra = models.FileField(upload_to="publications/letters")
-    description = models.TextField(blank=True)
     imagen = models.ImageField(upload_to="publications", blank=True, default="default.jpg")
     date_time = models.DateTimeField(validators=[validate_date])
     created_at = models.DateTimeField(auto_now_add=True)
-    gender = models.CharField(max_length=100, null=True, choices=MUSICAL_GENDER)
+    gender = models.ForeignKey(Genero, on_delete=models.CASCADE)
+    tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
+    autores = models.ManyToManyField(Autor)
+    materia = models.ForeignKey(Materia, on_delete=models.CASCADE)
+    sustrato = models.CharField(max_length=2, choices=SUSTRATO, default='PI')
+    encuadernacion = models.ForeignKey(EncuadernacionType, on_delete=models.SET_NULL, null=True, blank=True)
+    numero_paginas = models.PositiveSmallIntegerField(null=True, blank=True)
+    description = models.TextField(blank=True)
+    medio_digital = models.ForeignKey(DigitalMediaType, on_delete=models.CASCADE, null=True, blank=True)
+
 
     class Meta:
         verbose_name_plural = "publicaciones"
@@ -254,7 +418,8 @@ class Solicitud(models.Model):
         (ATENDIDO, "Atendido")
     }
 
-    editor = models.ForeignKey(Editor, on_delete=models.CASCADE, null=True)
+    editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True)
+    editorial = models.ForeignKey(Editorial, on_delete=models.SET_NULL, null=True)
     temporal = models.JSONField()
     tipo = models.CharField(max_length=50, choices=SOLICITUD_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)

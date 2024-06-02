@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-28 15:03-0400\n"
+"POT-Creation-Date: 2024-05-31 22:09-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,16 +19,66 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: .\App\permissions.py:4
-msgid "Puede agregar"
+#: .\App\middleware.py:21
+msgid "Trazas"
 msgstr ""
 
-#: .\App\permissions.py:5
+#: .\App\middleware.py:22
+msgid "Eventos CRUD"
+msgstr ""
+
+#: .\App\middleware.py:23 .\App\middleware.py:24
+msgid "Eventos de Sesiones"
+msgstr ""
+
+#: .\App\middleware.py:25
+msgid "Accesos"
+msgstr ""
+
+#: .\App\middleware.py:26
+msgid "Registo de Accesos"
+msgstr ""
+
+#: .\App\middleware.py:27
+msgid "Eliminar"
+msgstr ""
+
+#: .\App\middleware.py:28
+msgid "Puede añadir"
+msgstr ""
+
+#: .\App\middleware.py:29 .\App\permissions.py:5
 msgid "Puede cambiar"
 msgstr ""
 
-#: .\App\permissions.py:6
+#: .\App\middleware.py:30 .\App\permissions.py:6
 msgid "Puede eliminar"
+msgstr ""
+
+#: .\App\middleware.py:31
+msgid "Puede ver"
+msgstr ""
+
+#: .\App\middleware.py:32 .\App\middleware.py:33
+msgid " "
+msgstr ""
+
+#: .\App\middleware.py:34
+msgid "Existe un error en el formulario"
+msgstr ""
+
+#: .\App\middleware.py:35
+msgid "********"
+msgstr ""
+
+#: .\App\middleware.py:37
+msgid ""
+"Primero, inserte el nombre de usuario y su contraseña. Luego estará listo "
+"para editar más opciones de usuario."
+msgstr ""
+
+#: .\App\permissions.py:4
+msgid "Puede agregar"
 msgstr ""
 
 #: .\Lib\site-packages\django\contrib\messages\apps.py:15
@@ -1099,8 +1149,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 
 #: .\Lib\site-packages\django\views\csrf.py:136
@@ -1209,9 +1259,9 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 
 #: .\Lib\site-packages\django\views\templates\default_urlconf.html:229
@@ -1238,40 +1288,29 @@ msgstr ""
 msgid "Connect, get help, or contribute"
 msgstr ""
 
-#: .\djangoProject\settings.py:121
-msgid "Spanish"
-msgstr ""
-
-#: .\djangoProject\settings.py:122
-msgid "English"
-msgstr ""
-
-msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgid "This object doesn't have a change history. It probably wasn't added via "
 msgstr "Este usuario no tiene un registro histórico aún."
 
-msgid "CRUD events"
-msgstr "Eventos CRUD"
+#~ msgid "CRUD events"
+#~ msgstr "Eventos CRUD"
 
-msgid "Login events"
-msgstr "Eventos de Sesiones"
+#~ msgid "Login events"
+#~ msgstr "Eventos de Sesiones"
 
-msgid "Request events"
-msgstr "Accesos"
+#~ msgid "Request events"
+#~ msgstr "Accesos"
 
-msgid "Purge login events"
-msgstr "Eliminar Eventos"
+#~ msgid "Method"
+#~ msgstr "Método"
 
-msgid "Method"
-msgstr "Método"
+#~ msgid "Easy Audit Application"
+#~ msgstr "Trazas"
 
-msgid "Easy Audit Application"
-msgstr "Trazas"
+#~ msgid "Event type"
+#~ msgstr "Tipo de evento"
 
-msgid "Event type"
-msgstr "Tipo de evento"
+#~ msgid "Content type"
+#~ msgstr "Tipo de contenido"
 
-msgid "Content type"
-msgstr "Tipo de contenido"
-
-msgid "Date time"
-msgstr "Fecha"
+#~ msgid "Date time"
+#~ msgstr "Fecha"

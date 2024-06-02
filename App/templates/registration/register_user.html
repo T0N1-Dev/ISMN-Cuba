@@ -2,7 +2,16 @@
 
 <!-- Title on tab browser -->
 {% block title %} Usuario Registro {% endblock title %}
-{% block card-title %} <span class="text-primary"> INSERTE SUS DATOS </span> {% endblock card-title %}
+{% block card-title %}
+    <span class="text-primary"> INSERTE SUS DATOS
+        <br> NOTA IMPORTANTE:
+        Favor tenga en cuenta que según los parámetros de la Agencia Internacional el ISMN debe ser solicitado a
+        nombre de la entidad o persona natural legal y económicamente responsable de una publicación determinada,
+        en ningún caso los registros de ISMN deben ser solicitados a nombre de las empresas, representante legal
+        o personas que son contratadas para prestar distintos servicios de edición tales como diagramación, diseño,
+        encuadernación e impresión.
+    </span>
+{% endblock card-title %}
 
 <!-- Navbar content -->
 {% block navbar-content %}
@@ -12,7 +21,6 @@
 {% block Action %} action="/register_user/" {% endblock Action %}
 
 {% block Btn-content %}
-    <!--<div class="spinner-border text-primary" style="margin-left: auto; margin-right: auto" role="status"></div>-->
     <button type="submit" class="btn btn-primary btn-sm" id="btn-add">
         <i class="fa fa-registered"></i>&nbsp;&nbsp;Registrarse
     </button>

@@ -835,7 +835,7 @@ def delete_solicitud(request, solicitud_id):
     mensaje = "Solicitud eliminada correctamente !"
     if request.POST.get('note'):
         descripcion = request.POST.get('note')
-        send_solicitud_ismn_reject(request.user, solicitud, descripcion)
+        send_solicitud_ismn_reject(solicitud.editor.user, solicitud.temporal['title'], descripcion)
         mensaje = "Solicitud eliminada y rechazada correctamente, se le ha notificado los motivos al editor."
     if solicitud.tipo == 'Solicitud-ISMN':
         if 'publication_image' in solicitud.temporal.keys() and solicitud.temporal['publication_image']:
