@@ -8,85 +8,126 @@ function validateEmail(email){
 }
 
 function validateAll() {
+    let isValid = true;
 
-    // User Data
-    let username = $("#username").val();
-    let password = $("#userPassword").val();
-    let phone = $("#phone").val();
-    let email = $("#email").val();
-    let editor_type = $("#editorType").val();
-    let birthday = $("#birthday").val();
-    let first_name = $('#first_name').val();
-    let last_name = $('#last_name').val();
-    let address = $("#address").val();
-    // Publication Data
-    let idTribute = $("#idTribute").val();
-    let title = $("#title").val();
-    let autor = $("#autor").val();
-    let editor = $("input[name*='editor']").val();
-    let genero = $("#gender").val();
-    let date = $("#date").val();
-    let letra = $("input[name*='publication_letter']").val()
+    function validateField(field, errorMessage) {
+        if (field.val().trim() === '') {
+            field.addClass('is-invalid');
+            field.removeClass('is-valid');
+            swal("Opss !", errorMessage, "error");
+            isValid = false;
+        } else {
+            field.removeClass('is-invalid');
+            field.addClass('is-valid');
+        }
+    }
 
-    if (username === '') {
-        swal("Opsss !", "Inserte su nombre de usuario.", "error");
-        return false;
-    } else if (password === '') {
-        swal("Opsss !", "Inserte una contraseña.", "error");
-        return false;
-    } else if (phone === '') {
-        swal("Opsss !", "Inserte su número de teléfono.", "error");
-        return false;
-    } else if (email === '') {
-        swal("Opsss !", "Inserte su dirección de correo electrónico.", "error");
-        return false;
-    } else if (editor_type === '') {
-        swal("Opsss !", "Seleccione un tipo de Editor.", "error");
-        return false;
-    } else if (email && !(validateEmail(email))) {
+    let check = $('#flexCheckDefault');
+    let check2 = $('#flexCheckDefault2');
+    let username = $("#username");
+    let password = $("#userPassword");
+    let phone = $("#phone");
+    let email = $("#email");
+    let birthday = $("#birthday");
+    let first_name = $('#first_name');
+    let last_name = $('#last_name');
+    let ci = $('#CI');
+    let provincia = $('#editorProvincia');
+    let municipio = $('#editorMunicipio');
+    let address = $("#address");
+    let idTribute = $("#idTribute");
+    let editorPrefijo = $("#editorPrefijo");
+    let title = $("#title");
+    let autor = $("#autor");
+    let editor = $("input[name*='editor']");
+    let genero = $("#gender");
+    let date = $("#date");
+    let letra = $("input[name*='publication_letter']");
+
+    if (!check2.is(':checked')) {
+        check2.addClass('is-invalid');
+        swal("Opss!", "Asegúrese de leer y entender los terminos y condiciones y marque la opción de 'leido'.", "error");
+        isValid = false;
+        return isValid;
+    } else {
+        check2.removeClass('is-invalid').addClass('is-valid');
+    }
+
+    if (!check.is(':checked')) {
+        check.addClass('is-invalid');
+        swal("Opss!", "Asegúrese de leer y entender los terminos y condiciones y marque la opción de 'leido'.", "error");
+        isValid = false;
+        return isValid;
+    } else {
+        check.removeClass('is-invalid').addClass('is-valid');
+    }
+
+    if (email.val() && !(validateEmail(email.val()))) {
+        email.addClass('is-invalid');
         swal("Opsss !", "Inserte un correo válido.", "error");
-        return false;
-    } else if (editor_type === 'Independiente' && birthday === '') {
-        swal("Opsss !", "El campo 'Fecha de nacimiento' está vacío.", "error");
-        return false;
-    } else if (first_name === '') {
-        swal("Opss !", "Inserte su nombre.", "error")
-        return false;
-    } else if (editor_type === 'Independiente' && last_name === '') {
-        swal("Opss !", "Inserte su apellido.", "error")
-        return false;
-    } else if (address === '') {
-        swal("Opss !", "La dirección está vacia.", "error")
-        return false;
-    } else if (letra === '' && document.querySelector('div.edicion') == null) {
+        isValid = false;
+        return isValid;
+    } else if (email.val()) {
+        email.removeClass('is-invalid');
+        email.addClass('is-valid');
+    }
+
+    validateField(first_name, "Inserte su nombre.");
+    validateField(last_name, "Inserte su apellido.");
+    validateField(ci, "Inserte su Carnet de Identidad.");
+    validateField(birthday, "El campo 'Fecha de nacimiento' está vacío.");
+    validateField(idTribute, "Se ha olvidado el número de identificación tributaria.");
+    validateField(provincia, "Se ha olvidado seleccionar una provincia.");
+    validateField(municipio, "Se ha olvidado seleccionar un municipio.");
+    validateField(address, "La dirección está vacía.");
+    validateField(phone, "Inserte su número de teléfono.");
+    validateField(email, "Inserte su dirección de correo electrónico.");
+    validateField(username, "Inserte su nombre de usuario.");
+    validateField(password, "Inserte una contraseña.");
+    validateField(editorPrefijo, "Seleccione su número estimado de publicaciones por año.");
+
+    if (letra.val() === '' && document.querySelector('div.edicion') == null) {
         swal("Opss!", "Se ha olvidado la letra de la canción. Seleccione un archivo word, " +
             "pdf o txt donde tenga guardada la letra de la obra musical", "error");
-        return false;
-    } else if (idTribute === '') {
-        swal("Opss!", "Se ha olvidado el número de identificación tributaria.", "error");
-        return false;
-    } else if (title === '') {
+        isValid = false;
+    } else if (title.val() === '') {
         swal("Opss!", "Se ha olvidado el título de la obra.", "error");
-        return false;
-    } else if (autor === '') {
+        isValid = false;
+    } else if (autor.val() === '') {
         swal("Opss!", "Se ha olvidado el nombre del autor.", "error");
-        return false;
-    } else if (editor === '') {
-        swal("Opss!", "Se ha olvidado de elegir un editor.", "error")
-        return false;
-    } else if (genero === '') {
-        swal("Opss!", "Se ha olvidado de elegir un género musical.", "error")
-        return false;
-    } else if (date === '') {
-        swal("Opss!", "Se ha olvidado de elegir la fecha de creación de la obra musical.", "error")
-        return false;
+        isValid = false;
+    } else if (editor.val() === '') {
+        swal("Opss!", "Se ha olvidado de elegir un editor.", "error");
+        isValid = false;
+    } else if (genero.val() === '') {
+        swal("Opss!", "Se ha olvidado de elegir un género musical.", "error");
+        isValid = false;
+    } else if (date.val() === '') {
+        swal("Opss!", "Se ha olvidado de elegir la fecha de creación de la obra musical.", "error");
+        isValid = false;
     }
-    else {
-        return true;
+    return isValid;
+}
+
+function validateFieldOnInput() {
+    let field = $(this);
+    if (field.val().trim() === '') {
+        field.addClass('is-invalid');
+        field.removeClass('is-valid');
+    } else {
+        field.removeClass('is-invalid');
+        field.addClass('is-valid');
     }
 }
 
-$("#btn-add, #btn-send").bind("click", validateAll);
+$(document).ready(function () {
+    $("#btn-add, #btn-send").bind("click", function() {
+        return validateAll();
+    });
+
+    $("input, select").on("input change", validateFieldOnInput);
+});
+
 
 // 2) Script (Name field) only letter is allowed
 $(document).ready(function (){
@@ -94,8 +135,15 @@ $(document).ready(function (){
     // Only letter
     $('#first_name, #last_name, #autor').keyup(function () {
         var letter = $(this).val();
-        var allow = letter.replace(/[^a-zA-ZáéíóúñÑ _]/g, '');
+        var allow = letter.replace(/[^a-zA-ZáéíóúñÑ]/g, '');
         $(this).val(allow);
+
+        // Validar después del reemplazo
+        if ($(this).val().trim() === '') {
+            $(this).removeClass('is-valid').addClass('is-invalid');
+        } else {
+            $(this).removeClass('is-invalid').addClass('is-valid');
+        }
     });
 
     //prevent to write space in the input
@@ -136,6 +184,9 @@ $(document).ready(function (){
         if (date_input > currentDate || date_input.getFullYear() < 1900){
             swal('Opsss !', 'Fecha incorrecta. Revise por favor', 'error');
             $(this).val('')
+            $(this).removeClass('is-valid').addClass('is-invalid');
+        } else {
+            $(this).removeClass('is-invalid').addClass('is-valid');
         }
     });
 });
@@ -144,6 +195,7 @@ $(document).ready(function (){
 $(document).ready(function (){
     $('#phone').inputmask("+535-999-99-99", { "onincomplete": function () {
             swal('Opsss !', 'Número de teléfono incompleto. Revise por favor', 'error');
+            $(this).removeClass('is-valid').addClass('is-invalid');
         return false;
         }
     });
@@ -157,10 +209,12 @@ $(document).ready(function() {
         var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.jfif)$/i;
         if (!allowedExtensions.exec(filePath)) {
             swal('Opsss !', 'Por favor, selecciona un archivo de imagen válido.', 'error');
+            $(this).removeClass('is-valid').addClass('is-invalid');
             $(this).val('');
             return false;
         }
         else {
+            $(this).removeClass('is-invalid').addClass('is-valid');
             previewImage(event);
         }
     });
@@ -218,7 +272,7 @@ if (verify === 0) {
 }
 
 // 12) Script to allow only numbers in ID Tribute
-$("#idTribute").keyup(function () {
+$("#idTribute, #CI").keyup(function () {
     if(!/^[0-9]*$/.test(this.value)) {
         this.value = this.value.split(/[^0-9]/).join('');
     }
@@ -284,38 +338,6 @@ function toggleFunction(){
     }
 }
 
-// 17 Function to activate an birthday field editor
-// To Add
-$("#editorType").change( (e) => {
-
-    const birthday = $('#birthday')
-    const last_name = $('#last_name')
-
-    if (e.target.value === 'Independiente'){
-        birthday.removeAttr('disabled');
-        last_name.removeAttr('disabled')
-    }
-    else {
-        birthday.val('');
-        last_name.val('');
-        birthday.attr('disabled', 'disabled');
-        last_name.attr('disabled', 'disabled');
-    }
-})
-
-// To Edit
-$(document).ready(function () {
-    let editor_type = document.getElementById('editorType')
-    const birthday = $('#birthday')
-    const last_name = $('#last_name')
-    if (editor_type.children[0].label === 'Independiente') {
-        birthday.removeAttr('disabled');
-        last_name.removeAttr('disabled');
-    } else {
-        $("#birthday").val("");
-    }
-})
-
 // 18 Prevent to change the editor's prefijo
 $('#editorPrefijo').mousedown((e) => {
     if (e.target.baseURI.includes('/editor/')) {
@@ -333,7 +355,9 @@ $('#btn-accept').click((e) => {
 
 // 20 Ajax Calls to Spinner Loading
 jQuery(function ($) {
-    $(document).ajaxSend(function () {
+    // Evento de ajaxSend asociado solo a solicitudes AJAX que provienen del botón con clase 'ajax-submit-btn' para
+    // mostrar el spinner y el ´Espere...´
+    $(document).on('ajaxSend', '.ajax-submit-btn', function () {
         $(".spinner-border").fadeIn(500);
 
         let loading = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>&nbsp;
@@ -341,29 +365,52 @@ jQuery(function ($) {
         $("#btn-add").html(loading);
     });
 
-
-
-    $("#btn-add").click(function () {
-        let val = validateAll()
+    $("#btn-add").click(function (event) {
+        event.preventDefault();  // Prevenir la acción por defecto del botón de envío
+        let val = validateAll();
         if (val) {
-           $.ajax({
+            $.ajax({
                 type: 'GET',
                 success: function (data) {
                     console.log(data);
                 }
-            }).done( () => {
+            }).done(() => {
                 setTimeout(() => {
-                    $("#spinner-border").fadeOut(500);
+                    $(".spinner-border").fadeOut(500);
                 }, 700);
             });
         }
-
     });
-})
+
+    // Código para manejar el cambio de provincias y la actualización de municipios
+    $('#editorProvincia').change(function () {
+        var provinciaId = $(this).val();
+        if (provinciaId) {
+            $.ajax({
+                url: 'http://127.0.0.1:8000/get-municipios/',
+                data: {
+                    'provincia_id': provinciaId
+                },
+                dataType: 'json',
+                success: function (data) {
+                    var municipioSelect = $('#editorMunicipio');
+                    municipioSelect.empty();
+                    municipioSelect.append('<option value="" hidden>Municipio</option>');
+                    $.each(data, function (index, municipio) {
+                        municipioSelect.append('<option value="' + municipio.id + '">' + municipio.nombre + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#editorMunicipio').empty();
+            $('#editorMunicipio').append('<option value="" hidden>Municipio</option>');
+        }
+    });
+});
 
 var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
 var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
   return new bootstrap.Popover(popoverTriggerEl)
-})
+});
 
 

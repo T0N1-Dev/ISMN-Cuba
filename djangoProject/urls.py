@@ -26,7 +26,9 @@ urlpatterns = [
     # Edit profile
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     # Register User
-    path('register_user/', views.register_user, name='register_user'),
+    path('get-municipios/', views.get_municipios, name='get_municipios'),
+    path('register_autor_editor/', views.register_autor_editor, name='register_autor_editor'),
+    path('register_editorial/', views.register_editorial, name='register_editorial'),
     # Email Confirmation
     path('email_confirmation/', views.email_confirmation, name='email_confirmation'),
     # ===============

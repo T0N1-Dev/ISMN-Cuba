@@ -17,7 +17,7 @@
 
 <!-- Page content -->
 {% block content %}
-    <div class="container mt-5" id="loginForm">
+    <div class="container mt-3" id="loginForm">
         <div class="d-flex justify-content-center">
             <img src="{% static 'img/ismnlogo.png' %}" width="200" alt="logo ismn">
         </div>
@@ -35,7 +35,7 @@
                     <input type="password" class="form-control" name="password" placeholder="Password" id="userPassword" maxlength="30">
                     <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
                 </div>
-                <label class="mb-3 pl-4" for="reset_passw">Si no recuerda su contraseña puede: &nbsp;<a id="reset_passw" href="{% url 'reset_password' %}">ir aquí.</a></label>
+                <label class="mb-3 pl-4" for="reset_passw">Si no recuerda su contraseña puede: &nbsp;<a id="reset_passw" href="{% url 'reset_password' %}">pulse aquí.</a></label>
                 <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3 w-100" id="btn-add">
                     <i class="fas fa-sign-in-alt">&nbsp;&nbsp;</i> Iniciar Sesión
                 </button>
@@ -43,7 +43,20 @@
         </div>
 
         <div class="card mt-3 p-2">
-            <label for="register">Si no posee una cuenta puede: &nbsp;<a id="register" href="{% url 'register_user' %}">Solicitar Registro</a></label>
+            <label style="margin-left: 10px" for="register">Si es la primera vez que solicita un ISMN debe registrar sus datos:&nbsp;
+                <p class="d-inline-flex gap-1">
+                  <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    Solicitar registro
+                  </button>
+                </p>
+                <div class="collapse" id="collapseExample">
+                  <div class="card card-body">
+                      <p>Es usted un:&nbsp;
+                          <a href="{% url 'register_autor_editor' %}">Autor-Editor</a> ó representa una&nbsp;<a href="{% url 'register_editorial' %}">Editorial</a>?
+                      </p>
+                  </div>
+                </div>
+            </label>
         </div>
 
         <!-- Message from backend -->

@@ -2,16 +2,67 @@
 
 <!-- Title on tab browser -->
 {% block title %} Usuario Registro {% endblock title %}
+
 {% block card-title %}
-    <span class="text-primary"> INSERTE SUS DATOS
-        <br> NOTA IMPORTANTE:
-        Favor tenga en cuenta que según los parámetros de la Agencia Internacional el ISMN debe ser solicitado a
-        nombre de la entidad o persona natural legal y económicamente responsable de una publicación determinada,
-        en ningún caso los registros de ISMN deben ser solicitados a nombre de las empresas, representante legal
-        o personas que son contratadas para prestar distintos servicios de edición tales como diagramación, diseño,
-        encuadernación e impresión.
-    </span>
+    <span class="text-primary"><i class=""></i>&nbsp; INSERTE SUS DATOS</span>
 {% endblock card-title %}
+
+{% block attention %}
+    <div class="alert alert-danger mb-2" role="alert">
+        <span class="text-danger mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-exclamation-triangle fs-4 text-danger"></i>&nbsp;&nbsp;NOTA IMPORTANTE</span>
+        <p>Favor tenga en cuenta que según los parámetros de la Agencia Internacional el ISMN debe ser solicitado a nombre
+        de la entidad o persona natural legal y económicamente responsable de una publicación determinada, en ningún
+        caso los registros de ISMN deben ser solicitados a nombre de las empresas, representante legal o personas que
+        son contratadas para prestar distintos servicios de edición tales como diagramación, diseño, encuadernación e
+        impresión.</p>
+    </div>
+    <div class="form-check" style="margin-left: 10px">
+        <input class="form-check-input" type="checkbox" id="flexCheckDefault">
+        <label class="form-check-label" for="flexCheckDefault">
+            He leido y entiendo los términos.
+        </label>
+    </div>
+    <hr>
+{% endblock attention %}
+
+{% block footer-alert %}
+    <hr class="mt-0">
+    <div class="alert alert-info mb-2" role="alert">
+        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Tratamiento de datos personales</span>
+        <p class="mb-0" style="font-size: .9rem">Dando cumplimiento a lo dispuesto en la <a target="_blank" href="https://www.claustrofobias.com/resolucion-no-87-2007-reglamento-del-registro-nacional-del-internacional-standard-book-number-isbn/">
+            Resolución no. 87 del 27 de septiembre de 2007,</a>
+            la CÁMARA CUBANA DEL LIBRO adopta una política para el tratamiento de datos personales
+            que puede ser consultada <a target="_blank" href="https://www.claustrofobias.com/reglamento-de-la-agencia-isbn-de-cuba-para-el-tratamiento-de-datos-personales/">aquí</a>.
+            Los datos recolectados serán utilizados para el desarrollo
+            de su relación con la CÁMARA CUBANA DEL LIBRO. <br>De esta manera, la CÁMARA CUBANA DEL LIBRO manifiesta
+            que garantiza los derechos de la privacidad, la intimidad y el buen nombre, en el tratamiento de los datos
+            personales, y en consecuencia todas sus actuaciones se regirán por los principios de legalidad, finalidad,
+            libertad, veracidad o calidad, transparencia, acceso y circulación restringida, seguridad y confidencialidad.<br>
+            El titular podrá ejercer sus derechos de consultar en cualquier momento sus datos personales y el derecho
+            de solicitar expresamente, en cualquier momento, su corrección, actualización o supresión en los términos
+            establecidos en nuestra política, dirigiendo una comunicación escrita al correo electrónico imagen@ccl.cult.cu</p>
+    </div>
+    <div class="alert alert-danger mb-2" style="font-size: .9rem" role="alert">
+        <p>Al diligenciar el presente formulario autorizo de manera voluntaria, previa, expresa e informada a la
+            CÁMARA CUBANA DEL LIBRO, ubicada en la Calle 15 esquina C, La Habana, Cuba y con teléfono
+            +53 7 8329559 para recolectar, almacenar y hacer uso de los datos de acuerdo con su Política de
+            Tratamiento de Datos Personales y las siguientes finalidades:</p>
+        <ul>
+            <li>Registrar y tramitar solicitudes de ISMN.</li>
+            <li>Recibir información sobre eventos y actividades programados por la CÁMARA CUBANA DEL LIBRO que puedan resultar de interés.</li>
+            <li>Solicitar certificaciones relativas a la relación con la CÁMARA CUBANA DEL LIBRO.</li>
+            <li>Enviar los datos de contacto y ubicación a la Agencia Internacional del ISMN con sede en Alemania, los cuales serán incluidos en el Directorio ISMN, de acuerdo con el requisito contractual que se mantiene con la Agencia Internacional.</li>
+            <li>Permitir el tratamiento de los datos autorizados para fines históricos, estadísticos o científicos, en el cual los datos personales pueden ser compartidos con actores interesados en la industria.</li>
+            <li>y en general todas aquellas finalidades que sean necesarias para el desarrollo de la relación con la CÁMARA CUBANA DEL LIBRO.</li>
+        </ul>
+    </div>
+    <div class="form-check" style="margin-left: 10px">
+        <input class="form-check-input" type="checkbox" id="flexCheckDefault2">
+        <label class="form-check-label" for="flexCheckDefault2">
+            He leido y entiendo los términos.
+        </label>
+    </div>
+{% endblock footer-alert %}
 
 <!-- Navbar content -->
 {% block navbar-content %}

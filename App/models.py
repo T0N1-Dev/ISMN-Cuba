@@ -32,7 +32,8 @@ class Registered_Data(models.Model):
     user_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=50)
     phone = models.CharField(max_length=20)
-    id_tribute = models.PositiveIntegerField(default=0)
+    id_tribute = models.PositiveSmallIntegerField()
+    CI = models.PositiveSmallIntegerField()
 
     class Meta:
         verbose_name_plural = "Registrados"

@@ -6,8 +6,6 @@ from email import encoders
 from email.mime.base import MIMEBase
 from random import randint
 from smtplib import SMTPServerDisconnected, SMTPAuthenticationError
-
-import requests.utils
 from PIL import Image as PILImage
 from barcode import EAN13
 from barcode.writer import ImageWriter
@@ -29,10 +27,10 @@ from reportlab.graphics.widgets import signsandsymbols
 
 from App.forms import ChangePasswordForm, EditProfileForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
-                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud, CopyDB)
+                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud, CopyDB, Provincia, Municipio)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.db.models import Q, Max, Count
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives  # Required to send emails
@@ -41,7 +39,6 @@ from django.contrib.auth.views import LoginView, LogoutView
 import io
 from django.http import FileResponse
 from django.db import connections
-from easyaudit.models import CRUDEvent, LoginEvent, RequestEvent
 # REPORTLAB
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -236,13 +233,20 @@ def generate_prefijo_publicacion(valor):
 
 
 # Registration Function
-def register_user(request):
+def get_municipios(request):
+    provincia_id = request.GET.get('provincia_id')
+    municipios = Municipio.objects.filter(provincia_id=provincia_id).values('id', 'nombre')
+    return JsonResponse(list(municipios), safe=False)
+
+
+def register_autor_editor(request):
     if request.method == 'POST':
         # Check if email exists in BD
         username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
         id_tribute = request.POST['idTribute']
+        ci = request.POST.get('CI')
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/login')
@@ -255,6 +259,9 @@ def register_user(request):
         elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
             messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
             return HttpResponseRedirect('/login')
+        elif Registered_Data.objects.filter(CI=ci).exists():
+            messages.error(request, "Este número de identidad ya ha sido registrada en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
         # ===========================
         else:
             if request.POST.get('username') \
@@ -262,7 +269,6 @@ def register_user(request):
                     and request.POST.get('password') \
                     and request.POST.get('phone') \
                     and request.POST.get('email') \
-                    and request.POST.get('editorType') \
                     and request.POST.get('address') \
                     and request.POST.get('idTribute') \
                     and request.POST.get('editorPrefijo'):
@@ -286,7 +292,64 @@ def register_user(request):
                 messages.error(request, "Complete todos los campos del formulario")
                 return HttpResponseRedirect('/register_user')
     else:
-        return render(request, 'registration/register_user.html')
+        provincias_list = Provincia.objects.all()
+        return render(request, 'registration/register_user.html', {'provincias': provincias_list})
+
+
+def register_editorial(request):
+    if request.method == 'POST':
+        # Check if email exists in BD
+        username = request.POST['username']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        id_tribute = request.POST['idTribute']
+        ci = request.POST.get('CI')
+        if Registered_Data.objects.filter(email=email).exists():
+            messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        elif Registered_Data.objects.filter(phone=phone).exists():
+            messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        elif Registered_Data.objects.filter(user_name=username).exists():
+            messages.error(request, "Este nombre de usuario ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
+            messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        elif Registered_Data.objects.filter(CI=ci).exists():
+            messages.error(request, "Este número de identidad ya ha sido registrada en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
+        # ===========================
+        else:
+            if request.POST.get('username') \
+                    and request.POST.get('first_name') \
+                    and request.POST.get('password') \
+                    and request.POST.get('phone') \
+                    and request.POST.get('email') \
+                    and request.POST.get('address') \
+                    and request.POST.get('idTribute') \
+                    and request.POST.get('editorPrefijo'):
+                datos = request.POST.copy()
+                if request.FILES:
+                    # Convertir la imagen a base64 para poder serializarla a JSON en el request.session
+                    datos['imagenProfile'] = base64.b64encode(request.FILES['imagenProfile'].read())
+                    # Agregar la informacion inicial para que pueda ser leida por el "src" de <img> en el html
+                    imagen_extension = request.FILES['imagenProfile'].content_type
+                    datos['imagenProfile'] = f"data:{imagen_extension};base64," + datos['imagenProfile']
+                else:
+                    with open(f"{MEDIA_ROOT}\profile_default.png", "rb") as image_profile:
+                        datos['imagenProfile'] = f"data:png;base64," + base64.b64encode(image_profile.read()).decode()
+                        image_profile.close()
+
+                confirmation_code = send_code_confirmation(request)
+                datos['code_confirmation'] = confirmation_code
+                request.session['datos'] = datos
+                return render(request, 'registration/email_confirmation.html')
+            else:
+                messages.error(request, "Complete todos los campos del formulario")
+                return HttpResponseRedirect('/register_user')
+    else:
+        return render(request, 'registration/register_editorial.html')
 
 
 def email_confirmation(request):

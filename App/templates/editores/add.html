@@ -17,44 +17,154 @@
 
 <!-- PAGE CONTENT -->
 {% block content %}
-    <div class="container w-75" style="max-height: 200px">
+    <div class="container w-75">
         <div class="card card-body mt-5">
-            <span class="text-center"> {% block card-title %}
-                <span class="text-primary"> INSERTE LOS DATOS DEL EDITOR </span> {% endblock card-title %} </span>
+            <span class="text-center">
+                {% block card-title %}
+                    <span class="text-primary"> INSERTE LOS DATOS DEL EDITOR </span>
+                {% endblock card-title %}
+            </span>
         </div>
 
-        <!-- Column #1 -->
-        <div class="row">
-            <div class="col-lg-12">
-
-                <!-- Form -->
-                <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST"
-                                                                                     enctype="multipart/form-data"
-                                                                                     class="card p-3 mt-3 form-register">
+        <!-- Form -->
+        <form {% block Action %} action="/add_editor/" {% endblock Action %} method="POST"
+                                                                             enctype="multipart/form-data"
+                                                                             class="card p-3 mt-3 form-register">
                     {% csrf_token %}
                     <!-- Input ID denied here -->
                     {% block Id-hidden %} {% endblock Id-hidden %}
-
+                    {% block attention %}{% endblock attention %}
+                    <!-- Titulo de Informacion Personal -->
+                    <div class="alert alert-info mb-2" role="alert">
+                        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Información del editor - autor</span>
+                        <p class="mb-0" style="font-size: .9rem">Deben registrarse aquí como Autores-Editores las personas naturales, responsables legal
+                            y económicamente de la publicación de música notada (partituras), digitales o impresas,
+                            pudiendo realizar los distintos procesos de edición (diagramación, impresión,
+                            encuadernación, etc.) en talleres propios o de terceros.</p>
+                    </div>
+                    <!-- Inputs Nombre y Apellidos -->
                     <div class="row">
                         <div class="col-6">
-                            <div class="input-group input-group-sm mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-user"></i></span>
-                                <input type="text" class="form-control" maxlength="40" name="username" id="username" placeholder="Nombre de Usuario" required {% block Value-username %}{% endblock Value-username %}>
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-address-book"></i></span>
+                                <input type="text" class="form-control" name="first_name" id="first_name"
+                                       placeholder="Nombre" {% block Value-nombre %} {% endblock Value-nombre %}>
                             </div>
                         </div>
-                        
                         <div class="col-6">
                             <div class="input-group input-group-sm position-relative mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-lock"></i></span>
-                                <input type="password" class="form-control" name="password"
-                                       placeholder="Nueva Contraseña"
-                                        {% block Value-password %}{% endblock Value-password %}
-                                       id="userPassword" required>
-                                <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-address-book"></i></span>
+                                <input type="text" class="form-control" name="last_name" id="last_name"
+                                       placeholder="Apellido"
+                                        {% block Value-apellido %}{% endblock Value-apellido %}>
                             </div>
                         </div>
                     </div>
-
+                    <!-- Inputs CI y Fecha de Nacimiento -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-id-card"></i></span>
+                                <input type="text" class="form-control" name="CI" id="CI"
+                                       placeholder="Carnet de Identidad" maxlength="11" required
+                                        {% block Value-ci %}{% endblock Value-ci %}>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i
+                                        class="fas fa fa-calendar"></i></span>
+                                <input type="text" class="form-control" maxlength="10" name="birthday" id="birthday"
+                                       placeholder="Fecha de nacimiento" onfocus="(this.type='date')"
+                                       onblur="(this.type='text')" title="Fecha de Nacimiento" required
+                                        {% block Value-birthday %}{% endblock Value-birthday %}>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Input ID tributaria -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-credit-card"></i></span>
+                                <input type="text" class="form-control" name="idTribute" id="idTribute"
+                                       placeholder="ID Tributaria" maxlength="15"
+                                        {% block Value-tribute %}{% endblock Value-tribute %}>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Input Descripcion -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group mb-3">
+                                <textarea class="form-control text-sm" name="note" maxlength="1000" rows="3"
+                                          placeholder="La descripción es opcional...">{% block Value-description %}{% endblock Value-description %}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+                    <!-- Ubicacion -->
+                    <div class="alert alert-info mb-2" role="alert">
+                        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Datos de Ubicación</span>
+                        <p class="mb-0" style="font-size: .9rem">Datos de contacto del Autor-Editor. Permiten su posicionamiento e
+                            identificación en bases de datos de publicaciones musicales nacionales e internacionales.
+                            Mantenga estos datos actualizados.</p>
+                    </div>
+                    <!-- Inputs Pais y Provincia -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-flag"></i></span>
+                                <input type="text" class="form-control" value="Cuba" readonly>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group">
+                                <div class="input-group input-group-sm mb-3">
+                                    <label class="input-group-text side-label-form justify-content-center"><i
+                                            class="fa fa-location-arrow"></i></label>
+                                    <select class="form-select form-control" name="editorProvincia" id="editorProvincia"
+                                            required>
+                                        {% block Value-provincia %}
+                                            <option value="" hidden>Provincia</option>
+                                        {% endblock Value-provincia %}
+                                        <option disabled></option>
+                                        {% for provincia in provincias %}
+                                            <option value="{{ provincia.id }}">
+                                                {{ provincia }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Inputs Municipio y Direccion -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group">
+                                <div class="input-group input-group-sm mb-3">
+                                    <label class="input-group-text side-label-form justify-content-center"><i
+                                            class="fa fa-map-pin"></i></label>
+                                    <select class="form-select form-control" name="editorMunicipio" id="editorMunicipio"
+                                            required>
+                                        {% block Value-municipio %}
+                                            <option value="" hidden>Municipio</option>
+                                        {% endblock Value-municipio %}
+                                        <option value="">Seleccione su provincia primero...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-map-marker-alt"></i></span>
+                                <input type="text" class="form-control" name="address" id="address"
+                                       placeholder="Dirección"
+                                        {% block Value-direction %}{% endblock Value-direction %}>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Inputs Telefono y Correo -->
                     <div class="row">
                         <div class="col-6">
                             <div class="input-group input-group-sm mb-3">
@@ -69,73 +179,58 @@
                             </div>
                         </div>
                     </div>
-
+                    <hr class="mt-0">
+                    <!-- Informacion de Usuario -->
+                    <div class="alert alert-info mb-2" role="alert">
+                        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Usuario</span>
+                        <p class="mb-0" style="font-size: .9rem">Estos datos son esenciales para su acceso y personalización en
+                            nuestro sistema. Su nombre de usuario y contraseña le permiten iniciar sesión de manera
+                            segura, mientras que su foto de perfil ayuda a identificar su cuenta visualmente,
+                            proporcionando una experiencia más personalizada y reconocible dentro del sistema como
+                            "Usuario registrado", todos estos datos pueden ser editables en lo adelante.</p>
+                    </div>
+                    <!-- Inputs Username y Contraseña -->
                     <div class="row">
-                        <div class="col-6">
-                            <div class="input-group">
-                                <div class="input-group input-group-sm mb-3">
-                                    <label class="input-group-text side-label-form justify-content-center"><i class="fa fa-building"></i></label>
-                                    <select class="form-select form-control" name="editorType" id="editorType" required>
-                                        {% block Editor-type %}
-                                            <option value="" hidden>Tipo de Editor</option>
-                                        {% endblock Editor-type %}
-                                        <option disabled></option>
-                                        <option value="Independiente" title="Seleccione esta opcion si usted es un Editor independiente">Independiente</option>
-                                        <option value="Compañia" title="Seleccione esta opcion si usted representa a una compañia o Editorial">Compañia</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="col-6">
                             <div class="input-group input-group-sm mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i
-                                        class="fas fa fa-calendar"></i></span>
-                                <input type="text" class="form-control" maxlength="10" name="birthday" id="birthday"
-                                       placeholder="Fecha de nacimiento" onfocus="(this.type='date')"
-                                       onblur="(this.type='text')" title="Fecha de Nacimiento" disabled required
-                                        {% block Value-birthday %}{% endblock Value-birthday %}>
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-user"></i></span>
+                                <input type="text" class="form-control" maxlength="40" name="username" id="username" placeholder="Nombre de Usuario" required {% block Value-username %}{% endblock Value-username %}>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-lock"></i></span>
+                                <input type="password" class="form-control" name="password"
+                                       placeholder="Nueva Contraseña"
+                                        {% block Value-password %}{% endblock Value-password %}
+                                       id="userPassword" required >
+                                <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="input-group input-group-sm position-relative mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-address-book"></i></span>
-                                <input type="text" class="form-control" name="first_name" id="first_name"
-                                       placeholder="Nombre" {% block Value-nombre %} {% endblock Value-nombre %}>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="input-group input-group-sm position-relative mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-address-book"></i></span>
-                                <input type="text" class="form-control" name="last_name" id="last_name"
-                                       placeholder="Apellido" disabled
-                                        {% block Value-apellido %}{% endblock Value-apellido %}>
-                            </div>
-                        </div>
+                    <hr class="mt-0">
+                    <!-- Inputs Imagen de Perfil -->
+                    <div class="mb-3">
+                        {% block Value-imagen %}{% endblock Value-imagen %}
+                        <div class="mb-3" style="font-size: 14px;"><i class="fa fa-cloud-upload-alt"></i>&nbsp;&nbsp;
+                            {% block Title-Imagen-Sub %} Sube una foto a tu perfil {% endblock Title-Imagen-Sub %}</div>
+                        <input type="file" class="form-control form-control-sm" name="image_profile" accept="image/*">
+                        <div class="form-text" style="font-size: 12px;">* Extensiones permitidas: jpg - png - jpeg - *</div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="input-group input-group-sm position-relative mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-map-marker-alt"></i></span>
-                                <input type="text" class="form-control" name="address" id="address"
-                                       placeholder="Dirección"
-                                        {% block Value-direction %}{% endblock Value-direction %}>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="input-group input-group-sm position-relative mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-credit-card"></i></span>
-                                <input type="text" class="form-control" name="idTribute" id="idTribute"
-                                       placeholder="ID Tributaria" maxlength="15"
-                                        {% block Value-tribute %}{% endblock Value-tribute %}>
-                            </div>
-                        </div>
+                    <hr class="mt-0">
+                    <!-- Titulo de Numero estimado de publicaciones-->
+                    <div class="alert alert-info mb-2" role="alert">
+                        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Número estimado de publicaciones</span>
+                        <p class="mb-0" style="font-size: .9rem">La selección del número de publicaciones anuales es crucial para
+                            los editores. Esta decisión determina la cantidad de ISMN que se generarán para sus
+                            publicaciones. Seleccionar un número mayor al necesario resultará en un desperdicio de
+                            prefijos de publicaciones, mientras que una selección menor podría requerir la asignación
+                            de un nuevo prefijo durante el año, complicando la gestión de sus publicaciones.
+                            Por lo tanto, es esencial estimar con precisión para optimizar los recursos y evitar
+                            inconvenientes futuros.</p>
                     </div>
-
+                    <!-- Input Numero estimado de publicaciones -->
                     <div class="row">
                         <div class="col-12">
                             <div class="input-group">
@@ -173,26 +268,14 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-group mb-3">
-                        <textarea class="form-control text-sm" name="note" maxlength="1000" rows="4"
-                                  placeholder="La descripción es opcional...">{% block Value-description %}{% endblock Value-description %}</textarea>
-                    </div>
-
-                    <hr style="height: 2px;">
-                    <div class="mb-3">
-                    {% block Value-imagen %}{% endblock Value-imagen %}
-                        <div class="mb-3" style="font-size: 14px;"><i class="fa fa-cloud-upload-alt"></i>&nbsp;&nbsp;
-                            {% block Title-Imagen-Sub %} Sube una foto a tu perfil {% endblock Title-Imagen-Sub %}</div>
-                        <input type="file" class="form-control form-control-sm" name="image_profile" accept="image/*">
-                        <div class="form-text" style="font-size: 12px;">* Extensiones permitidas: jpg - png - jpeg - *</div>
-                    </div>
-
+                    <!-- Footer -->
+                    {% block footer-alert %}{% endblock %}
+                    <!-- Botones -->
                     <div class="d-grid gap-2 mt-3">
 
                         <!-- Add Button -->
                         {% block Btn-content %}
-                            <button type="submit" class="btn btn-primary btn-sm" id="btn-add">
+                            <button type="submit" class="btn btn-primary btn-sm ajax-submit-btn" id="btn-add">
                                 <i class="fas fa-plus">&nbsp;&nbsp;</i>Añadir
                             </button>
                         {% endblock Btn-content %}
@@ -201,12 +284,9 @@
                         {% block Btn-reset %} {% endblock Btn-reset %}
 
                         <!-- Back Button -->
-                        <a href="{% url 'backend_editores' 'list_dsc' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Back</a>
+                        <a href="{% url 'backend_editores' 'list_dsc' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Atrás</a>
                     </div>
                 </form>
-            </div>
-        </div>
-        </div>
     </div>
 {% endblock content %}
 
