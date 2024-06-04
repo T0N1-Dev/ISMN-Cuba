@@ -3,6 +3,13 @@
 <!-- Title on tab browser -->
 {% block title %} Usuario Registro {% endblock title %}
 
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-user"></i>&nbsp;&nbsp; Registro de Usuario
+{% endblock navbar-content %}
+
+{% block Action %}action="{% url 'register_autor_editor' %}"{% endblock Action %}
+
 {% block card-title %}
     <span class="text-primary"><i class=""></i>&nbsp; INSERTE SUS DATOS</span>
 {% endblock card-title %}
@@ -63,13 +70,6 @@
         </label>
     </div>
 {% endblock footer-alert %}
-
-<!-- Navbar content -->
-{% block navbar-content %}
-    <i class="fas fa-user"></i>&nbsp;&nbsp; Registro de Usuario
-{% endblock navbar-content %}
-
-{% block Action %} action="/register_user/" {% endblock Action %}
 
 {% block Btn-content %}
     <button type="submit" class="btn btn-primary btn-sm" id="btn-add">

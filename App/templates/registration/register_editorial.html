@@ -1,8 +1,231 @@
-{% extends 'editores/add.html' %}
+{% extends 'registration/register_user.html' %}
 
-<!-- Title on tab browser -->
-{% block title %} Usuario Registro {% endblock title %}
+{% block Action %}action="{% url 'register_editorial' %}"{% endblock Action %}
 
-{% block card-title %}
-    <span class="text-primary"><i class=""></i>&nbsp; INSERTE SUS DATOS</span>
-{% endblock card-title %}
+{% block Info-personal %}
+    <!--Titulo de Alerta de Registro-->
+    <div class="alert alert-warning mb-2" role="alert">
+        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-exclamation-circle fs-4 text-warning"></i>&nbsp;&nbsp;Atención</span>
+        <p class="mb-0" style="font-size: .9rem">Sólo registre aquí a su entidad si esta es la primera vez que realiza una publicación con ISMN.</p>
+    </div>
+    <!-- Titulo de Informacion Personal -->
+    <div class="alert alert-info mb-2" role="alert">
+        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Información de la Editorial</span>
+        <p class="mb-0" style="font-size: .9rem">Deben registrarse aquí como Editoriales, las entidades con número de NIT,
+            responsables legal y económicamente de la publicación de libros de notación musical en Cuba, pudiendo
+            realizar los distintos procesos de edición (diagramación, impresión, encuadernación, etc.) en talleres
+            propios o de terceros.</p>
+    </div>
+    <!-- Input ID tributaria y Nombre -->
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group input-group-sm position-relative mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-credit-card"></i></span>
+                <input type="text" class="form-control" name="idTribute" id="idTribute"
+                       placeholder="ID Tributaria" maxlength="15"
+                        {% block Value-tribute %}{% endblock Value-tribute %}>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group input-group-sm position-relative mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-building"></i></span>
+                <input type="text" class="form-control" name="nombreEditorial" id="nombreEditorial"
+                       placeholder="Nombre o Razón Social" maxlength="40"
+                        {% block Value-Nombre %}{% endblock Value-Nombre %}>
+            </div>
+        </div>
+    </div>
+    <!-- Input Descripcion y Siglas -->
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group mb-3">
+                <textarea class="form-control text-sm" name="note" maxlength="1000" rows="1"
+                          placeholder="La descripción es opcional...">{% block Value-description %}{% endblock Value-description %}</textarea>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group input-group-sm position-relative mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-s"></i></span>
+                <input type="text" class="form-control" name="siglasEditorial" id="siglasEditorial"
+                       placeholder="Siglas" maxlength="7"
+                        {% block Value-Siglas %}{% endblock Value-Siglas %}>
+            </div>
+        </div>
+    </div>
+    <hr class="mt-0">
+{% endblock Info-personal %}
+{% block Ubicacion %}
+    <!-- Ubicacion -->
+    <div class="alert alert-info mb-2" role="alert">
+        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Datos de Ubicación</span>
+        <p class="mb-0" style="font-size: .9rem">Datos de contacto de la Editorial. Permiten su posicionamiento e identificación en
+            bases de datos de libros en oferta, nacionales e internacionales. Mantenga esta información permanentemente
+            actualizada.</p>
+    </div>
+    <!-- Inputs Pais y Provincia -->
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-flag"></i></span>
+                <input type="text" class="form-control" value="Cuba" readonly>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group">
+                <div class="input-group input-group-sm mb-3">
+                    <label class="input-group-text side-label-form justify-content-center"><i
+                            class="fa fa-location-arrow"></i></label>
+                    <select class="form-select form-control" name="editorProvincia" id="editorProvincia"
+                            required>
+                        {% block Value-provincia %}
+                            <option value="" hidden>Provincia</option>
+                        {% endblock Value-provincia %}
+                        <option disabled></option>
+                        {% for provincia in provincias %}
+                            <option value="{{ provincia.id }}">
+                                {{ provincia }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Inputs Municipio y Direccion -->
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group">
+                <div class="input-group input-group-sm mb-3">
+                    <label class="input-group-text side-label-form justify-content-center"><i
+                            class="fa fa-map-pin"></i></label>
+                    <select class="form-select form-control" name="editorMunicipio" id="editorMunicipio"
+                            required>
+                        {% block Value-municipio %}
+                            <option value="" hidden>Municipio</option>
+                        {% endblock Value-municipio %}
+                        <option value="">Seleccione su provincia primero...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group input-group-sm position-relative mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-map-marker-alt"></i></span>
+                <input type="text" class="form-control" name="address" id="address"
+                       placeholder="Dirección"
+                        {% block Value-direction %}{% endblock Value-direction %}>
+            </div>
+        </div>
+    </div>
+    <!-- Inputs Telefono y Correo -->
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-phone"></i></span>
+                <input type="text" class="form-control" name="phone" id="phone" placeholder="Número de teléfono" required {% block Value-phone %}{% endblock Value-phone %}>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-envelope"></i></span>
+                <input type="email" class="form-control" maxlength="40" name="email" id="email" placeholder="Correo electrónico" required {% block Value-email %}{% endblock Value-email %}>
+            </div>
+        </div>
+    </div>
+    <hr class="mt-0">
+{% endblock Ubicacion %}
+{% block Another-Info %}
+    <!--Datos de Caracterizacion-->
+    <div class="alert alert-info mb-2" role="alert">
+        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Datos de Caracterización</span>
+    </div>
+    <!--Input Fecha de Fundacion y Actividad Principal-->
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i
+                        class="fas fa fa-calendar"></i></span>
+                <input type="text" class="form-control" maxlength="10" name="fundacion_date" id="fundacion_date"
+                       placeholder="Fecha de Fundación" onfocus="(this.type='date')"
+                       onblur="(this.type='text')" title="Fecha de Fundación" required
+                        {% block Value-Fundacion %}{% endblock Value-Fundacion %}>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group">
+                <div class="input-group input-group-sm mb-3">
+                    <label class="input-group-text side-label-form justify-content-center"><i
+                            class="fa fa-tasks"></i></label>
+                    <select class="form-select form-control" name="editorialActivity" id="editorialActivity"
+                            required>
+                        {% block Value-Activity %}
+                            <option value="" hidden>Actividad Principal</option>
+                        {% endblock Value-Activity %}
+                        <option disabled></option>
+                        {% for value, actividad in actividades %}
+                            <option value="{{ value }}">
+                                {{ actividad }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Input Naturaleza Juridica y Sello Editorial -->
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group">
+                <div class="input-group input-group-sm mb-3">
+                    <label class="input-group-text side-label-form justify-content-center"><i
+                            class="fa fa-gavel"></i></label>
+                    <select class="form-select form-control" name="editorialNaturalezaJud" id="editorialNaturalezaJud"
+                            required>
+                        {% block Value-NaturalezaJud %}
+                            <option value="" hidden>Naturaleza Jurídica</option>
+                        {% endblock Value-NaturalezaJud %}
+                        <option disabled></option>
+                        {% for value, nat in naturaleza_juridica %}
+                            <option value="{{ value }}">
+                                {{ nat }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group input-group-sm position-relative mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-a"></i></span>
+                <input type="text" class="form-control" name="selloEditorial" id="selloEditorial"
+                       placeholder="Nombre del sello o nombre bajo el cual edita" maxlength="20"
+                        {% block Value-Sello %}{% endblock Value-Sello %}>
+            </div>
+        </div>
+    </div>
+    <hr class="mt-0">
+    <!-- Responsable -->
+    <div class="alert alert-info mb-2" role="alert">
+        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Responsable</span>
+        <p class="mb-0" style="font-size: .9rem">Representante legal de la entidad inscrita. Persona que representa legalmente a la empresa ante terceros</p>
+    </div>
+    <!--Input Nombre y Apellidos-->
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group input-group-sm position-relative mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-address-book"></i></span>
+                <input type="text" class="form-control" name="representante_name" id="representante_name"
+                       placeholder="Nombre" {% block Value-nombre-representante %} {% endblock Value-nombre-representante %}>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group input-group-sm position-relative mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-address-book"></i></span>
+                <input type="text" class="form-control" name="representante_apellido" id="representante_apellido"
+                       placeholder="Apellido"
+                        {% block Value-apellido %}{% endblock Value-apellido %}>
+            </div>
+        </div>
+    </div>
+    <hr class="mt-0">
+{% endblock Another-Info %}

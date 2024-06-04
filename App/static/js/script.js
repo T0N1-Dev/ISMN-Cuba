@@ -7,14 +7,22 @@ function validateEmail(email){
     return regex.test(email);
 }
 
+function validateFormatPassword(password) {
+    let passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordPattern.test(password.val())
+}
+
 function validateAll() {
     let isValid = true;
 
     function validateField(field, errorMessage) {
-        if (field.val().trim() === '') {
+        if (field.val() === '') {
             field.addClass('is-invalid');
             field.removeClass('is-valid');
-            swal("Opss !", errorMessage, "error");
+            swal("Opss !", errorMessage, "error").then(() => {
+                field[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                field.focus();
+            });
             isValid = false;
         } else {
             field.removeClass('is-invalid');
@@ -22,21 +30,37 @@ function validateAll() {
         }
     }
 
+    // Usuarios
     let check = $('#flexCheckDefault');
     let check2 = $('#flexCheckDefault2');
     let username = $("#username");
     let password = $("#userPassword");
     let phone = $("#phone");
     let email = $("#email");
+    let fundacion_date = $("#fundacion_date");
+
+    // Autor
     let birthday = $("#birthday");
     let first_name = $('#first_name');
     let last_name = $('#last_name');
     let ci = $('#CI');
+
+    // Editorial
+    let nombreEditorial = $('#nombreEditorial');
+    let editorialActivity = $('#editorialActivity');
+    let editorialNaturalezaJud = $('#editorialNaturalezaJud');
+    let representante_name = $('#representante_name');
+    let representante_apellido = $('#representante_apellido');
+    let selloEditorial = $('#selloEditorial');
+
+    // Ambos
     let provincia = $('#editorProvincia');
     let municipio = $('#editorMunicipio');
     let address = $("#address");
     let idTribute = $("#idTribute");
     let editorPrefijo = $("#editorPrefijo");
+
+    // Publicacion
     let title = $("#title");
     let autor = $("#autor");
     let editor = $("input[name*='editor']");
@@ -44,27 +68,41 @@ function validateAll() {
     let date = $("#date");
     let letra = $("input[name*='publication_letter']");
 
-    if (!check2.is(':checked')) {
+
+    // Validar Checks
+    if (check2.length && !check2.is(':checked')) {
         check2.addClass('is-invalid');
-        swal("Opss!", "Asegúrese de leer y entender los terminos y condiciones y marque la opción de 'leido'.", "error");
+        swal("Opss!", "Asegúrese de leer y entender los terminos y condiciones.", "error")
+            .then(() => {
+                check2[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                check2.focus();
+            });
         isValid = false;
         return isValid;
     } else {
         check2.removeClass('is-invalid').addClass('is-valid');
     }
 
-    if (!check.is(':checked')) {
+    if (check.length && !check.is(':checked')) {
         check.addClass('is-invalid');
-        swal("Opss!", "Asegúrese de leer y entender los terminos y condiciones y marque la opción de 'leido'.", "error");
+        swal("Opss!", "Asegúrese de leer y entender los terminos y condiciones y marque la opción de 'leido'.", "error")
+            .then(() => {
+                check[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                check.focus();
+            });
         isValid = false;
         return isValid;
     } else {
         check.removeClass('is-invalid').addClass('is-valid');
     }
 
+    // Validar email
     if (email.val() && !(validateEmail(email.val()))) {
         email.addClass('is-invalid');
-        swal("Opsss !", "Inserte un correo válido.", "error");
+        swal("Opsss !", "Inserte un correo válido.", "error").then(() => {
+                email[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                email.focus();
+            });;
         isValid = false;
         return isValid;
     } else if (email.val()) {
@@ -72,16 +110,47 @@ function validateAll() {
         email.addClass('is-valid');
     }
 
+    // Validación de la contraseña
+    if (password.val() && !validateFormatPassword(password)) {
+        swal('Opsss !', 'La contraseña debe tener al menos 8 caracteres y ser alfanumérica.', 'error').then(() => {
+                password[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                password.focus();
+            });;
+        password.removeClass('is-valid').addClass('is-invalid');
+        isValid = false;
+        return isValid;
+    } else if (password.val()) {
+        password.removeClass('is-invalid').addClass('is-valid');
+    }
+
+    if (username.val() && password.val().includes(username.val())) {
+        swal('Opsss !', 'La contraseña NO debe contener el nombre de usuario.', 'error').then(() => {
+                password[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                password.focus();
+            });;
+        password.removeClass('is-valid').addClass('is-invalid');
+        isValid = false;
+        return isValid;
+    } else if (password.val()) {
+        password.removeClass('is-invalid').addClass('is-valid');
+    }
+
     validateField(first_name, "Inserte su nombre.");
     validateField(last_name, "Inserte su apellido.");
     validateField(ci, "Inserte su Carnet de Identidad.");
     validateField(birthday, "El campo 'Fecha de nacimiento' está vacío.");
     validateField(idTribute, "Se ha olvidado el número de identificación tributaria.");
+    validateField(nombreEditorial, "Inserte el nombre o razón social de la Editorial.");
     validateField(provincia, "Se ha olvidado seleccionar una provincia.");
     validateField(municipio, "Se ha olvidado seleccionar un municipio.");
     validateField(address, "La dirección está vacía.");
     validateField(phone, "Inserte su número de teléfono.");
     validateField(email, "Inserte su dirección de correo electrónico.");
+    validateField(fundacion_date, "Inserte la fecha de fundación de la Editorial.");
+    validateField(editorialActivity, "Seleccione la Actividad Principal de la Editorial.");
+    validateField(editorialNaturalezaJud, "Seleccione la Naturaleza Jurídica de la Editorial.");
+    validateField(representante_name, "Inserte el nombre del responsable  de la Editorial.");
+    validateField(representante_apellido, "Inserte el apellido del responsable  de la Editorial.");
     validateField(username, "Inserte su nombre de usuario.");
     validateField(password, "Inserte una contraseña.");
     validateField(editorPrefijo, "Seleccione su número estimado de publicaciones por año.");
@@ -106,6 +175,7 @@ function validateAll() {
         swal("Opss!", "Se ha olvidado de elegir la fecha de creación de la obra musical.", "error");
         isValid = false;
     }
+
     return isValid;
 }
 
@@ -133,7 +203,7 @@ $(document).ready(function () {
 $(document).ready(function (){
 
     // Only letter
-    $('#first_name, #last_name, #autor').keyup(function () {
+    $('#first_name, #last_name, #autor, #representante_apellido, #representante_name, #siglasEditorial').keyup(function () {
         var letter = $(this).val();
         var allow = letter.replace(/[^a-zA-ZáéíóúñÑ]/g, '');
         $(this).val(allow);
@@ -164,10 +234,17 @@ $(document).ready(function (){
 });
 
 // 3) Script to put First Letter capitalized
-$("#autor, #first_name, #last_name").keyup(function () {
+$("#autor, #first_name, #last_name, #representante_apellido, #representante_name").keyup(function () {
     var txt = $(this).val();
     $(this).val(txt.replace(/^(.)|\s(.)/g, function ($1){return $1.toUpperCase( );}));
 });
+
+// 3.1) Script to capitalize siglas
+$("#siglasEditorial").keyup(function () {
+    var txt = $(this).val();
+    $(this).val(txt.toUpperCase());
+});
+
 
 // 4) Script to lowercase input email
 $(document).ready(function (){
@@ -178,7 +255,7 @@ $(document).ready(function (){
 
 // 5) Date validation
 $(document).ready(function (){
-    $('#birthday, #date').blur(function () {
+    $('#birthday, #date, #fundacion_date').blur(function () {
         var currentDate = new Date();
         var date_input = new Date($(this).val())
         if (date_input > currentDate || date_input.getFullYear() < 1900){
@@ -338,6 +415,21 @@ function toggleFunction(){
     }
 }
 
+// 17 Validate Name Editorial
+// Only letter
+$('#nombreEditorial, #selloEditorial').keyup(function () {
+    var letter = $(this).val();
+    var allow = letter.replace(/[^a-zA-ZáéíóúñÑ0-9 ]/g, '');
+    $(this).val(allow);
+
+    // Validar después del reemplazo
+    if ($(this).val().trim() === '') {
+        $(this).removeClass('is-valid').addClass('is-invalid');
+    } else {
+        $(this).removeClass('is-invalid').addClass('is-valid');
+    }
+});
+
 // 18 Prevent to change the editor's prefijo
 $('#editorPrefijo').mousedown((e) => {
     if (e.target.baseURI.includes('/editor/')) {
@@ -355,20 +447,26 @@ $('#btn-accept').click((e) => {
 
 // 20 Ajax Calls to Spinner Loading
 jQuery(function ($) {
+    // Flag para controlar el spinner
+    let spinnerTriggered = false;
+
     // Evento de ajaxSend asociado solo a solicitudes AJAX que provienen del botón con clase 'ajax-submit-btn' para
     // mostrar el spinner y el ´Espere...´
-    $(document).on('ajaxSend', '.ajax-submit-btn', function () {
-        $(".spinner-border").fadeIn(500);
+    $(document).ajaxSend(function (event, xhr, settings) {
+        if (spinnerTriggered) {
+            $(".spinner-border").fadeIn(500);
 
-        let loading = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>&nbsp;
-                       <span role="status">Espere...</span>`
-        $("#btn-add").html(loading);
+            let loading = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>&nbsp;
+                           <span role="status">Espere...</span>`;
+            $("#btn-add").html(loading);
+        }
     });
 
     $("#btn-add").click(function (event) {
-        event.preventDefault();  // Prevenir la acción por defecto del botón de envío
         let val = validateAll();
         if (val) {
+            // Activa el flag
+            spinnerTriggered = true;
             $.ajax({
                 type: 'GET',
                 success: function (data) {
@@ -377,7 +475,12 @@ jQuery(function ($) {
             }).done(() => {
                 setTimeout(() => {
                     $(".spinner-border").fadeOut(500);
+                    // Resetea el flag
+                    spinnerTriggered = false;
                 }, 700);
+            }).fail(() => {
+                // Resetea el flag en caso de error
+                spinnerTriggered = false;
             });
         }
     });
@@ -407,6 +510,23 @@ jQuery(function ($) {
         }
     });
 });
+
+// 21 Validate Adress
+$('#address').keyup(function () {
+        var value = $(this).val();
+        var allow = value.replace(/[^a-zA-ZáéíóúñÑ./:,#0-9 ]/g, '');
+        $(this).val(allow);
+
+        // Validar después del reemplazo
+        if ($(this).val().trim() === '') {
+            $(this).removeClass('is-valid').addClass('is-invalid');
+        } else {
+            $(this).removeClass('is-invalid').addClass('is-valid');
+        }
+    });
+
+
+
 
 var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
 var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {

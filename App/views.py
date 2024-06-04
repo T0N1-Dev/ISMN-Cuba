@@ -27,7 +27,8 @@ from reportlab.graphics.widgets import signsandsymbols
 
 from App.forms import ChangePasswordForm, EditProfileForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
-                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud, CopyDB, Provincia, Municipio)
+                        Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud, CopyDB, Provincia, Municipio,
+                        Caracterizacion)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
 from django.http import HttpResponseRedirect, JsonResponse
@@ -266,10 +267,15 @@ def register_autor_editor(request):
         else:
             if request.POST.get('username') \
                     and request.POST.get('first_name') \
+                    and request.POST.get('last_name') \
                     and request.POST.get('password') \
                     and request.POST.get('phone') \
                     and request.POST.get('email') \
+                    and request.POST.get('birthday') \
+                    and request.POST.get('CI') \
                     and request.POST.get('address') \
+                    and request.POST.get('editorMunicipio') \
+                    and request.POST.get('editorProvincia') \
                     and request.POST.get('idTribute') \
                     and request.POST.get('editorPrefijo'):
                 datos = request.POST.copy()
@@ -290,7 +296,7 @@ def register_autor_editor(request):
                 return render(request, 'registration/email_confirmation.html')
             else:
                 messages.error(request, "Complete todos los campos del formulario")
-                return HttpResponseRedirect('/register_user')
+                return HttpResponseRedirect('/register_autor_editor')
     else:
         provincias_list = Provincia.objects.all()
         return render(request, 'registration/register_user.html', {'provincias': provincias_list})
@@ -347,9 +353,14 @@ def register_editorial(request):
                 return render(request, 'registration/email_confirmation.html')
             else:
                 messages.error(request, "Complete todos los campos del formulario")
-                return HttpResponseRedirect('/register_user')
+                return HttpResponseRedirect('/register_editorial')
     else:
-        return render(request, 'registration/register_editorial.html')
+        actividades = Caracterizacion.ACTIVIDADES
+        naturaleza_juridica = Caracterizacion.NATURALEZA
+        provincias_list = Provincia.objects.all()
+        return render(request, 'registration/register_editorial.html', {'provincias': provincias_list,
+                                                                        'actividades': actividades,
+                                                                        'naturaleza_juridica': naturaleza_juridica})
 
 
 def email_confirmation(request):
