@@ -63,7 +63,12 @@
     {% for solicitud in solicitudes %}
         <tr id="chk_td">
             <td>{{ solicitud.id }}</td>
-            <td>{{ solicitud.editor|default:'-' }}</td>
+            {% if solicitud.editor %}
+                <td>{{ solicitud.editor|default:'-' }}</td>
+            {% else %}
+                <td>{{ solicitud.editorial|default:'-' }}</td>
+            {% endif %}
+
             <td>{{ solicitud.created_at }}</td>
             <td>{{ solicitud.tipo }}</td>
             {% if solicitud.status == 'Pendiente' %}
@@ -104,8 +109,10 @@
                           <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA SOLICITUD ???</span>
                           {% if solicitud.tipo == 'Solicitud-ISMN' %}
                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.title|default:solicitud.editor }}</div>
-                          {% else %}
+                          {% elif solicitud.temporal.first_name %}
                               <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.first_name|default:solicitud.editor }}</div>
+                          {% else %}
+                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.nombreEditorial|default:solicitud.editor }}</div>
                           {% endif %}
                           {% if solicitud.status == 'Pendiente' %}
                               <div class="form-floating mb-3">
@@ -122,7 +129,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
                     {% if solicitud.status == 'Pendiente' %}
-                        <button type="submit" class="btn btn-outline-danger btn-sm" id="rejectButton">
+                        <button type="submit" class="btn btn-outline-danger w-50 btn-sm" id="rejectButton">
                             <i class="fas fa-times"></i>&nbsp;&nbsp;Rechazar
                         </button>
                     {% else %}
@@ -152,7 +159,90 @@
                       <div class="container-fluid" style="font-size: large; text-align: left">
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Nombre de Usuario:</strong> &nbsp;&nbsp;{{ solicitud.temporal.username }}
+                                <strong>Tipo de Editor:</strong> &nbsp;&nbsp;{{ solicitud.temporal.editor_type }}
+                            </div>
+                          </div>
+                          <hr>
+                          {% if solicitud.temporal.editor_type == 'Autor-Editor' %}
+                              <!-- Autor Editor-->
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Nombre:</strong> &nbsp;&nbsp;{{ solicitud.temporal.first_name }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Apellido:</strong> &nbsp;&nbsp;{{ solicitud.temporal.last_name }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Carnet de Identidad:</strong> &nbsp;&nbsp;{{ solicitud.temporal.CI }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Nacimiento:</strong> &nbsp;&nbsp;{{ solicitud.temporal.birthday }}
+                                </div>
+                              </div>
+                              <hr>
+                          {% else %}
+                              <!-- Editorial -->
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Nombre:</strong> &nbsp;&nbsp;{{ solicitud.temporal.nombreEditorial }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Siglas:</strong> &nbsp;&nbsp;{{ solicitud.temporal.siglasEditorial|default:'-' }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Actividad Principal:</strong> &nbsp;&nbsp;{{ solicitud.temporal.editorialActivity }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Naturaleza Jurídica:</strong> &nbsp;&nbsp;{{ solicitud.temporal.editorialNaturalezaJud }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Sello Editorial:</strong> &nbsp;&nbsp;{{ solicitud.temporal.selloEditorial }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Nombre del representante:</strong> &nbsp;&nbsp;{{ solicitud.temporal.representante_name }}
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row mb-1">
+                                <div class="col-12">
+                                    <strong>Apellido del representante:</strong> &nbsp;&nbsp;{{ solicitud.temporal.representante_apellido }}
+                                </div>
+                              </div>
+                              <hr>
+                          {% endif %}
+                          <div class="row mb-1">
+                            <div class="col-12">
+                                <strong>ID Tributaria:</strong> &nbsp;&nbsp;{{ solicitud.temporal.idTribute }}
+                            </div>
+                          </div>
+                          <hr>
+                          <div class="row mb-1">
+                            <div class="col-12">
+                                <strong>Dirección:</strong> &nbsp;&nbsp;{{ solicitud.temporal.editorProvincia }}, {{ solicitud.temporal.editorMunicipio  }}, {{ solicitud.temporal.address }}
                             </div>
                           </div>
                           <hr>
@@ -170,37 +260,7 @@
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Nombre:</strong> &nbsp;&nbsp;{{ solicitud.temporal.first_name }}
-                            </div>
-                          </div>
-                          <hr>
-                          <div class="row mb-1">
-                            <div class="col-12">
-                                <strong>Tipo de Editor:</strong> &nbsp;&nbsp;{{ solicitud.temporal.editorType }}
-                            </div>
-                          </div>
-                          <hr>
-                          <div class="row mb-1">
-                            <div class="col-12">
-                                <strong>Edad:</strong> &nbsp;&nbsp;{{ solicitud.temporal.age|default:'-' }}
-                            </div>
-                          </div>
-                          <hr>
-                          <div class="row mb-1">
-                            <div class="col-12">
-                                <strong>Apellido:</strong> &nbsp;&nbsp;{{ solicitud.temporal.last_name|default:'-' }}
-                            </div>
-                          </div>
-                          <hr>
-                          <div class="row mb-1">
-                            <div class="col-12">
-                                <strong>Dirección:</strong> &nbsp;&nbsp;{{ solicitud.temporal.address }}
-                            </div>
-                          </div>
-                          <hr>
-                          <div class="row mb-1">
-                            <div class="col-12">
-                                <strong>ID Tributaria:</strong> &nbsp;&nbsp;{{ solicitud.temporal.idTribute }}
+                                <strong>Nombre de Usuario:</strong> &nbsp;&nbsp;{{ solicitud.temporal.username }}
                             </div>
                           </div>
                           <hr>

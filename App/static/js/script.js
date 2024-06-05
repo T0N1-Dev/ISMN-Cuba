@@ -472,12 +472,6 @@ jQuery(function ($) {
                 success: function (data) {
                     console.log(data);
                 }
-            }).done(() => {
-                setTimeout(() => {
-                    $(".spinner-border").fadeOut(500);
-                    // Resetea el flag
-                    spinnerTriggered = false;
-                }, 700);
             }).fail(() => {
                 // Resetea el flag en caso de error
                 spinnerTriggered = false;

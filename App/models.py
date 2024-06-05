@@ -157,8 +157,8 @@ class Municipio(models.Model):
 # Direccion donde radican los Editores o editoriales
 class Ubicacion(models.Model):
     direccion = models.CharField(max_length=150)
-    provincia = models.OneToOneField(Provincia, models.PROTECT)
-    municipio = models.OneToOneField(Municipio, models.PROTECT)
+    provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT)
+    municipio = models.ForeignKey(Municipio, on_delete=models.PROTECT)
 
     class Meta:
         verbose_name_plural = "ubicaciones"
@@ -204,12 +204,13 @@ class Editorial(models.Model):
     nombre_sello = models.CharField(max_length=100)
     nombre_responsable = models.CharField(max_length=50)
     apellidos_responsable = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "editoriales"
 
     def __str__(self):
-        return self.user.username
+        return self.user.first_name
 
     def get_state_display(self):
         return 'Activo' if self.state else 'Inactivo'

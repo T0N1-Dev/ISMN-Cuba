@@ -28,7 +28,7 @@ from reportlab.graphics.widgets import signsandsymbols
 from App.forms import ChangePasswordForm, EditProfileForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud, CopyDB, Provincia, Municipio,
-                        Caracterizacion)
+                        Caracterizacion, Editorial, Ubicacion)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
 from django.http import HttpResponseRedirect, JsonResponse
@@ -279,6 +279,9 @@ def register_autor_editor(request):
                     and request.POST.get('idTribute') \
                     and request.POST.get('editorPrefijo'):
                 datos = request.POST.copy()
+                datos.pop('csrfmiddlewaretoken', None)
+                datos['editorProvincia'] = Provincia.objects.get(id=datos['editorProvincia']).__str__()
+                datos['editorMunicipio'] = Municipio.objects.get(id=datos['editorMunicipio']).__str__()
                 if request.FILES:
                     # Convertir la imagen a base64 para poder serializarla a JSON en el request.session
                     datos['imagenProfile'] = base64.b64encode(request.FILES['imagenProfile'].read())
@@ -292,6 +295,7 @@ def register_autor_editor(request):
 
                 confirmation_code = send_code_confirmation(request)
                 datos['code_confirmation'] = confirmation_code
+                datos['editor_type'] = 'Autor-Editor'
                 request.session['datos'] = datos
                 return render(request, 'registration/email_confirmation.html')
             else:
@@ -309,7 +313,6 @@ def register_editorial(request):
         email = request.POST['email']
         phone = request.POST['phone']
         id_tribute = request.POST['idTribute']
-        ci = request.POST.get('CI')
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/login')
@@ -322,20 +325,29 @@ def register_editorial(request):
         elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
             messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
             return HttpResponseRedirect('/login')
-        elif Registered_Data.objects.filter(CI=ci).exists():
-            messages.error(request, "Este número de identidad ya ha sido registrada en nuestra Base de Datos")
-            return HttpResponseRedirect('/login')
         # ===========================
         else:
             if request.POST.get('username') \
-                    and request.POST.get('first_name') \
+                    and request.POST.get('nombreEditorial') \
+                    and request.POST.get('editorProvincia') \
+                    and request.POST.get('editorMunicipio') \
                     and request.POST.get('password') \
                     and request.POST.get('phone') \
                     and request.POST.get('email') \
                     and request.POST.get('address') \
                     and request.POST.get('idTribute') \
+                    and request.POST.get('fundacion_date') \
+                    and request.POST.get('editorialActivity') \
+                    and request.POST.get('editorialNaturalezaJud') \
+                    and request.POST.get('representante_name') \
+                    and request.POST.get('representante_apellido') \
                     and request.POST.get('editorPrefijo'):
                 datos = request.POST.copy()
+                datos.pop('csrfmiddlewaretoken', None)
+                datos['editorProvincia'] = Provincia.objects.get(id=datos['editorProvincia']).__str__()
+                datos['editorMunicipio'] = Municipio.objects.get(id=datos['editorMunicipio']).__str__()
+                datos['editorialActivity'] = dict(Caracterizacion.ACTIVIDADES)[datos['editorialActivity']]
+                datos['editorialNaturalezaJud'] = dict(Caracterizacion.NATURALEZA)[datos['editorialNaturalezaJud']]
                 if request.FILES:
                     # Convertir la imagen a base64 para poder serializarla a JSON en el request.session
                     datos['imagenProfile'] = base64.b64encode(request.FILES['imagenProfile'].read())
@@ -349,6 +361,7 @@ def register_editorial(request):
 
                 confirmation_code = send_code_confirmation(request)
                 datos['code_confirmation'] = confirmation_code
+                datos['editor_type'] = 'Editorial'
                 request.session['datos'] = datos
                 return render(request, 'registration/email_confirmation.html')
             else:
@@ -521,49 +534,108 @@ def guardar_imagen_base64(base64_string, name):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def accept_inscription(request, solicitud_id):
+    # Solicitud aceptada
     solicitud = Solicitud.objects.get(id=solicitud_id)
+    # Prefijo de Autor o de Editorial
     prefijo_editor = generate_prefijo_editor(solicitud.temporal['editorPrefijo'])
+    # Usuario de Autor o Editorial
     user = User()
-    editor = Editor()
     user.username = solicitud.temporal['username']
     user.set_password(solicitud.temporal['password'])
-    user.first_name = solicitud.temporal['first_name']
     user.email = solicitud.temporal['email']
-    if solicitud.temporal['editorType'] == 'Independiente':
+    # Datos en comun para ambos tipos de editores
+    # Ubicacion
+    provincia = Provincia.objects.get(nombre=solicitud.temporal['editorProvincia'])
+    municipio = Municipio.objects.get(nombre=solicitud.temporal['editorMunicipio'])
+    direccion = solicitud.temporal['address']
+    ubicacion = Ubicacion.objects.create(direccion=direccion, provincia=provincia, municipio=municipio)
+    phone = solicitud.temporal['phone']
+    # ID Tributaria
+    id_tributaria = solicitud.temporal['idTribute']
+
+    if solicitud.temporal['editor_type'] == 'Autor-Editor':
+        editor = Editor()
+        user.first_name = solicitud.temporal['first_name']
         user.last_name = solicitud.temporal['last_name']
         editor.birthday = solicitud.temporal['birthday']
-    editor.user = user
-    editor.phone = solicitud.temporal['phone']
-    editor.prefijo = prefijo_editor
-    editor.type = solicitud.temporal['editorType']
-    # PARA TRANSFORMAR DE BASE64 A IMAGE
-    imagen = guardar_imagen_base64(solicitud.temporal['imagenProfile'], user.first_name)
-    editor.image_profile = imagen
-    editor.note = solicitud.temporal['note']
-    editor.directions = solicitud.temporal['address']
-    editor.id_tribute = solicitud.temporal['idTribute']
-    solicitud.editor = editor
-    solicitud.status = 'Atendido'
-    contact = Registered_Data()
-    contact.email = user.email
-    contact.phone = editor.phone
-    contact.user_name = user.username
-    correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email,
-                                   username=user.username, password=solicitud.temporal['password'])
-    solicitud.temporal = {}
-    if correo:
-        user.save()
-        editor.save()
-        solicitud.save()
-        contact.save()
-        messages.success(request,
-                         f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a "
-                         f"su correo. Ahora {user.first_name} ya "
-                         f"puede realizar solicitudes ISMN !")
+        editor.CI = solicitud.temporal['CI']
+        editor.id_tribute = id_tributaria
+        editor.note = solicitud.temporal['note']
+        editor.ubicacion = ubicacion
+        editor.phone = phone
+        editor.user = user
+        editor.prefijo = prefijo_editor
+        # PARA TRANSFORMAR DE BASE64 A IMAGE
+        imagen = guardar_imagen_base64(solicitud.temporal['imagenProfile'], user.first_name)
+        editor.image_profile = imagen
+        solicitud.editor = editor
+        solicitud.status = 'Atendido'
+        contact = Registered_Data()
+        contact.email = user.email
+        contact.phone = phone
+        contact.user_name = user.username
+        contact.CI = editor.CI
+        correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email,
+                                       username=user.username, password=solicitud.temporal['password'])
+        solicitud.temporal = {}
+        if correo:
+            user.save()
+            editor.save()
+            solicitud.save()
+            contact.save()
+            messages.success(request,
+                             f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a "
+                             f"su correo. Ahora {user.first_name} ya "
+                             f"puede realizar solicitudes ISMN !")
 
+        else:
+            messages.error(request, 'Ha ocurrido un error al intentar notificar al correo del cliente, pruebe más tarde')
+        return HttpResponseRedirect('/backend_solicitudes/list_dsc')
     else:
-        messages.error(request, 'Ha ocurrido un error al intentar notificar al correo del cliente, pruebe más tarde')
-    return HttpResponseRedirect('/backend_solicitudes/list_dsc')
+        editorial = Editorial()
+        editorial.id_tribute = id_tributaria
+        editorial.descripcion = solicitud.temporal['note']
+        editorial.sigla = solicitud.temporal['siglasEditorial']
+        editorial.ubicacion = ubicacion
+        editorial.phone = phone
+        fecha_fundacion = solicitud.temporal['fundacion_date']
+        actividad = solicitud.temporal['editorialActivity']
+        naturaleza = solicitud.temporal['editorialNaturalezaJud']
+        caracterizacion = Caracterizacion.objects.create(fecha_fundacion=fecha_fundacion,
+                                                         actividad_principal=actividad, naturaleza_juridica=naturaleza)
+        editorial.caracterizacion = caracterizacion
+        editorial.nombre_sello = solicitud.temporal['selloEditorial']
+        editorial.nombre_responsable = solicitud.temporal['representante_name']
+        editorial.apellidos_responsable = solicitud.temporal['representante_apellido']
+        editorial.user = user
+        editorial.user.first_name = solicitud.temporal['nombreEditorial']
+        editorial.prefijo = prefijo_editor
+        # PARA TRANSFORMAR DE BASE64 A IMAGE
+        imagen = guardar_imagen_base64(solicitud.temporal['imagenProfile'], user.first_name)
+        editorial.image_profile = imagen
+        solicitud.editorial = editorial
+        solicitud.status = 'Atendido'
+        contact = Registered_Data()
+        contact.email = user.email
+        contact.phone = phone
+        contact.user_name = user.username
+        correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email,
+                                       username=user.username, password=solicitud.temporal['password'])
+        solicitud.temporal = {}
+        if correo:
+            user.save()
+            editorial.save()
+            solicitud.save()
+            contact.save()
+            messages.success(request,
+                             f"Se ha aceptado la solicitud de inscripción y se ha notificado a {user.first_name} a "
+                             f"su correo. Ahora {user.first_name} ya "
+                             f"puede realizar solicitudes ISMN !")
+
+        else:
+            messages.error(request,
+                           'Ha ocurrido un error al intentar notificar al correo del cliente, pruebe más tarde')
+        return HttpResponseRedirect('/backend_solicitudes/list_dsc')
 
 
 # Reformat the path to files since their names
@@ -907,10 +979,23 @@ def delete_musical_publication(request, musical_publication_id):
 def delete_solicitud(request, solicitud_id):
     solicitud = Solicitud.objects.get(id=solicitud_id)
     mensaje = "Solicitud eliminada correctamente !"
+    descripcion = request.POST.get('note')
+
+    # Si la solicitud es tipo 'Pendiente' se solicita una explicación del rechazo
     if request.POST.get('note'):
-        descripcion = request.POST.get('note')
-        send_solicitud_ismn_reject(solicitud.editor.user, solicitud.temporal['title'], descripcion)
-        mensaje = "Solicitud eliminada y rechazada correctamente, se le ha notificado los motivos al editor."
+        if solicitud.tipo == 'Solicitud-ISMN':
+            send_solicitud_ismn_reject(solicitud.editor.user, solicitud.temporal['title'], descripcion)
+            mensaje = "Solicitud ISMN eliminada y rechazada correctamente, se le ha notificado los motivos al editor."
+        else:
+            # Se trata de una Solicitud de Inscripcion
+            solicitante_email = solicitud.temporal['email']
+            if 'nombreEditorial' in solicitud.temporal.keys():
+                solicitante = solicitud.temporal['nombreEditorial']
+            else:
+                solicitante = solicitud.temporal['first_name']
+            send_solicitud_inscrip_reject(solicitante, solicitante_email, descripcion)
+            mensaje = "Solicitud de Inscripción eliminada y rechazada correctamente, se le ha notificado los motivos al editor."
+
     if solicitud.tipo == 'Solicitud-ISMN':
         if 'publication_image' in solicitud.temporal.keys() and solicitud.temporal['publication_image']:
             os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
@@ -1042,8 +1127,13 @@ def solicitud_ismn(request):
 def send_code_confirmation(request):
     confirmation_code = randint(1000, 9999)
     print(confirmation_code)
+    nombre = request.POST.get('first_name')
+
+    if request.POST.get('first_name') is None:
+        nombre = request.POST.get('nombreEditorial')
+
     context = {
-        'nombre': request.POST.get('first_name'),
+        'nombre': nombre,
         'code': confirmation_code
     }
     message = loader.render_to_string('emails/mail_confirmation_client.html', context)
@@ -1056,7 +1146,7 @@ def send_code_confirmation(request):
     try:
         email.send()
         return confirmation_code
-    except TimeoutError or SMTPServerDisconnected:
+    except TimeoutError or SMTPServerDisconnected or FileNotFoundError:
         messages.error(request, 'Error en la conexión. Intente más tarde.')
         return HttpResponseRedirect('/')
 
@@ -1077,7 +1167,7 @@ def send_info_inscripcion(nombre, user_email, username, password):
     try:
         email.send()
         return True
-    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError:
+    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError or FileNotFoundError:
         return False
 
 
@@ -1116,7 +1206,7 @@ def send_solicitud_ismn_accepted(user, publicacion):
     try:
         email.send()
         return True
-    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError:
+    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError or FileNotFoundError:
         return False
 
 
@@ -1157,7 +1247,47 @@ def send_solicitud_ismn_reject(user, titulo_solicitud, descripcion):
     try:
         email.send()
         return True
-    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError:
+    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError or FileNotFoundError:
+        return False
+
+
+def send_solicitud_inscrip_reject(solicitante, email, descripcion):
+    context = {
+        'nombre': solicitante,
+        'descripcion': descripcion
+    }
+
+    message = loader.render_to_string('emails/reject_inscription.html', context)
+
+    email = EmailMultiAlternatives(
+        "Solicitud Inscripción rechazada", message,
+        "CCL de Cuba",
+        [email],
+    )
+    email.content_subtype = 'html'
+
+    # Generar el reporte y saber su ruta
+    ruta = Path(f"{BASE_DIR}/App/static/document/requisitos.pdf")
+
+    # Leer el archivo PDF en modo binario
+    with open(ruta, "rb") as archivo_pdf:
+        contenido_pdf = archivo_pdf.read()
+
+    # Crear un objeto MIMEBase
+    archivo_adjunto = MIMEBase('application', 'octet-stream')
+    archivo_adjunto.set_payload(contenido_pdf)
+
+    # Codificar el archivo adjunto en base64
+    encoders.encode_base64(archivo_adjunto)
+
+    # Establecer las cabeceras del archivo adjunto
+    archivo_adjunto.add_header('Content-Disposition', f'attachment; filename="{ruta.name}"')
+
+    email.attach(archivo_adjunto)
+    try:
+        email.send()
+        return True
+    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError or FileNotFoundError:
         return False
 
 
