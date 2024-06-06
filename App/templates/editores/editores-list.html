@@ -99,7 +99,7 @@
                                 </th>
                                 <th style="width: 10%" class="th_button">
                                     <a style="border-radius: 0" href="/backend/{{ flag }}" class="btn btn-secondary btn-header-list">
-                                        Tipo &nbsp;<i class="fa fa-arrows-up-down"></i>
+                                        CI &nbsp;<i class="fa fa-arrows-up-down"></i>
                                     </a>
                                 </th>
                                 <th style="width: 12%" class="th_button">
@@ -141,12 +141,8 @@
                         {% for editor in editores %}
                             <tr id="chk_td">
                                 <td>{{ editor.id }}</td>
-                                {% if editor.type  == 'Independiente' %}
-                                    <td>Independiente</td>
-                                {% else %}
-                                    <td>Empresa</td>
-                                {% endif %}
-                                <td>{{ editor.user }}</td>
+                                <td>{{ editor.CI }}</td>
+                                <td>{{ editor.user.first_name }}</td>
                                 <td>{{ editor.id_tribute }}</td>
                                 {% if editor.prefijo.value < 10 %}
                                     <td>0{{ editor.prefijo }}</td>
@@ -158,7 +154,7 @@
                                 {% else %}
                                     <td>Inactivo</td>
                                 {% endif %}
-                                <td>{{ editor.directions }}</td>
+                                <td>{{ editor.ubicacion.provincia }}, {{ editor.ubicacion.municipio }}, {{ editor.ubicacion.direccion }}</td>
                                 <td>{{ editor.phone }}</td>
                                 <td>
                                     <a href="{% url 'editor' editor.id %}"
@@ -272,17 +268,17 @@
                                                   <div class="form-check">
                                                       <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoE" value="Compañia">
                                                       <label class="form-check-label" for="flexRadioTipoE">
-                                                        Empresa
+                                                        Editorial
                                                       </label>
                                                   </div>
                                                   <div class="form-check">
-                                                      <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoI" value="Independiente">
+                                                      <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoI" value="Independiente" checked>
                                                       <label class="form-check-label" for="flexRadioTipoI">
-                                                        Independiente
+                                                        Autor-Editor
                                                       </label>
                                                   </div>
                                                   <div class="form-check">
-                                                      <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoA" value="Ambos" checked>
+                                                      <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoA" value="Ambos">
                                                       <label class="form-check-label" for="flexRadioTipoA">
                                                         Ambos
                                                       </label>
@@ -307,15 +303,21 @@
                                             </div>
                                         </div>
                                         <div class="row mb-2">
+                                            <div class="col-12 ms-auto" style="text-align: left">
+                                                <div class="form-floating">
+                                                  <input type="text" class="form-control" name="CI" id="floatingInput2" maxlength="11" placeholder="-">
+                                                  <label for="floatingInput2">Carnet de Identidad</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
                                             <div class="col-12 ms-auto" style="text-align: left;">
                                                 <div class="form-floating">
                                                   <select class="form-select" id="floatingSelect" name="rango" aria-label="Floating label select example">
                                                       <option selected>Todos</option>
-                                                      <option value="99">Menores</option>
-                                                      <option value="999">100-999</option>
-                                                      <option value="9999">1000-9999</option>
-                                                      <option value="99999">10000-99999</option>
-                                                      <option value="999999">Mayores</option>
+                                                      {% for rango in rangos %}
+                                                          <option value="{{ rango.rango_superior }}">{{ rango }}</option>
+                                                      {% endfor %}
                                                   </select>
                                                   <label for="floatingSelect">Selecciona un rango de prefijo</label>
                                                 </div>

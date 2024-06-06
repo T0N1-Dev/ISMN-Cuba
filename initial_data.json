@@ -1081,14 +1081,6 @@
   },
   {
     "model": "App.municipio",
-    "pk": 122,
-    "fields": {
-      "nombre": "Baguanos",
-      "provincia": 12
-    }
-  },
-  {
-    "model": "App.municipio",
     "pk": 123,
     "fields": {
       "nombre": "Banes",
@@ -1201,17 +1193,9 @@
   },
   {
     "model": "App.municipio",
-    "pk": 137,
-    "fields": {
-      "nombre": "Báguano",
-      "provincia": 12
-    }
-  },
-  {
-    "model": "App.municipio",
     "pk": 138,
     "fields": {
-      "nombre": "Campechuela",
+      "nombre": "Contramaestre",
       "provincia": 13
     }
   },
@@ -1219,7 +1203,7 @@
     "model": "App.municipio",
     "pk": 139,
     "fields": {
-      "nombre": "Cauto Cristo",
+      "nombre": "Guamá",
       "provincia": 13
     }
   },
@@ -1227,7 +1211,7 @@
     "model": "App.municipio",
     "pk": 140,
     "fields": {
-      "nombre": "Granma",
+      "nombre": "Julio Antonio Mella",
       "provincia": 13
     }
   },
@@ -1235,7 +1219,7 @@
     "model": "App.municipio",
     "pk": 141,
     "fields": {
-      "nombre": "Guisa",
+      "nombre": "Palma Soriano",
       "provincia": 13
     }
   },
@@ -1243,7 +1227,7 @@
     "model": "App.municipio",
     "pk": 142,
     "fields": {
-      "nombre": "Jiguaní",
+      "nombre": "San Luis",
       "provincia": 13
     }
   },
@@ -1251,7 +1235,7 @@
     "model": "App.municipio",
     "pk": 143,
     "fields": {
-      "nombre": "Manzanillo",
+      "nombre": "Santiago de Cuba",
       "provincia": 13
     }
   },
@@ -1259,7 +1243,7 @@
     "model": "App.municipio",
     "pk": 144,
     "fields": {
-      "nombre": "Media Luna",
+      "nombre": "Segundo Frente",
       "provincia": 13
     }
   },
@@ -1267,7 +1251,7 @@
     "model": "App.municipio",
     "pk": 145,
     "fields": {
-      "nombre": "Niquero",
+      "nombre": "Songo la Maya",
       "provincia": 13
     }
   },
@@ -1275,47 +1259,7 @@
     "model": "App.municipio",
     "pk": 146,
     "fields": {
-      "nombre": "Pilón",
-      "provincia": 13
-    }
-  },
-  {
-    "model": "App.municipio",
-    "pk": 147,
-    "fields": {
-      "nombre": "Río Cauto",
-      "provincia": 13
-    }
-  },
-  {
-    "model": "App.municipio",
-    "pk": 148,
-    "fields": {
-      "nombre": "Yara",
-      "provincia": 13
-    }
-  },
-  {
-    "model": "App.municipio",
-    "pk": 149,
-    "fields": {
-      "nombre": "Bayamo",
-      "provincia": 13
-    }
-  },
-  {
-    "model": "App.municipio",
-    "pk": 150,
-    "fields": {
-      "nombre": "Buey Arriba",
-      "provincia": 13
-    }
-  },
-  {
-    "model": "App.municipio",
-    "pk": 151,
-    "fields": {
-      "nombre": "Bartolomé Masó",
+      "nombre": "Tercer Frente",
       "provincia": 13
     }
   },
@@ -1323,7 +1267,7 @@
     "model": "App.municipio",
     "pk": 152,
     "fields": {
-      "nombre": "Alto Songo",
+      "nombre": "Baracoa",
       "provincia": 14
     }
   },
@@ -1331,7 +1275,7 @@
     "model": "App.municipio",
     "pk": 153,
     "fields": {
-      "nombre": "Contramaestre",
+      "nombre": "Caimanera",
       "provincia": 14
     }
   },
@@ -1339,7 +1283,7 @@
     "model": "App.municipio",
     "pk": 154,
     "fields": {
-      "nombre": "Guamá",
+      "nombre": "El Salvador",
       "provincia": 14
     }
   },
@@ -1347,7 +1291,7 @@
     "model": "App.municipio",
     "pk": 155,
     "fields": {
-      "nombre": "Julio Antonio Mella",
+      "nombre": "Guantánamo",
       "provincia": 14
     }
   },
@@ -1355,7 +1299,7 @@
     "model": "App.municipio",
     "pk": 156,
     "fields": {
-      "nombre": "Mella",
+      "nombre": "Imías",
       "provincia": 14
     }
   },
@@ -1363,7 +1307,7 @@
     "model": "App.municipio",
     "pk": 157,
     "fields": {
-      "nombre": "Palma Soriano",
+      "nombre": "Maisí",
       "provincia": 14
     }
   },
@@ -1371,7 +1315,7 @@
     "model": "App.municipio",
     "pk": 158,
     "fields": {
-      "nombre": "San Luis",
+      "nombre": "Manuel Tames",
       "provincia": 14
     }
   },
@@ -1379,7 +1323,7 @@
     "model": "App.municipio",
     "pk": 159,
     "fields": {
-      "nombre": "Segundo Frente",
+      "nombre": "Niceto Pérez",
       "provincia": 14
     }
   },
@@ -1387,7 +1331,7 @@
     "model": "App.municipio",
     "pk": 160,
     "fields": {
-      "nombre": "Songo La Maya",
+      "nombre": "San Antonio del Sur",
       "provincia": 14
     }
   },
@@ -1395,7 +1339,7 @@
     "model": "App.municipio",
     "pk": 161,
     "fields": {
-      "nombre": "Tercer Frente",
+      "nombre": "Yateras",
       "provincia": 14
     }
   },
@@ -1403,96 +1347,112 @@
     "model": "App.municipio",
     "pk": 162,
     "fields": {
-      "nombre": "Santiago de Cuba",
-      "provincia": 14
+      "nombre": "Municipio Especial",
+      "provincia": 15
     }
   },
   {
     "model": "App.municipio",
     "pk": 163,
     "fields": {
-      "nombre": "Guantánamo",
-      "provincia": 15
+      "nombre": "Bartolomé Masó",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 164,
     "fields": {
-      "nombre": "Caimanera",
-      "provincia": 15
+      "nombre": "Bayamo",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 165,
     "fields": {
-      "nombre": "Baracoa",
-      "provincia": 15
+      "nombre": "Buey Arriba",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 166,
     "fields": {
-      "nombre": "Maisí",
-      "provincia": 15
+      "nombre": "Campechuela",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 167,
     "fields": {
-      "nombre": "Imías",
-      "provincia": 15
+      "nombre": "Cauto Cristo",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 168,
     "fields": {
-      "nombre": "San Antonio del Sur",
-      "provincia": 15
+      "nombre": "Guisa",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 169,
     "fields": {
-      "nombre": "Yateras",
-      "provincia": 15
+      "nombre": "Jiguaní",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 170,
     "fields": {
-      "nombre": "El Salvador",
-      "provincia": 15
+      "nombre": "Manzanillo",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 171,
     "fields": {
-      "nombre": "Niceto Pérez",
-      "provincia": 15
+      "nombre": "Media Luna",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 172,
     "fields": {
-      "nombre": "Manuel Tames",
-      "provincia": 15
+      "nombre": "Niquero",
+      "provincia": 16
     }
   },
   {
     "model": "App.municipio",
     "pk": 173,
     "fields": {
-      "nombre": "Yateras",
-      "provincia": 15
+      "nombre": "Pilón",
+      "provincia": 16
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 174,
+    "fields": {
+      "nombre": "Río Cauto",
+      "provincia": 16
+    }
+  },
+  {
+    "model": "App.municipio",
+    "pk": 175,
+    "fields": {
+      "nombre": "Yara",
+      "provincia": 16
     }
   }
 ]

@@ -12,6 +12,12 @@ function validateFormatPassword(password) {
     return passwordPattern.test(password.val())
 }
 
+function validateCI(ci) {
+    let ciValue = ci.val();
+    let ciPattern = /^\d{11}$/;
+    return ciPattern.test(ciValue);
+}
+
 function validateAll() {
     let isValid = true;
 
@@ -51,7 +57,6 @@ function validateAll() {
     let editorialNaturalezaJud = $('#editorialNaturalezaJud');
     let representante_name = $('#representante_name');
     let representante_apellido = $('#representante_apellido');
-    let selloEditorial = $('#selloEditorial');
 
     // Ambos
     let provincia = $('#editorProvincia');
@@ -102,7 +107,7 @@ function validateAll() {
         swal("Opsss !", "Inserte un correo válido.", "error").then(() => {
                 email[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                 email.focus();
-            });;
+            });
         isValid = false;
         return isValid;
     } else if (email.val()) {
@@ -115,7 +120,7 @@ function validateAll() {
         swal('Opsss !', 'La contraseña debe tener al menos 8 caracteres y ser alfanumérica.', 'error').then(() => {
                 password[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                 password.focus();
-            });;
+            });
         password.removeClass('is-valid').addClass('is-invalid');
         isValid = false;
         return isValid;
@@ -127,12 +132,25 @@ function validateAll() {
         swal('Opsss !', 'La contraseña NO debe contener el nombre de usuario.', 'error').then(() => {
                 password[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                 password.focus();
-            });;
+            });
         password.removeClass('is-valid').addClass('is-invalid');
         isValid = false;
         return isValid;
     } else if (password.val()) {
         password.removeClass('is-invalid').addClass('is-valid');
+    }
+
+    // Validar el CI
+    if (ci.val() && !validateCI(ci)){
+        swal('Opsss !', 'La número de carnet de identidad debe tener 11 dígitos.', 'error').then(() => {
+                ci[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                ci.focus();
+            });
+        ci.removeClass('is-valid').addClass('is-invalid');
+        isValid = false;
+        return isValid;
+    } else if (ci.val()) {
+        ci.removeClass('is-invalid').addClass('is-valid');
     }
 
     validateField(first_name, "Inserte su nombre.");
@@ -175,7 +193,6 @@ function validateAll() {
         swal("Opss!", "Se ha olvidado de elegir la fecha de creación de la obra musical.", "error");
         isValid = false;
     }
-
     return isValid;
 }
 
@@ -203,7 +220,7 @@ $(document).ready(function () {
 $(document).ready(function (){
 
     // Only letter
-    $('#first_name, #last_name, #autor, #representante_apellido, #representante_name, #siglasEditorial').keyup(function () {
+    $('#first_name, #last_name, #autor, #representante_apellido, #representante_name, #siglasEditorial, #floatingInput').keyup(function () {
         var letter = $(this).val();
         var allow = letter.replace(/[^a-zA-ZáéíóúñÑ]/g, '');
         $(this).val(allow);
@@ -316,10 +333,11 @@ $(document).ready(function () {
         let currentDate = new Date();
         let date_input = new Date($(this).val())
         let p_error = $('#p_error')
-        if (date_input > currentDate || date_input.getFullYear() < 1900){
+        console.log($(this).val())
+        if (date_input > currentDate || date_input.getFullYear() < 1900 || $(this).val().length < 10){
             $(this).addClass('is-invalid');
             $(this).val('')
-            p_error.removeAttr('hidden').html('&ast;&nbsp;No es posible viajar en el tiempo.');
+            p_error.removeAttr('hidden').html('&ast;&nbsp;Fecha incorrecta.');
         }
         else {
             $(this).removeClass('is-invalid');
@@ -349,7 +367,7 @@ if (verify === 0) {
 }
 
 // 12) Script to allow only numbers in ID Tribute
-$("#idTribute, #CI").keyup(function () {
+$("#idTribute, #CI, #floatingInput2").keyup(function () {
     if(!/^[0-9]*$/.test(this.value)) {
         this.value = this.value.split(/[^0-9]/).join('');
     }
@@ -372,6 +390,9 @@ $(document).ready(function(){
             // Si no está vacío, enviar el formulario
             $('#floatingTextarea3').removeClass('is-invalid');
             $('#form-reject').submit();
+            $('#rejectButton i').remove();
+            $('.invalid-feedback-spinner').removeAttr('hidden');
+
         }
     });
 });
@@ -431,10 +452,10 @@ $('#nombreEditorial, #selloEditorial').keyup(function () {
 });
 
 // 18 Prevent to change the editor's prefijo
-$('#editorPrefijo').mousedown((e) => {
+$('#editorPrefijo, #userPassword').mousedown((e) => {
     if (e.target.baseURI.includes('/editor/')) {
         e.preventDefault();
-        swal('Error', 'No es posible editar o cambiar los prefijos asignados a los editores', 'error');
+        swal('Error', 'No es posible editar o cambiar los prefijos asignados a los editores ni sus contraseñas.', 'error');
     }
 })
 
@@ -468,10 +489,7 @@ jQuery(function ($) {
             // Activa el flag
             spinnerTriggered = true;
             $.ajax({
-                type: 'GET',
-                success: function (data) {
-                    console.log(data);
-                }
+                type: 'GET'
             }).fail(() => {
                 // Resetea el flag en caso de error
                 spinnerTriggered = false;
@@ -492,7 +510,13 @@ jQuery(function ($) {
                 success: function (data) {
                     var municipioSelect = $('#editorMunicipio');
                     municipioSelect.empty();
-                    municipioSelect.append('<option value="" hidden>Municipio</option>');
+                    // Si la provincia es Isla de la Juventud
+                    if (provinciaId === '15') {
+                        municipioSelect.append('<option value="162" hidden>Municipio Especial</option>');
+                    } else {
+                        municipioSelect.append('<option value="" hidden>Municipio</option>');
+                    }
+
                     $.each(data, function (index, municipio) {
                         municipioSelect.append('<option value="' + municipio.id + '">' + municipio.nombre + '</option>');
                     });

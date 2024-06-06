@@ -64,14 +64,12 @@ class Rango_Prefijo_Editor(models.Model):
     PUBLICADOR_MEDIO = "P-Medio"  # rango-inferior: 100 rango-superior: 999
     PUBLICADOR_MEDIO_INFERIOR = "P-Medio_Inferior"  # rango-inferior: 1000 rango-superior: 9999
     PUBLICADOR_INFERIOR = "P-Inferior"  # rango-inferior: 10000 rango-superior: 99999
-    PUBLICADOR_MENOR = "P-Menor"  # rango-inferior: 100000 rango-superior: 999999
 
     TYPE = {
         (PUBLICADOR_SUPERIOR, "P-Superior"),
         (PUBLICADOR_MEDIO, "P-Medio"),
         (PUBLICADOR_MEDIO_INFERIOR, "P-Medio_Inferior"),
-        (PUBLICADOR_INFERIOR, "P-Inferior"),
-        (PUBLICADOR_MENOR, "P-Menor")
+        (PUBLICADOR_INFERIOR, "P-Inferior")
     }
 
     rango_inferior = models.PositiveIntegerField()
@@ -164,7 +162,9 @@ class Ubicacion(models.Model):
         verbose_name_plural = "ubicaciones"
 
     def __str__(self):
-        return self.direccion
+        return f'{self.provincia}, {self.municipio}, {self.direccion}'
+
+
 
 
 # Solo para Editoriales
@@ -228,6 +228,7 @@ class Editor(models.Model):
     state = models.BooleanField(default=True)
     CI = models.PositiveSmallIntegerField(unique=True, null=True, blank=True)
     ubicacion = models.OneToOneField(Ubicacion, models.CASCADE)
+    descripcion = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "editores"

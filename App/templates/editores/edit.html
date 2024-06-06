@@ -23,16 +23,21 @@
 {% block Value-password %} value = ******** {% endblock Value-password %}
 {% block Value-phone %} value = "{{ editor.phone }}" {% endblock Value-phone %}
 {% block Value-email %} value = "{{ editor.user.email }}" {% endblock Value-email %}
-{% block Editor-type %}
-    <option id="seleccion_editor_type" style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
-    {{ editor.type }}
-{% endblock Editor-type %}
+{% block Value-direction %} value = "{{ editor.ubicacion.direccion }}" {% endblock Value-direction %}
+{% block Value-provincia %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
+    {{ editor.ubicacion.provincia }}
+{% endblock Value-provincia %}
+{% block Value-municipio %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
+    {{ editor.ubicacion.municipio }}
+{% endblock Value-municipio %}
+{% block Value-ci %} value= "{{ editor.CI }}" {% endblock Value-ci %}>
 {% block Value-birthday %} value = "{{ editor.birthday | date:"Y-m-d" }}" {% endblock Value-birthday %}
 {% block Value-nombre %} value = "{{ editor.user.first_name }}" {% endblock Value-nombre %}
 {% block Value-apellido %} value = "{{ editor.user.last_name }}" {% endblock Value-apellido %}
-{% block Value-direction %} value = "{{ editor.directions }}" {% endblock Value-direction %}
 {% block Value-tribute %} value = "{{ editor.id_tribute }}" {% endblock Value-tribute %}
-{% block Value-description %}{{ editor.note }}{% endblock Value-description %}
+{% block Value-description %}{{ editor.descripcion }}{% endblock Value-description %}
 {% block Value-publications_per_year %}
     <option id="editor_prefijo" style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
     {{ editor.prefijo.rango }}

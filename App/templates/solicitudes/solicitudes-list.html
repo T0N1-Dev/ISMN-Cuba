@@ -129,8 +129,10 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
                     {% if solicitud.status == 'Pendiente' %}
-                        <button type="submit" class="btn btn-outline-danger w-50 btn-sm" id="rejectButton">
-                            <i class="fas fa-times"></i>&nbsp;&nbsp;Rechazar
+                        <button type="submit" class="btn d-flex justify-content-center align-items-center btn-outline-danger w-50 btn-sm" id="rejectButton">
+                            <div class="spinner-border text-danger invalid-feedback-spinner" style="width: 20px; height: 20px" hidden role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div><i class="fa fa-times fs-5"></i>&nbsp;&nbsp;Rechazar
                         </button>
                     {% else %}
                         <button type="submit" class="btn btn-outline-danger btn-sm">

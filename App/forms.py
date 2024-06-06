@@ -21,8 +21,8 @@ class ChangePasswordForm(PasswordChangeForm):
 
 
 class EditProfileForm(UserChangeForm):
-    first_name = forms.CharField(label='Nombre', validators=[RegexValidator(r'^[a-zA-Z]*$', 'Solo se permiten letras.')])
-    last_name = forms.CharField(label='Apellidos', validators=[RegexValidator(r'^[a-zA-Z]*$', 'Solo se permiten letras.')])
+    first_name = forms.CharField(label='Nombre', validators=[RegexValidator(r'^[a-zA-Zñáéíóú]*$', 'Solo se permiten letras.')])
+    last_name = forms.CharField(label='Apellidos', validators=[RegexValidator(r'^[a-zA-Zñáéíóú]*$', 'Solo se permiten letras.')])
 
     class Meta:
         model = User

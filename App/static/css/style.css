@@ -107,6 +107,11 @@ body {
     animation: preloader 1.2s forwards;
 }
 
+#rejectButton:hover .spinner-border {
+    color: #dc3545; /* Cambiar el color del spinner */
+    border-color: #ffffff; /* Cambiar el borde del spinner */
+}
+
 @keyframes preloader {
     to {
         transform: rotate(360deg);

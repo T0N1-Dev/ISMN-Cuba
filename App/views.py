@@ -248,6 +248,7 @@ def register_autor_editor(request):
         phone = request.POST['phone']
         id_tribute = request.POST['idTribute']
         ci = request.POST.get('CI')
+        print(request.POST)
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/login')
@@ -412,12 +413,13 @@ def backend_editores(request, order):
             flag = 'list_dsc'
             q = request.GET['q']
             all_editor_list = Editor.objects.filter(
-                Q(user__username__icontains=q) | Q(user__email__icontains=q) | Q(directions__icontains=q) |
-                Q(note__icontains=q) | Q(user__first_name__icontains=q) | Q(type__icontains=q)
+                Q(user__username__icontains=q) | Q(user__email__icontains=q) | Q(ubicacion__provincia__nombre__icontains=q) |
+                Q(ubicacion__municipio__nombre__icontains=q) | Q(ubicacion__direccion__icontains=q) |
+                Q(descripcion__icontains=q) | Q(user__first_name__icontains=q)
             ).order_by('-user__date_joined')
             if q.isnumeric():
-                all_editor_list = Editor.objects.filter(Q(phone__contains=q) | Q(prefijo__value__contains=q) |
-                                                        Q(id_tribute=q)).order_by('-user__date_joined')
+                all_editor_list = Editor.objects.filter(Q(phone__contains=q) | Q(prefijo__value__contains=int(q)) |
+                                                        Q(id_tribute__contains=int(q))).order_by('-user__date_joined')
         elif order == 'list_dsc':
             all_editor_list = Editor.objects.all()[::-1]
             # Para ordenar ascendente o descendente
@@ -431,9 +433,12 @@ def backend_editores(request, order):
         all_editor = paginator.get_page(page)
         solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
         usuario = request.user
+        rangos = Rango_Prefijo_Editor.objects.all()
         return render(request, 'editores/editores-list.html', {"editores": all_editor,
                                                                'solicitudes_pendientes': solicitudes_pendientes,
-                                                               'usuario': usuario, 'flag': flag})
+                                                               'usuario': usuario,
+                                                               'rangos': rangos,
+                                                               'flag': flag})
 
 
 # Function to render publication's lists
@@ -478,8 +483,8 @@ def backend_solicitudes(request, order):
             flag = 'list_dsc'
             q = request.GET['q']
             all_solicitudes_list = Solicitud.objects.filter(
-                Q(tipo__icontains=q) | Q(editor__user__username__icontains=q) |
-                Q(status__icontains=q, deleted=False)
+                Q(tipo__icontains=q) | Q(editor__user__first_name__icontains=q) |
+                Q(editorial__user__first_name=q) | Q(status__icontains=q, deleted=False)
             ).order_by('-created_at')
         elif order == 'list_dsc':
             all_solicitudes_list = Solicitud.objects.filter(deleted=False).order_by('-created_at')
@@ -711,6 +716,7 @@ def add_editor(request):
         email = request.POST['email']
         phone = request.POST['phone']
         id_tribute = request.POST['idTribute']
+        ci = request.POST.get('CI')
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
             return HttpResponseRedirect('/add_editor')
@@ -723,40 +729,49 @@ def add_editor(request):
         elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
             messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
             return HttpResponseRedirect('/add_editor')
+        elif Registered_Data.objects.filter(CI=ci).exists():
+            messages.error(request, "Este número de identidad ya ha sido registrada en nuestra Base de Datos")
+            return HttpResponseRedirect('/login')
         # ===========================
         else:
             if request.POST.get('username') \
                     and request.POST.get('first_name') \
+                    and request.POST.get('last_name') \
                     and request.POST.get('password') \
                     and request.POST.get('phone') \
                     and request.POST.get('email') \
-                    and request.POST.get('editorType') \
+                    and request.POST.get('birthday') \
+                    and request.POST.get('CI') \
                     and request.POST.get('address') \
+                    and request.POST.get('editorMunicipio') \
+                    and request.POST.get('editorProvincia') \
                     and request.POST.get('idTribute') \
                     and request.POST.get('editorPrefijo'):
                 editor = Editor()
                 user = User()
                 user.username = request.POST.get('username')
-                user.set_password(request.POST.get('password'))
                 user.first_name = request.POST.get('first_name')
+                user.last_name = request.POST.get('last_name')
+                user.set_password(request.POST.get('password'))
                 editor.phone = request.POST.get('phone')
                 user.email = request.POST.get('email')
-                editor.directions = request.POST.get('address')
-                editor.type = request.POST.get('editorType')
-                if editor.type == 'Independiente':
-                    user.last_name = request.POST.get('last_name')
-                    editor.birthday = request.POST.get('birthday')
-                editor.directions = request.POST.get('address')
+                editor.birthday = request.POST.get('birthday')
+                editor.CI = request.POST.get('CI')
+                provincia = Provincia.objects.get(id=request.POST.get('editorProvincia'))
+                municipio = Municipio.objects.get(id=request.POST.get('editorMunicipio'))
+                direccion = request.POST.get('address')
+                ubicacion = Ubicacion.objects.create(provincia=provincia, municipio=municipio, direccion=direccion)
+                editor.ubicacion = ubicacion
                 editor.id_tribute = request.POST.get('idTribute')
-                editor.user = user
                 editor.prefijo = generate_prefijo_editor(request.POST.get('editorPrefijo'))
-                editor.note = request.POST.get('note')
+                editor.descripcion = request.POST.get('note')
                 image_profile = request.FILES.get('image_profile')
                 if image_profile:
                     if image_profile.size > 10 * 1024 * 1024:
                         messages.error(request, "La imagen no puede ser mayor a 10 MB")
                         return HttpResponseRedirect('/add_editor')
                     editor.image_profile = request.FILES.get('imagenProfile')
+                editor.user = user
                 user.save()
                 editor.save()
                 # Register email and phone inside BD
@@ -765,6 +780,7 @@ def add_editor(request):
                 contact.email = email
                 contact.phone = phone
                 contact.id_tribute = id_tribute
+                contact.CI = ci
                 contact.save()
                 # ========================
 
@@ -776,7 +792,8 @@ def add_editor(request):
                                     'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
             return HttpResponseRedirect('/backend/list_dsc')
         else:
-            return render(request, "editores/add.html")
+            provincias_list = Provincia.objects.all()
+            return render(request, "editores/add.html", {'provincias': provincias_list})
 
 
 # Function to delete Editor
@@ -805,7 +822,9 @@ def editor(request, editor_id):
                                     'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
             return HttpResponseRedirect('/backend/list_dsc')
         else:
-            return render(request, "editores/edit.html", {"editor": editor})
+            provincias_list = Provincia.objects.all()
+            return render(request, "editores/edit.html", {"editor": editor,
+                                                          "provincias": provincias_list})
     else:
         return HttpResponseRedirect('/backend/list_dsc')
 
@@ -819,19 +838,25 @@ def edit_editor(request):
         if editor:
             editor.user.username = request.POST.get('username')
             editor.user.first_name = request.POST.get('first_name')
+            editor.user.last_name = request.POST.get('last_name')
+            editor.CI = request.POST.get('CI')
+            editor.birthday = request.POST.get("birthday")
+            editor.id_tribute = request.POST.get("idTribute")
+            editor.descripcion = request.POST.get("note")
+            if request.POST.get('editorProvincia').isnumeric():
+                editor.ubicacion.provincia = Provincia.objects.get(id=request.POST.get('editorProvincia'))
+                editor.ubicacion.municipio = Municipio.objects.get(id=request.POST.get('editorMunicipio'))
+            editor.ubicacion.direccion = request.POST.get('address')
             editor.phone = request.POST.get('phone')
             editor.user.email = request.POST.get("email")
-            editor.directions = request.POST.get('address')
-            editor.type = request.POST.get("editorType")
-            if request.POST.get('birthday'):
-                editor.birthday = request.POST.get("birthday")
-                editor.user.last_name = request.POST.get('last_name')
-            editor.id_tribute = request.POST.get("idTribute")
-            editor.note = request.POST.get("note")
-            editor.image_profile = request.FILES.get('imagenProfile')
+            if request.FILES:
+                editor.image_profile = request.FILES.get('image_profile')
+            editor.user.save()
+            editor.ubicacion.save()
             editor.save()
             messages.success(request, "Editor editado correctamente !")
             return HttpResponseRedirect('/backend/list_dsc')
+
 
 
 # Function to show musical collections
@@ -1547,23 +1572,25 @@ def extraer_datos_model(modelo_list):
         contenido['Género'] = [publicacion.gender for publicacion in modelo_list]
     elif modelo_type == 'editor':
         contenido['ID'] = [editor.id for editor in modelo_list]
-        contenido['Tipo'] = [editor.type for editor in modelo_list]
         contenido['Nombre'] = [editor.user.first_name for editor in modelo_list]
+        contenido['CI'] = [editor.CI for editor in modelo_list]
         contenido['ID Tributaria'] = [editor.id_tribute for editor in modelo_list]
         contenido['Prefijo'] = [editor.prefijo for editor in modelo_list]
         contenido['Estado'] = [editor.get_state_display() for editor in modelo_list]
-        contenido['Dirección'] = [editor.directions for editor in modelo_list]
+        contenido['Dirección'] = [editor.ubicacion for editor in modelo_list]
         contenido['Teléfono'] = [editor.phone for editor in modelo_list]
     elif modelo_type == 'solicitud':
         contenido['ID'] = [solicitud.id for solicitud in modelo_list]
         contenido['Editor'] = [solicitud.editor.user.first_name if solicitud.editor else '-' for solicitud in
                                modelo_list]
-        contenido['Solicitante'] = [solicitud.temporal['first_name'] if solicitud.tipo == 'Solicitud-Inscripción'
-                                                                        and solicitud.status == 'Pendiente' else '-'
+        contenido['Solicitante'] = [solicitud.temporal['first_name'] if 'first_name' in solicitud.temporal
+                                    else solicitud.temporal['nombreEditorial'] if solicitud.temporal else '-'
                                     for solicitud in modelo_list]
         contenido['Fecha'] = [solicitud.created_at.strftime('%Y-%m-%d') for solicitud in modelo_list]
         contenido['Tipo'] = [solicitud.tipo for solicitud in modelo_list]
         contenido['Estado'] = [solicitud.status for solicitud in modelo_list]
+        contenido['Rechazada'] = ['Si' if solicitud.deleted and solicitud.status == 'Pendiente' else 'No'
+                                  for solicitud in modelo_list]
     else:
         pass
     return contenido
@@ -1583,11 +1610,11 @@ def crear_report_list(model_list, buffer):
         title = 'Publicaciones Musicales'
         col_widths = [30, 120, 120, 110, 110, 110]
     elif tipo == 'Editor':
-        title = 'Editores'
-        col_widths = [30, 90, 120, 90, 60, 50, 160, 90]
+        title = 'Autores-Editores'
+        col_widths = [25, 80, 70, 80, 40, 50, 260, 90]
     else:
         title = 'Solicitudes'
-        col_widths = [30, 130, 130, 100, 115, 110]
+        col_widths = [25, 100, 130, 90, 115, 90, 60]
 
     # Importar las fuentes externas
     pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
@@ -1755,9 +1782,9 @@ def export_editores_list(request):
     buffer = io.BytesIO()
 
     # Filtros de exportacion
-    tipo_editor_filter = request.POST['flexRadioTipo'] if request.POST['flexRadioTipo'] != 'Ambos' else None
     fecha_inscripcion_filter = request.POST['fecha'] if request.POST['fecha'] else None
     nombre_filter = request.POST['nombre'] if request.POST['nombre'] else None
+    ci_filter = request.POST['CI'] if request.POST['CI'] else None
     rango_filter = request.POST['rango'] if request.POST['rango'] != 'Todos' else None
     activo_filter = bool('activo' in request.POST)
     orden_filter = bool('orden' in request.POST)
@@ -1770,10 +1797,10 @@ def export_editores_list(request):
     }
     cantidad_filter = cantidades.get(request.POST.get('cant_element'), None)
     filters = {
-        'type': tipo_editor_filter,
         'user__date_joined__gte': fecha_inscripcion_filter,
         'user__first_name__icontains': nombre_filter,
         'prefijo__rango__rango_superior': rango_filter,
+        'CI__icontains': ci_filter
     }
 
     # Lista completa de editores en orden LIFO
@@ -1822,7 +1849,7 @@ def export_solicitudes_list(request):
     }
 
     # Lista completa de solicitudes en orden LIFO
-    list_solicitudes = Solicitud.objects.all().order_by('-id')
+    list_solicitudes = Solicitud.objects.filter(deleted=False).order_by('-id')
 
     # Aplicando los filtros a la lista de Solicitudes
     for key, value in filters.items():
