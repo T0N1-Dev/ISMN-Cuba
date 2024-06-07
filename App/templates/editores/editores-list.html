@@ -52,7 +52,7 @@
                     <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exporting_pModal">
                     <i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar Tabla</a>
                     <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#statisticsBackdrop">
-                    <i class="fas fa-bar-chart"></i>&nbsp;&nbsp;Estadísticas</a>
+                    <i class="fas fa-arrows-left-right"></i>&nbsp;&nbsp;Rangos de Prefijo</a>
                 {% endblock %}
 
                 <!-- 2) Column Get users -->
@@ -93,7 +93,7 @@
                         <tr>
                             {% block title-table %}
                                 <th style="width: 7%;" class="th_button">
-                                    <a style="border-radius: 0" href="/backend/{{ flag }}" class="btn btn-secondary btn-header-list">
+                                    <a style="border-radius: 0" href="{% url 'backend_editores' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
                                         ID &nbsp;<i class="fa fa-arrows-up-down"></i>
                                     </a>
                                 </th>
@@ -302,11 +302,16 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
-                                            <div class="col-12 ms-auto" style="text-align: left">
+                                         <div class="row mb-2">
+                                            <div class="col-12 ms-auto" style="text-align: left;">
                                                 <div class="form-floating">
-                                                  <input type="text" class="form-control" name="CI" id="floatingInput2" maxlength="11" placeholder="-">
-                                                  <label for="floatingInput2">Carnet de Identidad</label>
+                                                  <select class="form-select" id="floatingSelect" name="provincia" aria-label="Floating label select example">
+                                                      <option selected>Todas</option>
+                                                      {% for provincia in provincias %}
+                                                          <option value="{{ provincia.id }}">{{ provincia }}</option>
+                                                      {% endfor %}
+                                                  </select>
+                                                  <label for="floatingSelect">Selecciona una provincia</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -316,7 +321,7 @@
                                                   <select class="form-select" id="floatingSelect" name="rango" aria-label="Floating label select example">
                                                       <option selected>Todos</option>
                                                       {% for rango in rangos %}
-                                                          <option value="{{ rango.rango_superior }}">{{ rango }}</option>
+                                                          <option value="{{ rango.rango_superior }}">{{ rango }}  ({{ rango.rango_inferior }}-{{ rango.rango_superior }})</option>
                                                       {% endfor %}
                                                   </select>
                                                   <label for="floatingSelect">Selecciona un rango de prefijo</label>
@@ -364,7 +369,7 @@
                   <div class="modal-dialog modal-dialog-scrollable">
                     <div class="modal-content" style="min-width: 900px;">
                       <div class="modal-header">
-                        <h1 class="modal-title fs-5 text-dark-emphasis" id="infoModalLabel"><i class="fas fa-chart-bar"></i>&nbsp;&nbsp;Estadísticas.</h1>
+                        <h1 class="modal-title fs-5 text-dark-emphasis" id="infoModalLabel"><i class="fas fa-arrows-left-right"></i>&nbsp;&nbsp;Rangos de Prefijo.</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                         {% block statistics-modal %}
@@ -434,6 +439,7 @@
 {% endblock content %}
 
 {% block Offcanvas %}
+    <a class="btn btn-dark" href="{% url 'backend_editoriales' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editoriales</a>
     <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
     <a class="btn btn-dark" href="{% url 'backend_publicaciones' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Publicaciones
         Musicales</a>

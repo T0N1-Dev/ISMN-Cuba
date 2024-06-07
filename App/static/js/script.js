@@ -333,7 +333,6 @@ $(document).ready(function () {
         let currentDate = new Date();
         let date_input = new Date($(this).val())
         let p_error = $('#p_error')
-        console.log($(this).val())
         if (date_input > currentDate || date_input.getFullYear() < 1900 || $(this).val().length < 10){
             $(this).addClass('is-invalid');
             $(this).val('')
@@ -452,8 +451,8 @@ $('#nombreEditorial, #selloEditorial').keyup(function () {
 });
 
 // 18 Prevent to change the editor's prefijo
-$('#editorPrefijo, #userPassword').mousedown((e) => {
-    if (e.target.baseURI.includes('/editor/')) {
+$('#editorPrefijo, #userPassword, #editorial_prefijo').mousedown((e) => {
+    if (e.target.baseURI.includes('/editor')) {
         e.preventDefault();
         swal('Error', 'No es posible editar o cambiar los prefijos asignados a los editores ni sus contraseñas.', 'error');
     }

@@ -38,18 +38,27 @@ urlpatterns = [
     path('backend/<str:order>', views.backend_editores, name="backend_editores"),
     path('backend_publicaciones/<str:order>', views.backend_publicaciones, name="backend_publicaciones"),
     path('backend_solicitudes/<str:order>', views.backend_solicitudes, name="backend_solicitudes"),
+    path('backend_editoriales/<str:order>', views.backend_editoriales, name="backend_editoriales"),
     # Path to accept an inscription application
     path('accept_inscription/<str:solicitud_id>', views.accept_inscription, name="accept_inscription"),
     # Path to accept an ismn application
     path('accept_ismn_application/<str:solicitud_id>', views.accept_ismn_solicitud, name="accept_ismn_application"),
     # Path to add an editor
     path('add_editor/', views.add_editor, name="add_editor"),
+    # Path to add an editor
+    path('add_editorial/', views.add_editorial, name="add_editorial"),
     # Path to delete an editor
     path('delete_editor/<str:editor_id>', views.delete_editor, name="delete_editor"),
+    # Path to delete an editorial
+    path('delete_editorial/<str:editorial_id>', views.delete_editorial, name="delete_editorial"),
     # Path to access the editor individualy
     path('editor/<str:editor_id>', views.editor, name="editor"),
     # Path to edit the editor
     path('edit_editor/', views.edit_editor, name="edit_editor"),
+    # Path to access the editor individualy
+    path('editorial/<str:editorial_id>', views.editorial, name="editorial"),
+    # Path to edit the editor
+    path('edit_editorial/', views.edit_editorial, name="edit_editorial"),
     # Path to access the musical colections
     path('musical_colections/', views.musical_colections_list, name="musical_colections"),
     # Path to add a musical publication

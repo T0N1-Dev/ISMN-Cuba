@@ -1,21 +1,30 @@
-{% extends 'registration/register_user.html' %}
+{% extends 'editores/add.html' %}
 
-{% block Action %}action="{% url 'register_editorial' %}"{% endblock Action %}
+<!-- Title on tab browser -->
+{% block title %} Añadir Editorial {% endblock title %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-user-plus"></i>&nbsp;&nbsp; Añadir Editorial
+{% endblock navbar-content %}
+
+
+{% block card-title %}
+    <span class="text-primary"> INSERTE LOS DATOS DE LA EDITORIAL </span>
+{% endblock card-title %}
+
+{% block Action %}action="{% url 'add_editorial' %}"{% endblock Action %}
 
 {% block Info-personal %}
-        <!--Titulo de Alerta de Registro-->
-        <div class="alert alert-warning mb-2" role="alert">
-            <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-exclamation-circle fs-4 text-warning"></i>&nbsp;&nbsp;Atención</span>
-            <p class="mb-0" style="font-size: .9rem">Sólo registre aquí a su entidad si esta es la primera vez que realiza una publicación con ISMN.</p>
-        </div>
-        <!-- Titulo de Informacion Personal -->
-        <div class="alert alert-info mb-2" role="alert">
-            <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Información de la Editorial</span>
-            <p class="mb-0" style="font-size: .9rem">Deben registrarse aquí como Editoriales, las entidades con número de NIT,
-                responsables legal y económicamente de la publicación de libros de notación musical en Cuba, pudiendo
-                realizar los distintos procesos de edición (diagramación, impresión, encuadernación, etc.) en talleres
-                propios o de terceros.</p>
-        </div>
+
+    <!-- Titulo de Informacion Personal -->
+    <div class="alert alert-info mb-2" role="alert">
+        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Información de la Editorial</span>
+        <p class="mb-0" style="font-size: .9rem">Deben registrarse aquí como Editoriales, las entidades con número de NIT,
+            responsables legal y económicamente de la publicación de libros de notación musical en Cuba, pudiendo
+            realizar los distintos procesos de edición (diagramación, impresión, encuadernación, etc.) en talleres
+            propios o de terceros.</p>
+    </div>
     <!-- Input ID tributaria y Nombre -->
     <div class="row">
         <div class="col-6">
@@ -229,3 +238,48 @@
     </div>
     <hr class="mt-0">
 {% endblock Another-Info %}
+{% block Info-Usuario %}
+    <!-- Informacion de Usuario -->
+    <div class="alert alert-info mb-2" role="alert">
+        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Usuario</span>
+        <p class="mb-0" style="font-size: .9rem">Estos datos son esenciales para su acceso y personalización en
+            nuestro sistema. Su nombre de usuario y contraseña le permiten iniciar sesión de manera
+            segura, mientras que su foto de perfil ayuda a identificar su cuenta visualmente,
+            proporcionando una experiencia más personalizada y reconocible dentro del sistema como
+            "Usuario registrado", todos estos datos pueden ser editables en lo adelante.</p>
+    </div>
+    <!-- Inputs Username y Contraseña -->
+    <div class="row">
+        <div class="col-6">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-user"></i></span>
+                <input type="text" class="form-control" maxlength="40" name="username" id="username" placeholder="Nombre de Usuario" required {% block Value-username %}{% endblock Value-username %}>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="input-group input-group-sm position-relative mb-3">
+                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-lock"></i></span>
+                <input type="password" class="form-control" name="password"
+                       placeholder="Nueva Contraseña"
+                        {% block Value-password %}{% endblock Value-password %}
+                       id="userPassword" required >
+                <i class="fa fa-eye-slash position-absolute" onclick="toggleFunction()" style="cursor: pointer; bottom: .5rem; right: 1rem;" id="toggleIcon"></i>
+            </div>
+        </div>
+    </div>
+    <hr class="mt-0">
+    <!-- Inputs Imagen de Perfil -->
+    <div class="mb-3">
+        {% block Value-imagen %}{% endblock Value-imagen %}
+        <div class="mb-3" style="font-size: 14px;"><i class="fa fa-cloud-upload-alt"></i>&nbsp;&nbsp;
+            {% block Title-Imagen-Sub %} Sube una foto a tu perfil {% endblock Title-Imagen-Sub %}</div>
+        <input type="file" class="form-control form-control-sm" name="image_profile" accept="image/*">
+        <div class="form-text" style="font-size: 12px;">* Extensiones permitidas: jpg - png - jpeg - *</div>
+    </div>
+    <hr class="mt-0">
+{% endblock Info-Usuario %}
+
+
+{% block Btn-back-form %}<a href="{% url 'backend_editoriales' 'list_dsc' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Atrás</a>{% endblock Btn-back-form %}
+{% block Btn-back-offc %}<a class="btn btn-dark" href="{% url 'backend_editoriales' 'list_dsc' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>{% endblock Btn-back-offc %}

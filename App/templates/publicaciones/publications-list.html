@@ -142,7 +142,8 @@
 
 {% block Offcanvas %}
     <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
-    <a class="btn btn-dark" href="{% url 'backend_editores' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editores</a>
+    <a class="btn btn-dark" href="{% url 'backend_editores' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Autores-Editores</a>
+    <a class="btn btn-dark" href="{% url 'backend_editoriales' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editoriales</a>
     <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
     <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i
             class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>

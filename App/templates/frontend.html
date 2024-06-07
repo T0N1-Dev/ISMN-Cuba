@@ -32,7 +32,9 @@
     {% if request.user.is_authenticated %}
         {% if request.user.especialista %}
             <a class="btn btn-dark" href="{% url 'backend_editores' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
-                de Editores</a>
+                de Autores-Editores</a>
+            <a class="btn btn-dark" href="{% url 'backend_editoriales' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
+                de Editoriales</a>
             <a class="btn btn-dark" href="{% url 'backend_publicaciones' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
                 de Publicaciones</a>
             <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista de Solicitudes</a>

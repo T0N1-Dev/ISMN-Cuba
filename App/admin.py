@@ -3,9 +3,9 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from App.forms import CustomUserAdminForm
-from App.models import (Editor, Especialista, Registered_Data, Rango_Prefijo_Editor,
+from App.models import (Editor, Especialista, Rango_Prefijo_Editor,
                         Rango_Prefijo_Publicacion)
-
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django import forms
@@ -16,6 +16,23 @@ class CustomUserChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = '__all__'
+
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+
+        if not all(char.isalpha() for char in first_name):
+            raise ValidationError("El nombre es incorrecto.")
+
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+
+        if not all(char.isalpha() for char in last_name):
+            raise ValidationError("El apellido es incorrecto.")
+
+        return last_name
 
     def clean(self):
         cleaned_data = super().clean()
@@ -49,16 +66,41 @@ class CustomUserAdmin(UserAdmin):
         ('Permisos', {'fields': ('is_active', 'is_staff', 'groups', 'user_permissions')}),
     )
 
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = [
+            (None, {'fields': ('username', 'password')}),
+            ('Información Personal', {'fields': ('first_name', 'last_name', 'email')}),
+            ('Fechas Importantes', {'fields': ('last_login', 'date_joined')}),
+        ]
+
+        if obj != request.user:
+            fieldsets.append(
+                ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}))
+
+        return fieldsets
+
     def has_delete_permission(self, request, obj=None):
         if obj is None:
             return True
         else:
-            return not obj.is_superuser
+            return not obj
 
     form = CustomUserChangeForm
 
     def save_model(self, request, obj, form, change):
         if change:
+            if obj == request.user:
+                original_obj = User.objects.get(pk=obj.pk)
+                if original_obj.is_superuser and not obj.is_superuser:
+                    messages.error(request, _("No puedes deshabilitar tu propio permiso de superusuario."))
+                    obj.is_superuser = True
+                if original_obj.is_staff and not obj.is_staff:
+                    messages.error(request, _("No puedes deshabilitar tu propio permiso de staff."))
+                    obj.is_staff = True
+                if original_obj.is_active and not obj.is_active:
+                    messages.error(request, _("No puedes deshabilitar tu propio estado activo."))
+                    obj.is_active = True
+
             groups = form.cleaned_data.get('groups', [])
             restricted_groups = {'Editores', 'Especialistas', 'Administrador'}
             selected_group_names = set(group.name for group in groups)
@@ -88,7 +130,7 @@ class CustomEditorAdminForm(forms.ModelForm):
             raise ValidationError("El teléfono solo puede contener números, '+' y '-'.")
 
         if len(phone) > 14:
-            raise ValidationError("El teléfono no puede tener más de 14 caracteres.")
+            raise ValidationError("El teléfono no puede tener más de 14 dígitos.")
 
         return phone
 
@@ -96,7 +138,7 @@ class CustomEditorAdminForm(forms.ModelForm):
         id_tribute = self.cleaned_data.get('id_tribute')
 
         if len(str(id_tribute)) > 14:
-            raise ValidationError("El ID Tributario no puede tener más de 14 caracteres.")
+            raise ValidationError("El ID Tributario no puede tener más de 14 dígitos.")
 
         return id_tribute
 
@@ -120,6 +162,20 @@ class EditorAdmin(admin.ModelAdmin):
     form = CustomEditorAdminForm
 
 
+class CustomEspecialistaAdminForm(forms.ModelForm):
+    class Meta:
+        model = Editor
+        fields = '__all__'
+
+    def clean_CI(self):
+        CI = self.cleaned_data.get('CI')
+
+        if len(str(CI)) != 11:
+            raise ValidationError("El Carnet de Identidad debe tener 11 dígitos.")
+
+        return CI
+
+
 class EspecialistaInline(admin.StackedInline):
     model = Especialista
     verbose_name_plural = "especialistas"
@@ -130,15 +186,9 @@ class EspecialistaAdmin(admin.ModelAdmin):
     list_display = ['user', 'phone', 'directions']
     search_fields = ['user__first_name', 'phone', 'directions']
     list_per_page = 8
+    form = CustomEspecialistaAdminForm
 
 
-class RegisterDataAdmin(admin.ModelAdmin):
-    list_display = ['user_name', 'email', 'phone', 'id_tribute']
-    search_fields = ['user__first_name', 'phone', 'directions']
-    list_per_page = 8
-
-
-admin.site.register(Registered_Data, RegisterDataAdmin)
 admin.site.register(Rango_Prefijo_Editor)
 admin.site.register(Rango_Prefijo_Publicacion)
 admin.site.register(Editor, EditorAdmin)

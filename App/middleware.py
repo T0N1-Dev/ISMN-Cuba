@@ -34,6 +34,9 @@ class TranslationMiddleware(MiddlewareMixin):
             content = content.replace('/admin/easyaudit/requestevent/purge/', _("/admin/easyaudit/requestevent/"))
             content = content.replace("Versión de Jazzmin", _(""))
             content = content.replace("3.0.0", _(""))
+            content = content.replace("Object repr", _("Objeto"))
+            content = content.replace("Content Type", _("Tipo"))
+            content = content.replace("Object ID", _("ID"))
             content = content.replace("Please correct the error below", _("Existe un error en el formulario"))
             content = content.replace("No se ha establecido la clave.", _("********"))
             content = content.replace("First, enter a username and password. Then, you'll be able to edit more user options.",

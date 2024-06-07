@@ -110,7 +110,6 @@ function removeDataBarChart(chart){
     chart.update();
 }
 
-
 function saveChart(pChartBar){
     let canvas_line_chart = document.getElementById('myChart');
     let canvas_bar_chart = document.getElementById('myChart2');

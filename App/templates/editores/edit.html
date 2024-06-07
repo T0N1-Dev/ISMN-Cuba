@@ -5,6 +5,7 @@
 
 <!-- Input ID passed here -->
 {% block Id-hidden %} <input type="text" name="id" value="{{ editor.id }}" hidden> {% endblock Id-hidden %}
+
 <!-- Navbar content -->
 {% block navbar-content %}
     <i class="fas fa-user-edit"></i>&nbsp;&nbsp; {{ editor.user.first_name }}
@@ -42,6 +43,7 @@
     <option id="editor_prefijo" style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
     {{ editor.prefijo.rango }}
 {% endblock Value-publications_per_year %}
+
 {% block Value-disbled %} readonly {% endblock Value-disbled %}
 {% block Title-Imagen-Sub %}
     Cambiar imagen del editor.

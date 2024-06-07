@@ -1,0 +1,297 @@
+{% extends 'editores/editores-list.html' %}
+
+<!-- Title on tab browser -->
+{% block title %} Editoriales {% endblock title %}
+
+<!-- Navbar content -->
+{% block navbar-content %}
+    <!--Title-->
+    <i class="fas fa-users"></i>&nbsp;&nbsp;Editoriales
+{% endblock navbar-content %}
+
+{% block btn-add %}
+    <a href="{% url 'add_editorial' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-plus"></i>&nbsp;&nbsp; Añadir Editorial</a>
+    <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exporting_pModal">
+    <i class="fas fa-file-export "></i>&nbsp;&nbsp;Exportar Tabla</a>
+    <a class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#statisticsBackdrop">
+    <i class="fas fa-arrows-left-right"></i>&nbsp;&nbsp;Rangos de Prefijo</a>
+{% endblock %}
+
+{% block search_bar_link %}
+    <a href="{% url 'backend_editoriales' 'list_asc' %}" class="btn btn-dark" style="margin-left: 2px"><i class="fas fa-sync-alt"></i></a>
+{% endblock search_bar_link %}
+
+{% block Offcanvas %}
+    <a class="btn btn-dark" href="{% url 'backend_publicaciones' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Publicaciones</a>
+    <a class="btn btn-dark" href="{% url 'backend_editores' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editores</a>
+    <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Solicitudes</a>
+    <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
+    <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i
+            class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
+    <hr>
+    <a href="#" class="btn btn-dark">
+        <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
+    </a>
+{% endblock Offcanvas %}
+
+{% block title-table %}
+    <th style="width: 5%;" class="th_button">
+        <a style="border-radius: 0" href="{% url 'backend_editoriales' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
+            ID &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 20%;" class="th_button">
+        <a style="border-radius: 0" href="{% url 'backend_editoriales' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
+            Editorial &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 7%" class="th_button">
+        <a style="border-radius: 0" href="{% url 'backend_editoriales' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
+            Siglas &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 7%" class="th_button">
+        <a style="border-radius: 0" href="{% url 'backend_editoriales' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
+            Prefijo &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 8%" class="th_button">
+        <a style="border-radius: 0" href="{% url 'backend_editoriales' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
+            Estado &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 25%" class="th_button">
+        <a style="border-radius: 0" href="{% url 'backend_editoriales' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
+            Dirección &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 14%" class="th_button">
+        <a style="border-radius: 0" href="{% url 'backend_editoriales' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
+            N&deg; de ID Tributaria &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 9%" class="th_button">
+        <a style="border-radius: 0" href="{% url 'backend_editoriales' '{{ flag }}' %}" class="btn btn-secondary btn-header-list">
+            Teléfono &nbsp;<i class="fa fa-arrows-up-down"></i>
+        </a>
+    </th>
+    <th style="width: 15%" colspan="3" class="th_button"><a style="border-radius: 0" href="#" class="btn btn-secondary btn-header-list">Acciones</a></th>
+{% endblock title-table %}
+
+{% block for-data-table %}
+    {% for editorial in editoriales %}
+        <tr id="chk_td">
+            <td>{{ editorial.id }}</td>
+            <td>{{ editorial.user.first_name }}</td>
+            <td>{{ editorial.sigla }}</td>
+            {% if editorial.prefijo.value < 10 %}
+                <td>0{{ editorial.prefijo }}</td>
+            {% else %}
+                <td>{{ editorial.prefijo }}</td>
+            {% endif %}
+            {% if editorial.user.is_active %}
+                <td>Activo</td>
+            {% else %}
+                <td>Inactivo</td>
+            {% endif %}
+            <td>{{ editorial.ubicacion.provincia }}, {{ editorial.ubicacion.municipio }}, {{ editorial.ubicacion.direccion }}</td>
+            <td>{{ editorial.id_tribute }}</td>
+            <td>{{ editorial.phone }}</td>
+            <td>
+                <a href="{% url 'editorial' editorial.id %}"
+                   class="btn btn-sm btn-primary " title="Editar Editorial">
+                    <i class="fas fa-pen"></i>
+                </a>
+            </td>
+            <td>
+                <a class="btn btn-sm btn-secondary" title="Delete Editorial" data-bs-toggle="modal" data-bs-target="#deleteModal{{ editorial.pk }}">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </td>
+        </tr>
+
+        <!-- Delete confirmation -->
+        <div class="modal fade" id="deleteModal{{ editorial.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="deleteModalLabel"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar Editorial</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body text-center">
+                <div class="text-center text-danger"><i class="fas fa-times-circle fa-5x mb-4 mt-2"></i></div>
+                  <div class="text-center text-danger">
+                      <span>ESTÁS SEGURO QUE DESEAS ELIMINAR LA EDITORIAL ???</span>
+                      <div class="text-dark mt-3 mb-2 ">
+                          <strong> {{ editorial.user.first_name }} </strong></div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                <a href="/delete_editorial/{{ editorial.id }}" type="button" class="btn btn-outline-danger btn-sm">Eliminar</a>
+              </div>
+            </div>
+          </div>
+        </div>
+    {% endfor %}
+{% endblock for-data-table %}
+
+{% block pagination %}
+    <nav class="mt-4" aria-label="Page navigation example">
+        {% if editoriales.has_other_pages %}
+            <ul class="pagination justify-content-left">
+            {% if editoriales.has_previous %}
+                <a href="?page=1" class="btn btn-outline-primary mb-4" style="width: auto; border-radius: 1px; border: 1px solid #d3d3d3">Primera</a>
+                <li class="page-item"><a class="page-link" href="?page={{ editoriales.previous_page_number }}"><i class="fas fa-angle-double-left"></i></a></li>
+            {% else %}
+                <li class="page-item disabled"></li>
+            {% endif %}
+
+            {% if editoriales.number|add:'-2' > 1 %}
+                <li><a class="page-link" href="?page={{ editoriales.number|add:'-2' }}">&hellip;</a></li>
+            {% endif %}
+
+            {% for i in editoriales.paginator.page_range %}
+                {% if editoriales.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}<span class="sr-only"></span></span></li>
+                {% elif i > editoriales.number|add:'-2' and i < editoriales.number|add:'2' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if editoriales.paginator.num_pages > editoriales.number|add:'2' %}
+                <li><a class="page-link" href="?page={{ editoriales.number|add:'-2' }}">&hellip;</a></li>
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+                <li><a class="page-link" href="?page={{ editoriales.paginator.num_pages }}">{{ editoriales.paginator.num_pages }}</a></li>
+            {% endif %}
+
+            {% if editoriales.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ editoriales.next_page_number }}"><i class="fas fa-angle-double-right"></i></a></li>
+                <a href="?page={{ editoriales.paginator.num_pages }}" class="btn btn-outline-primary mb-4" style="width: auto; border-radius: 1px; border: 1px solid #d3d3d3; border-left: none;">Última</a>
+            {% else %}
+                <li class="page-item disabled"></li>
+            {% endif %}
+            </ul>
+        {% endif %}
+    </nav>
+{% endblock pagination %}
+
+{% block exporting_options %}
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-4" style="text-align: left">
+                    <h6>Tipo de Editor</h6>
+                      <div class="form-check">
+                          <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoE" value="Compañia" checked>
+                          <label class="form-check-label" for="flexRadioTipoE">
+                            Editorial
+                          </label>
+                      </div>
+                      <div class="form-check">
+                          <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoI" value="Independiente">
+                          <label class="form-check-label" for="flexRadioTipoI">
+                            Autor-Editor
+                          </label>
+                      </div>
+                      <div class="form-check">
+                          <input class="form-check-input" type="radio" name="flexRadioTipo" id="flexRadioTipoA" value="Ambos">
+                          <label class="form-check-label" for="flexRadioTipoA">
+                            Ambos
+                          </label>
+                      </div>
+                  </div>
+                <div class="col-8">
+                    <div class="form-floating" style="height: 100%">
+                      <input type="date" class="form-control" placeholder=""
+                                id="floatingTextarea2" name="fecha" style="height: 100%">
+                      <label for="floatingTextarea2">Editoriales agregadas después de:</label>
+                        <p id="p_error" class="text-danger fw-light text-start" style="font-size: small; margin-left: 12px;" hidden></p>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4">
+            <div class="row mb-2">
+                <div class="col-6 ms-auto" style="text-align: left">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="nombre" id="floatingInput" placeholder="-">
+                      <label for="floatingInput">Nombre de la editorial</label>
+                    </div>
+                </div>
+                <div class="col-6 ms-auto" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="floatingSelect" name="provincia" aria-label="Floating label select example">
+                          <option selected>Todas</option>
+                          {% for provincia in provincias %}
+                              <option value="{{ provincia.id }}">{{ provincia }}</option>
+                          {% endfor %}
+                      </select>
+                      <label for="floatingSelect">Selecciona una provincia</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6 ms-auto" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="floatingSelect" name="rango" aria-label="Floating label select example">
+                          <option selected>Todos</option>
+                          {% for rango in rangos %}
+                              <option value="{{ rango.rango_superior }}">{{ rango }}  ({{ rango.rango_inferior }}-{{ rango.rango_superior }})</option>
+                          {% endfor %}
+                      </select>
+                      <label for="floatingSelect">Selecciona un rango de prefijo</label>
+                    </div>
+                </div>
+                <div class="col-6 ms-auto" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="floatingSelect" name="actividad" aria-label="Floating label select example">
+                          <option selected>Todas</option>
+                          {% for actividad in actividades %}
+                              <option value="{{ actividad }}">{{ actividad }}</option>
+                          {% endfor %}
+                      </select>
+                      <label for="floatingSelect">Selecciona un actividad</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 ms-auto" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="floatingSelect" name="naturaleza" aria-label="Floating label select example">
+                          <option selected>Todas</option>
+                          {% for naturaleza in naturalezas %}
+                              <option value="{{ naturaleza }}">{{ naturaleza }}</option>
+                          {% endfor %}
+                      </select>
+                      <label for="floatingSelect">Selecciona una naturaleza jurídica</label>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row mt-6">
+                <div class="col-6 form-check form-switch" style="text-align: left; margin-left: 15px">
+                  <input class="form-check-input" style="cursor: pointer;" type="checkbox" name="activo" role="switch" id="flexSwitchCheckChecked" checked>
+                  <label class="form-check-label"  for="flexSwitchCheckChecked">Editoriales activas</label>
+                </div>
+                <div class="col-4 form-check form-switch" style="text-align: left; margin-left: 15px">
+                  <input class="form-check-input" style="cursor: pointer;" type="checkbox" name="orden" role="switch" id="flexSwitchCheckChecked" checked>
+                  <label class="form-check-label" for="flexSwitchCheckChecked">Orden LIFO</label>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-12">
+                  <label for="customRange2" class="form-label">Cantidad de elementos?</label>
+                  <input type="range" class="form-range" value="4" style="height: 5px" min="0" max="4" name="cant_element" id="customRange2">
+                  <div class="d-flex">
+                      <span>1</span>
+                      <span style="margin-left: 23%">10</span>
+                      <span style="margin-left: 22.3%">25</span>
+                      <span style="margin-left: 22%">40</span>
+                      <span style="margin-left: auto">Todos</span>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock exporting_options %}

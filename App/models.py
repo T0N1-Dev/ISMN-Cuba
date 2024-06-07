@@ -8,6 +8,8 @@ import os
 # Validate Dates
 from django.db.models import Min, Count
 from django.db.models.functions import TruncDate
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -52,7 +54,6 @@ class CopyDB(models.Model):
     rute_BD = models.CharField(max_length=600)
 
 # ==========MODELS TO MY BUSINESS==========
-
 # Models to manage the prefix numbers
 class Rango_Prefijo_Editor(models.Model):
     # NOTAS
@@ -60,10 +61,10 @@ class Rango_Prefijo_Editor(models.Model):
     # los editores que publican más son los que se les asignan menores números en el prefijo y si publican menos
     # tendrán un prefijo mayor. Más info en http://127.0.0.1:8000/ayuda/Prefijo-Editor
 
-    PUBLICADOR_SUPERIOR = "P-Superior"  # rango-inferior: 0 rango-superior: 99
-    PUBLICADOR_MEDIO = "P-Medio"  # rango-inferior: 100 rango-superior: 999
-    PUBLICADOR_MEDIO_INFERIOR = "P-Medio_Inferior"  # rango-inferior: 1000 rango-superior: 9999
-    PUBLICADOR_INFERIOR = "P-Inferior"  # rango-inferior: 10000 rango-superior: 99999
+    PUBLICADOR_SUPERIOR = "P-Superior"  # rango-inferior: 0 rango-superior: 19
+    PUBLICADOR_MEDIO = "P-Medio"  # rango-inferior: 200 rango-superior: 699
+    PUBLICADOR_MEDIO_INFERIOR = "P-Medio_Inferior"  # rango-inferior: 7000  rango-superior: 8499
+    PUBLICADOR_INFERIOR = "P-Inferior"  # rango-inferior: 85000 rango-superior: 99999
 
     TYPE = {
         (PUBLICADOR_SUPERIOR, "P-Superior"),
@@ -93,14 +94,12 @@ class Rango_Prefijo_Publicacion(models.Model):
     PUBLICACION_MEDIA = "P-Media"  # rango-superior: 99999
     PUBLICACION_MEDIA_INFERIOR = "P-Media_Inferior"  # rango-superior: 9999
     PUBLICACION_INFERIOR = "P-Inferior"  # rango-superior: 999
-    PUBLICACION_MENOR = "P-Menor"  # rango-superior: 99
 
     TYPE = {
         (PUBLICACION_SUPERIOR, "P-Superior"),
         (PUBLICACION_MEDIA, "P-Medio"),
         (PUBLICACION_MEDIA_INFERIOR, "P-Medio_Inferior"),
-        (PUBLICACION_INFERIOR, "P-Inferior"),
-        (PUBLICACION_MENOR, "P-Menor")
+        (PUBLICACION_INFERIOR, "P-Inferior")
     }
 
     rango_superior = models.PositiveIntegerField()
@@ -123,6 +122,18 @@ class PrefijoEditor(models.Model):
 
     def __str__(self):
         return f'{self.value}'
+
+    def clean(self):
+        super().clean()
+        rango = self.rango
+        if self.value > rango.rango_superior:
+            raise ValidationError({
+                'value': _('El valor de PrefijoEditor no puede exceder el rango superior del Rango_Prefijo_Editor.')
+            })
+
+    def save(self, *args, **kwargs):
+        self.clean()  # Llama a clean() para asegurarte de que se ejecuten las validaciones.
+        super().save(*args, **kwargs)
 
 
 class PrefijoPublicacion(models.Model):
@@ -163,8 +174,6 @@ class Ubicacion(models.Model):
 
     def __str__(self):
         return f'{self.provincia}, {self.municipio}, {self.direccion}'
-
-
 
 
 # Solo para Editoriales

@@ -250,8 +250,8 @@
                                 {% endblock Value-publications_per_year %}
                                 <option disabled></option>
                                 <option value="p-inferior"
-                                        title="Seleccione esta opcion si usted publica entre 1 y 999 publicaciones por año ">
-                                    1 - 999
+                                        title="Seleccione esta opcion si usted publica menos de 1000 publicaciones por año ">
+                                    Menos de 1000
                                 </option>
                                 <option value="p-medio_inferior"
                                         title="Seleccione esta opcion si usted publica entre 1000 y 9999 publicaciones por año ">
@@ -263,7 +263,7 @@
                                 </option>
                                 <option value="p-superior"
                                         title="Seleccione esta opcion si usted publica más de 100000 de publicaciones por año ">
-                                    100000 - ...
+                                    Más...
                                 </option>
                             </select>
                         </div>
@@ -286,14 +286,14 @@
                 {% block Btn-reset %} {% endblock Btn-reset %}
 
                 <!-- Back Button -->
-                <a href="{% url 'backend_editores' 'list_dsc' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Atrás</a>
+                {% block Btn-back-form %}<a href="{% url 'backend_editores' 'list_dsc' %}" class="btn btn-dark btn-sm"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;Atrás</a>{% endblock Btn-back-form %}
             </div>
         </form>
     </div>
 {% endblock content %}
 
 {% block Offcanvas %}
-    <a class="btn btn-dark" href="{% url 'backend_editores' 'list_dsc' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>
+    {% block Btn-back-offc %}<a class="btn btn-dark" href="{% url 'backend_editores' 'list_dsc' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Atrás</a>{% endblock Btn-back-offc %}
     <hr>
     <a href="#" class="btn btn-dark">
         <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda

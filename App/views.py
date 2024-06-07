@@ -158,23 +158,15 @@ def restore_database(request):
 def generate_prefijo_editor(range):
     value = 0
     lote = '979-0'
-    if range == 'p-menor':
-        max_menor = PrefijoEditor.objects.filter(rango__tipo='P-Menor').aggregate(Max('value'))['value__max']
-        if max_menor:
-            value = max_menor + 1
-            return PrefijoEditor.objects.create(value=value, lote=lote,
-                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Menor'))
-        else:
-            return PrefijoEditor.objects.create(value=100001, lote=lote,
-                                                rango=Rango_Prefijo_Editor.objects.get(tipo='P-Menor'))
-    elif range == 'p-inferior':
+    if range == 'p-inferior':
         max_inferior = PrefijoEditor.objects.filter(rango__tipo='P-Inferior').aggregate(Max('value'))['value__max']
         if max_inferior:
             value = max_inferior + 1
             return PrefijoEditor.objects.create(value=value, lote=lote,
                                                 rango=Rango_Prefijo_Editor.objects.get(tipo='P-Inferior'))
         else:
-            return PrefijoEditor.objects.create(value=10001, lote=lote,
+            valor_inicial = Rango_Prefijo_Editor.objects.get(tipo='P-Inferior').rango_inferior + 1
+            return PrefijoEditor.objects.create(value=valor_inicial, lote=lote,
                                                 rango=Rango_Prefijo_Editor.objects.get(tipo='P-Inferior'))
     elif range == 'p-medio_inferior':
         max_medio_inf = PrefijoEditor.objects.filter(rango__tipo='P-Medio_Inferior').aggregate(Max('value'))[
@@ -184,7 +176,8 @@ def generate_prefijo_editor(range):
             return PrefijoEditor.objects.create(value=value, lote=lote,
                                                 rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior'))
         else:
-            return PrefijoEditor.objects.create(value=1001, lote=lote,
+            valor_inicial = Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior').rango_inferior + 1
+            return PrefijoEditor.objects.create(value=valor_inicial, lote=lote,
                                                 rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio_Inferior'))
     elif range == 'p-medio':
         max_medio = PrefijoEditor.objects.filter(rango__tipo='P-Medio').aggregate(Max('value'))['value__max']
@@ -193,7 +186,8 @@ def generate_prefijo_editor(range):
             return PrefijoEditor.objects.create(value=value, lote=lote,
                                                 rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio'))
         else:
-            return PrefijoEditor.objects.create(value=101, lote=lote,
+            valor_incial = Rango_Prefijo_Editor.objects.get(tipo='P-Medio').rango_inferior + 1
+            return PrefijoEditor.objects.create(value=valor_incial, lote=lote,
                                                 rango=Rango_Prefijo_Editor.objects.get(tipo='P-Medio'))
     elif range == 'p-superior':
         max_superior = PrefijoEditor.objects.filter(rango__tipo='P-Superior').aggregate(Max('value'))['value__max']
@@ -248,22 +242,21 @@ def register_autor_editor(request):
         phone = request.POST['phone']
         id_tribute = request.POST['idTribute']
         ci = request.POST.get('CI')
-        print(request.POST)
         if Registered_Data.objects.filter(email=email).exists():
             messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/login')
+            return HttpResponseRedirect('/register_autor_editor')
         elif Registered_Data.objects.filter(phone=phone).exists():
             messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/login')
+            return HttpResponseRedirect('/register_autor_editor')
         elif Registered_Data.objects.filter(user_name=username).exists():
             messages.error(request, "Este nombre de usuario ya ha sido registrado en nuestra Base de Datos")
-            return HttpResponseRedirect('/login')
+            return HttpResponseRedirect('/register_autor_editor')
         elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
             messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
-            return HttpResponseRedirect('/login')
+            return HttpResponseRedirect('/register_autor_editor')
         elif Registered_Data.objects.filter(CI=ci).exists():
             messages.error(request, "Este número de identidad ya ha sido registrada en nuestra Base de Datos")
-            return HttpResponseRedirect('/login')
+            return HttpResponseRedirect('/register_autor_editor')
         # ===========================
         else:
             if request.POST.get('username') \
@@ -419,7 +412,7 @@ def backend_editores(request, order):
             ).order_by('-user__date_joined')
             if q.isnumeric():
                 all_editor_list = Editor.objects.filter(Q(phone__contains=q) | Q(prefijo__value__contains=int(q)) |
-                                                        Q(id_tribute__contains=int(q))).order_by('-user__date_joined')
+                                                        Q(id_tribute__contains=q)).order_by('-user__date_joined')
         elif order == 'list_dsc':
             all_editor_list = Editor.objects.all()[::-1]
             # Para ordenar ascendente o descendente
@@ -434,11 +427,57 @@ def backend_editores(request, order):
         solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
         usuario = request.user
         rangos = Rango_Prefijo_Editor.objects.all()
+        provincias = Provincia.objects.all()
         return render(request, 'editores/editores-list.html', {"editores": all_editor,
                                                                'solicitudes_pendientes': solicitudes_pendientes,
                                                                'usuario': usuario,
                                                                'rangos': rangos,
-                                                               'flag': flag})
+                                                               'flag': flag,
+                                                               'provincias': provincias})
+
+# Function to render editor's lists
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def backend_editoriales(request, order):
+    if request.POST:
+        return export_editoriales_list(request)
+    else:
+        if 'q' in request.GET:
+            flag = 'list_dsc'
+            q = request.GET['q']
+            all_editoriales_list = Editorial.objects.filter(
+                Q(user__email__icontains=q) | Q(ubicacion__provincia__nombre__icontains=q) |
+                Q(ubicacion__municipio__nombre__icontains=q) | Q(ubicacion__direccion__icontains=q) |
+                Q(descripcion__icontains=q) | Q(user__first_name__icontains=q) | Q(sigla__icontains=q) | Q(nombre_sello__icontains=q)
+                | Q(nombre_responsable__icontains=q) | Q(caracterizacion__actividad_principal__icontains=q)
+                | Q(caracterizacion__naturaleza_juridica__icontains=q)
+            ).order_by('-user__date_joined')
+            if q.isnumeric():
+                all_editoriales_list = Editorial.objects.filter(Q(phone__contains=q) | Q(prefijo__value__contains=int(q)) |
+                                                        Q(id_tribute__contains=int(q)) | Q(caracterizacion__fecha_fundacion__year=q)
+                                                        ).order_by('-user__date_joined')
+        elif order == 'list_dsc':
+            all_editoriales_list = Editorial.objects.all()[::-1]
+            # Para ordenar ascendente o descendente
+            flag = 'list_asc'
+        else:
+            all_editoriales_list = Editorial.objects.all()
+            flag = 'list_dsc'
+
+        paginator = Paginator(all_editoriales_list, 5)
+        page = request.GET.get('page')
+        all_editoriales = paginator.get_page(page)
+        solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
+        provincias_list = Provincia.objects.all()
+        usuario = request.user
+        rangos = Rango_Prefijo_Editor.objects.all()
+        return render(request, 'editoriales/editoriales-list.html', {"editoriales": all_editoriales,
+                                                               'solicitudes_pendientes': solicitudes_pendientes,
+                                                               'usuario': usuario,
+                                                               'rangos': rangos,
+                                                               'flag': flag,
+                                                               'provincias': provincias_list
+                                                               })
 
 
 # Function to render publication's lists
@@ -484,7 +523,11 @@ def backend_solicitudes(request, order):
             q = request.GET['q']
             all_solicitudes_list = Solicitud.objects.filter(
                 Q(tipo__icontains=q) | Q(editor__user__first_name__icontains=q) |
-                Q(editorial__user__first_name=q) | Q(status__icontains=q, deleted=False)
+                Q(editorial__user__first_name__icontains=q) | Q(status__icontains=q), deleted=False
+            ).order_by('-created_at')
+            if q.isnumeric():
+                all_solicitudes_list = Solicitud.objects.filter(Q(created_at__year=q) | Q(created_at__month=q) |
+                Q(created_at__day=q) | Q(id=q), deleted=False
             ).order_by('-created_at')
         elif order == 'list_dsc':
             all_solicitudes_list = Solicitud.objects.filter(deleted=False).order_by('-created_at')
@@ -796,15 +839,119 @@ def add_editor(request):
             return render(request, "editores/add.html", {'provincias': provincias_list})
 
 
+# Function to Add Editorial
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def add_editorial(request):
+    if request.method == 'POST':
+        # Check if email exist in BD
+        username = request.POST['username']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        id_tribute = request.POST['idTribute']
+        if Registered_Data.objects.filter(email=email).exists():
+            messages.error(request, "Este correo electrónico ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/add_editor')
+        elif Registered_Data.objects.filter(phone=phone).exists():
+            messages.error(request, "Este teléfono ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/add_editor')
+        elif Registered_Data.objects.filter(user_name=username).exists():
+            messages.error(request, "Este nombre de usuario ya ha sido registrado en nuestra Base de Datos")
+            return HttpResponseRedirect('/add_editor')
+        elif Registered_Data.objects.filter(id_tribute=id_tribute).exists():
+            messages.error(request, "Esta identificación tributaria ya ha sido registrada en nuestra Base de Datos")
+            return HttpResponseRedirect('/add_editor')
+        # ===========================
+        else:
+            if request.POST.get('username') \
+                    and request.POST.get('nombreEditorial') \
+                    and request.POST.get('editorProvincia') \
+                    and request.POST.get('editorMunicipio') \
+                    and request.POST.get('password') \
+                    and request.POST.get('phone') \
+                    and request.POST.get('email') \
+                    and request.POST.get('address') \
+                    and request.POST.get('idTribute') \
+                    and request.POST.get('fundacion_date') \
+                    and request.POST.get('editorialActivity') \
+                    and request.POST.get('editorialNaturalezaJud') \
+                    and request.POST.get('representante_name') \
+                    and request.POST.get('representante_apellido') \
+                    and request.POST.get('editorPrefijo'):
+                editorial = Editorial()
+                user = User()
+                user.username = request.POST.get('username')
+                user.first_name = request.POST.get('nombreEditorial')
+                editorial.id_tribute = request.POST.get('idTribute')
+                editorial.sigla = request.POST.get("siglasEditorial")
+                provincia = Provincia.objects.get(id=request.POST.get('editorProvincia'))
+                municipio = Municipio.objects.get(id=request.POST.get('editorMunicipio'))
+                direccion = request.POST.get('address')
+                editorial.phone = request.POST.get('phone')
+                user.email = request.POST.get('email')
+                fundacion_date = request.POST.get('fundacion_date')
+                editorialActivity = request.POST.get('editorialActivity')
+                editorialNaturalezaJud = request.POST.get('editorialNaturalezaJud')
+                editorial.nombre_sello = request.POST.get('selloEditorial')
+                user.set_password(request.POST.get('password'))
+                editorial.nombre_responsable = request.POST.get('representante_name')
+                editorial.apellidos_responsable = request.POST.get('representante_apellido')
+                ubicacion = Ubicacion.objects.create(provincia=provincia, municipio=municipio, direccion=direccion)
+                caracterizacion = Caracterizacion.objects.create(fecha_fundacion=fundacion_date, actividad_principal=editorialActivity, naturaleza_juridica=editorialNaturalezaJud)
+                editorial.ubicacion = ubicacion
+                editorial.caracterizacion = caracterizacion
+                editorial.prefijo = generate_prefijo_editor(request.POST.get('editorPrefijo'))
+                editor.descripcion = request.POST.get('note')
+                image_profile = request.FILES.get('image_profile')
+                if image_profile:
+                    if image_profile.size > 10 * 1024 * 1024:
+                        messages.error(request, "La imagen no puede ser mayor a 10 MB")
+                        return HttpResponseRedirect('/add_editorial')
+                    editorial.image_profile = request.FILES.get('imagenProfile')
+                editorial.user = user
+                user.save()
+                editorial.save()
+                # Register email and phone inside BD
+                contact = Registered_Data()
+                contact.user_name = user.username
+                contact.email = email
+                contact.phone = phone
+                contact.id_tribute = id_tribute
+                contact.save()
+                # ========================
+                messages.success(request, "Editorial añadida correctamente !")
+                return HttpResponseRedirect('/backend_editoriales/list_dsc')
+            else:
+                messages.error(request, "Complete todos los campos del formulario")
+                return HttpResponseRedirect('/add_editorial')
+    elif request.method == 'GET':
+        if Solicitud.objects.filter(status='Pendiente', deleted=False).filter(tipo='Solicitud-Inscripción').exists():
+            messages.error(request, 'No es posible añadir una editorial en este momento. '
+                                    'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
+            return HttpResponseRedirect('/backend_editoriales/list_dsc')
+        else:
+            actividades = Caracterizacion.ACTIVIDADES
+            naturaleza_juridica = Caracterizacion.NATURALEZA
+            provincias_list = Provincia.objects.all()
+            return render(request, 'editoriales/add.html', {'provincias': provincias_list,
+                                                            'actividades': actividades,
+                                                            'naturaleza_juridica': naturaleza_juridica})
+
+
 # Function to delete Editor
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def delete_editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
+    user = User.objects.get(id=editor.user.id)
     if editor.image_profile.name != 'profile_default.png':
         editor.image_profile.delete()
     Registered_Data.objects.get(phone=editor.phone).delete()
-    User.objects.get(username=editor.user.username).delete()
+    Registered_Data.objects.get(id_tribute=editor.id_tribute).delete()
+    Registered_Data.objects.get(CI=editor.CI).delete()
+    Registered_Data.objects.get(user_name=editor.user.username).delete()
+    Registered_Data.objects.get(email=editor.user.email).delete()
+    user.delete()
     editor.delete()
     messages.success(request, "Editor eliminado correctamente !")
     return HttpResponseRedirect('/backend/list_dsc')
@@ -857,6 +1004,58 @@ def edit_editor(request):
             messages.success(request, "Editor editado correctamente !")
             return HttpResponseRedirect('/backend/list_dsc')
 
+
+# Function to access the Editor individually
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def editorial(request, editorial_id):
+    editorial = Editorial.objects.get(id=editorial_id)
+    solicitud_inscripcion = Solicitud.objects.filter(tipo='Solicitud-Inscripción', deleted=False).filter(status='Pendiente').exists()
+    if editorial:
+        if solicitud_inscripcion:
+            messages.error(request, 'No es posible editar un editor en este momento. '
+                                    'Atienda las solicitudes de inscripción que han sido enviadas y luego regrese.')
+            return HttpResponseRedirect('/backend_editoriales/list_dsc')
+        else:
+            provincias_list = Provincia.objects.all()
+            return render(request, "editoriales/edit.html", {"editorial": editorial,
+                                                          "provincias": provincias_list})
+    else:
+        return HttpResponseRedirect('/backend_editoriales/list_dsc')
+
+
+# Function to edit the Editor
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def edit_editorial(request):
+    if request.method == "POST":
+        editorial = Editorial.objects.get(id=request.POST.get('id'))
+        if editorial:
+            editorial.user.username = request.POST.get('username')
+            editorial.user.first_name = request.POST.get('nombreEditorial')
+            editorial.id_tribute = request.POST.get("idTribute")
+            editorial.descripcion = request.POST.get("note")
+            if request.POST.get('editorProvincia').isnumeric():
+                editorial.ubicacion.provincia = Provincia.objects.get(id=request.POST.get('editorProvincia'))
+                editorial.ubicacion.municipio = Municipio.objects.get(id=request.POST.get('editorMunicipio'))
+            editorial.ubicacion.direccion = request.POST.get('address')
+            editorial.phone = request.POST.get('phone')
+            editorial.user.email = request.POST.get("email")
+            editorial.sigla = request.POST.get("siglasEditorial")
+            editorial.caracterizacion.fecha_fundacion = request.POST.get('fundacion_date')
+            editorial.caracterizacion.actividad_principal = request.POST.get('editorialActivity')
+            editorial.caracterizacion.naturaleza_juridica = request.POST.get('editorialNaturalezaJud')
+            editorial.nombre_sello = request.POST.get('selloEditorial')
+            editorial.nombre_responsable = request.POST.get('representante_name')
+            editorial.apellidos_responsable = request.POST.get('representante_apellido')
+            if request.FILES:
+                editorial.image_profile = request.FILES.get('image_profile')
+            editorial.user.save()
+            editorial.ubicacion.save()
+            editorial.caracterizacion.save()
+            editorial.save()
+            messages.success(request, "Editorial editada correctamente !")
+            return HttpResponseRedirect('/backend_editoriales/list_dsc')
 
 
 # Function to show musical collections
@@ -1035,6 +1234,27 @@ def delete_solicitud(request, solicitud_id):
     return HttpResponseRedirect('/backend_solicitudes/list_dsc')
 
 
+# Function to delete Editorial
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url="login")
+def delete_editorial(request, editorial_id):
+    editorial = Editorial.objects.get(id=editorial_id)
+    user = User.objects.get(id=editorial.user.id)
+    if editorial.image_profile.name != 'profile_default.png':
+        editorial.image_profile.delete()
+    try:
+        Registered_Data.objects.get(phone=editorial.phone).delete()
+        Registered_Data.objects.get(id_tribute=editorial.id_tribute).delete()
+        Registered_Data.objects.get(user_name=editorial.user.username).delete()
+        Registered_Data.objects.get(email=editorial.user.eamil).delete()
+        user.delete()
+        editorial.delete()
+        messages.success(request, "Editorial eliminada correctamente !")
+    except:
+        messages.error(request, "Ha surgido un problema durante la eliminación. !")
+    return HttpResponseRedirect('/backend_editoriales/list_dsc')
+
+
 # ---- GENERAR ISMN ------
 def generar_ismn(editor):
     """ Notas
@@ -1171,7 +1391,7 @@ def send_code_confirmation(request):
     try:
         email.send()
         return confirmation_code
-    except TimeoutError or SMTPServerDisconnected or FileNotFoundError:
+    except TimeoutError or TypeError or SMTPServerDisconnected or FileNotFoundError:
         messages.error(request, 'Error en la conexión. Intente más tarde.')
         return HttpResponseRedirect('/')
 
@@ -1192,7 +1412,7 @@ def send_info_inscripcion(nombre, user_email, username, password):
     try:
         email.send()
         return True
-    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError or FileNotFoundError:
+    except TimeoutError or SMTPServerDisconnected or TypeError or SMTPAuthenticationError or FileNotFoundError:
         return False
 
 
@@ -1231,7 +1451,7 @@ def send_solicitud_ismn_accepted(user, publicacion):
     try:
         email.send()
         return True
-    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError or FileNotFoundError:
+    except TimeoutError or SMTPServerDisconnected or TypeError or SMTPAuthenticationError or FileNotFoundError:
         return False
 
 
@@ -1272,7 +1492,7 @@ def send_solicitud_ismn_reject(user, titulo_solicitud, descripcion):
     try:
         email.send()
         return True
-    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError or FileNotFoundError:
+    except TimeoutError or SMTPServerDisconnected or TypeError or SMTPAuthenticationError or FileNotFoundError:
         return False
 
 
@@ -1312,7 +1532,7 @@ def send_solicitud_inscrip_reject(solicitante, email, descripcion):
     try:
         email.send()
         return True
-    except TimeoutError or SMTPServerDisconnected or SMTPAuthenticationError or FileNotFoundError:
+    except TimeoutError or SMTPServerDisconnected or TypeError or SMTPAuthenticationError or FileNotFoundError:
         return False
 
 
@@ -1579,10 +1799,20 @@ def extraer_datos_model(modelo_list):
         contenido['Estado'] = [editor.get_state_display() for editor in modelo_list]
         contenido['Dirección'] = [editor.ubicacion for editor in modelo_list]
         contenido['Teléfono'] = [editor.phone for editor in modelo_list]
+    elif modelo_type == 'editorial':
+        contenido['ID'] = [editorial.id for editorial in modelo_list]
+        contenido['Nombre'] = [editorial.user.first_name for editorial in modelo_list]
+        contenido['Siglas'] = [editorial.sigla for editorial in modelo_list]
+        contenido['Prefijo'] = [editorial.prefijo for editorial in modelo_list]
+        contenido['Estado'] = [editorial.get_state_display() for editorial in modelo_list]
+        contenido['Dirección'] = [editorial.ubicacion for editorial in modelo_list]
+        contenido['ID Tributaria'] = [editorial.id_tribute for editorial in modelo_list]
+        contenido['Teléfono'] = [editorial.phone for editorial in modelo_list]
     elif modelo_type == 'solicitud':
         contenido['ID'] = [solicitud.id for solicitud in modelo_list]
-        contenido['Editor'] = [solicitud.editor.user.first_name if solicitud.editor else '-' for solicitud in
-                               modelo_list]
+        contenido['Editor'] = [solicitud.editor.user.first_name if solicitud.editor else solicitud.editorial.user.first_name
+                               if solicitud.editorial else '-'
+                               for solicitud in modelo_list]
         contenido['Solicitante'] = [solicitud.temporal['first_name'] if 'first_name' in solicitud.temporal
                                     else solicitud.temporal['nombreEditorial'] if solicitud.temporal else '-'
                                     for solicitud in modelo_list]
@@ -1612,6 +1842,9 @@ def crear_report_list(model_list, buffer):
     elif tipo == 'Editor':
         title = 'Autores-Editores'
         col_widths = [25, 80, 70, 80, 40, 50, 260, 90]
+    elif tipo == 'Editorial':
+        title = 'Editoriales'
+        col_widths = [25, 70, 70, 80, 40, 220, 100, 90]
     else:
         title = 'Solicitudes'
         col_widths = [25, 100, 130, 90, 115, 90, 60]
@@ -1784,7 +2017,7 @@ def export_editores_list(request):
     # Filtros de exportacion
     fecha_inscripcion_filter = request.POST['fecha'] if request.POST['fecha'] else None
     nombre_filter = request.POST['nombre'] if request.POST['nombre'] else None
-    ci_filter = request.POST['CI'] if request.POST['CI'] else None
+    provincia_filter = Provincia.objects.get(id=request.POST['provincia']) if request.POST['provincia'] else None
     rango_filter = request.POST['rango'] if request.POST['rango'] != 'Todos' else None
     activo_filter = bool('activo' in request.POST)
     orden_filter = bool('orden' in request.POST)
@@ -1800,7 +2033,7 @@ def export_editores_list(request):
         'user__date_joined__gte': fecha_inscripcion_filter,
         'user__first_name__icontains': nombre_filter,
         'prefijo__rango__rango_superior': rango_filter,
-        'CI__icontains': ci_filter
+        'ubicacion__provincia': provincia_filter
     }
 
     # Lista completa de editores en orden LIFO
@@ -1808,6 +2041,57 @@ def export_editores_list(request):
 
     # Aplicando los filtros a la lista de Editores
     for key, value in filters.items():
+        if value:
+            list_editores = list_editores.filter(**{key: value})
+    if not activo_filter:
+        list_editores = list_editores.filter(state=False)
+    if not orden_filter:
+        list_editores = list_editores.order_by('id')
+    if cantidad_filter and len(list_editores) >= cantidad_filter:
+        list_editores = list_editores.all()[:cantidad_filter]
+
+    # Funcion encargada de generar el reporte
+    crear_report_list(list_editores, buffer)
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f"Editores_lista.pdf")
+
+
+def export_editoriales_list(request):
+    # Crear el temporal para el pdf
+    buffer = io.BytesIO()
+
+    # Filtros de exportacion
+    fecha_inscripcion_filter = request.POST['fecha'] if request.POST['fecha'] else None
+    nombre_filter = request.POST['nombre'] if request.POST['nombre'] else None
+    provincia_filter = Provincia.objects.get(id=request.POST['provincia']) if request.POST['provincia'] != 'Todas' else None
+    rango_filter = request.POST['rango'] if request.POST['rango'] != 'Todos' else None
+    actividad_filter = request.POST['actividad'] if request.POST['actividad'] != 'Todas' else None
+    naturaleza_filter = request.POST['naturaleza'] if request.POST['naturaleza'] != 'Todas' else None
+    activo_filter = bool('activo' in request.POST)
+    orden_filter = bool('orden' in request.POST)
+    cantidades = {
+        '0': 1,
+        '1': 10,
+        '2': 25,
+        '3': 40,
+        '4': None
+    }
+    cantidad_filter = cantidades.get(request.POST.get('cant_element'), None)
+    filters = {
+        'user__date_joined__gte': fecha_inscripcion_filter,
+        'user__first_name__icontains': nombre_filter,
+        'prefijo__rango__rango_superior': rango_filter,
+        'ubicacion__provincia': provincia_filter,
+        'caracterizacion__actividad_principal': actividad_filter,
+        'caracterizacion__naturaleza_juridica': naturaleza_filter
+    }
+
+    # Lista completa de editores en orden LIFO
+    list_editores = Editorial.objects.all().order_by('-id')
+
+    # Aplicando los filtros a la lista de Editores
+    for key, value in filters.items():
+        print(key, value)
         if value:
             list_editores = list_editores.filter(**{key: value})
     if not activo_filter:
@@ -1843,6 +2127,7 @@ def export_solicitudes_list(request):
     cantidad_filter = cantidades.get(request.POST['cant_element'], None)
     filters = {
         'editor__user__first_name__icontains': editor_filter,
+        'editorial__user__first_name__icontains': editor_filter,
         'created_at__gte': fecha_filter,
         'tipo': tipo_filter,
         'status': estado_filter
@@ -1854,7 +2139,13 @@ def export_solicitudes_list(request):
     # Aplicando los filtros a la lista de Solicitudes
     for key, value in filters.items():
         if value:
-            list_solicitudes = list_solicitudes.filter(**{key:value})
+            if 'editor' in key:
+                list_solicitudes_copy = list_solicitudes
+                list_solicitudes = list_solicitudes.filter(**{key: value})
+                if not list_solicitudes:
+                    list_solicitudes = list_solicitudes_copy
+            else:
+                list_solicitudes = list_solicitudes.filter(**{key:value})
     if not orden_filter:
         list_solicitudes = list_solicitudes.order_by('id')
     if cantidad_filter and len(list_solicitudes) >= cantidad_filter:

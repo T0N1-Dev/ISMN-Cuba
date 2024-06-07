@@ -20,7 +20,8 @@
 
 {% block Offcanvas %}
     <a class="btn btn-dark" href="{% url 'backend_publicaciones' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Publicaciones</a>
-    <a class="btn btn-dark" href="{% url 'backend_editores' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editores</a>
+    <a class="btn btn-dark" href="{% url 'backend_editores' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Autores-Editores</a>
+    <a class="btn btn-dark" href="{% url 'backend_editoriales' 'list_asc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Editoriales</a>
     <a class="btn btn-dark" href="{% url 'frontend' %}"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Inicio</a>
     <a class="btn btn-danger" href="{% url 'logout' %}" data-bs-toggle="modal" data-bs-target="#exampleModal"><i
             class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Cerrar Sesión</a>
@@ -68,7 +69,6 @@
             {% else %}
                 <td>{{ solicitud.editorial|default:'-' }}</td>
             {% endif %}
-
             <td>{{ solicitud.created_at }}</td>
             <td>{{ solicitud.tipo }}</td>
             {% if solicitud.status == 'Pendiente' %}
@@ -109,10 +109,12 @@
                           <span>ESTÁS SEGURO QUE DESEAS ELIMINAR ESTA SOLICITUD ???</span>
                           {% if solicitud.tipo == 'Solicitud-ISMN' %}
                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.title|default:solicitud.editor }}</div>
-                          {% elif solicitud.temporal.first_name %}
-                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.first_name|default:solicitud.editor }}</div>
+                          {% elif solicitud.status == 'Pendiente' and solicitud.temporal.first_name %}
+                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.first_name }}</div>
+                          {% elif solicitud.status == 'Pendiente' and solicitud.temporal.nombreEditorial %}
+                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.nombreEditorial }}</div>
                           {% else %}
-                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.temporal.nombreEditorial|default:solicitud.editor }}</div>
+                              <div class="text-dark-emphasis mt-3 mb-4 ">{{ solicitud.tipo }}: {{ solicitud.editor|default:solicitud.editorial }}</div>
                           {% endif %}
                           {% if solicitud.status == 'Pendiente' %}
                               <div class="form-floating mb-3">
@@ -405,7 +407,7 @@
                 <div class="col-12 ms-auto" style="text-align: left">
                     <div class="form-floating">
                       <input type="text" class="form-control" name="sol_editor" id="floatingInput" placeholder="Editor">
-                      <label for="floatingInput">Nombre del editor</label>
+                      <label for="floatingInput">Nombre del editor o editorial.</label>
                     </div>
                 </div>
             </div>
@@ -763,7 +765,6 @@
       rmvButtonBarChart.addEventListener('click', function (){
           removeDataBarChart(ChartBar);
       });
-
 
     </script>
 {% endblock statistics-modal %}

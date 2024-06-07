@@ -1,0 +1,80 @@
+{% extends 'editoriales/add.html' %}
+
+<!-- Title on tab browser -->
+{% block title %} Editorial {% endblock title %}
+
+<!-- Input ID passed here -->
+{% block Id-hidden %} <input type="text" name="id" value="{{ editorial.id }}" hidden> {% endblock Id-hidden %}
+<!-- Navbar content -->
+{% block navbar-content %}
+    <i class="fas fa-user-edit"></i>&nbsp;&nbsp; {{ editorial.user.first_name }}
+{% endblock navbar-content %}
+
+<!-- Title in card -->
+{% block card-title %} Registrado en:
+    &nbsp;&nbsp;
+    <span class="text-primary"> <strong> {{ editorial.user.date_joined | date:'m/d/Y (H:i)' }} </strong></span>
+{% endblock card-title %}
+
+<!-- Form Action -->
+{% block Action %} action="/edit_editorial/" {% endblock Action %}
+
+<!--=========== Extends all <inputs> from add.html ===========-->
+{% block Value-username %} value = "{{ editorial.user.username }}" {% endblock Value-username %}
+{% block Value-password %} value = ******** {% endblock Value-password %}
+{% block Value-phone %} value = "{{ editorial.phone }}" {% endblock Value-phone %}
+{% block Value-email %} value = "{{ editorial.user.email }}" {% endblock Value-email %}
+{% block Value-direction %} value = "{{ editorial.ubicacion.direccion }}" {% endblock Value-direction %}
+{% block Value-Nombre %} value = "{{ editorial.user.first_name }}" {% endblock Value-Nombre %}>
+{% block Value-provincia %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
+    {{ editorial.ubicacion.provincia }}
+{% endblock Value-provincia %}
+{% block Value-Siglas %} value = "{{ editorial.sigla }}" {% endblock Value-Siglas %}>
+{% block Value-municipio %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
+    {{ editorial.ubicacion.municipio }}
+{% endblock Value-municipio %}
+
+{% block Value-Fundacion %} value = "{{ editorial.caracterizacion.fecha_fundacion | date:"Y-m-d" }}" {% endblock Value-Fundacion %}>
+{% block Value-Activity %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
+    {{ editorial.caracterizacion.actividad_principal }}
+{% endblock Value-Activity %}
+
+{% block Value-NaturalezaJud %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
+    {{ editorial.caracterizacion.naturaleza_juridica }}
+{% endblock Value-NaturalezaJud %}
+
+{% block Value-Sello %} value = "{{ editorial.nombre_sello }}" {% endblock Value-Sello %}>
+{% block Value-nombre-representante %} value = "{{ editorial.nombre_responsable }}" {% endblock Value-nombre-representante %}
+{% block Value-apellido %} value = "{{ editorial.apellidos_responsable }}"{% endblock Value-apellido %}>
+{% block Value-tribute %} value = "{{ editorial.id_tribute }}" {% endblock Value-tribute %}
+{% block Value-description %}{{ editorial.descripcion }}{% endblock Value-description %}
+{% block Value-publications_per_year %}
+    <option id="editorial_prefijo" style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold">
+    {{ editorial.prefijo.rango }}
+{% endblock Value-publications_per_year %}
+
+{% block Value-disbled %} readonly {% endblock Value-disbled %}
+{% block Title-Imagen-Sub %}
+    Cambiar imagen del editor.
+{% endblock Title-Imagen-Sub %}
+
+{% block Value-imagen %}
+    <div class="mb-3">Actualmente:
+        <a href="/media/{{ editorial.image_profile.name }}">{{ editorial.image_profile.name }}</a>
+    </div>
+{% endblock Value-imagen %}
+
+<!-- Extends ADD Button -->
+{% block Btn-content %}
+    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save">&nbsp;&nbsp;</i> Guardar</button>
+{% endblock Btn-content %}
+
+<!-- Extends Reset Button -->
+{% block Btn-reset %}
+    <button type="reset" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i>&nbsp;&nbsp; Restablecer
+    </button>
+{% endblock Btn-reset %}
