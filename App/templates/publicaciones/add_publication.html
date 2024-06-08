@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 <!-- Title on tab browser -->
 {% block title %} Añadir Publicacion {% endblock title %}
@@ -27,6 +28,97 @@
 
 <!-- PAGE CONTENT -->
 {% block content %}
+    <!-- MultiSelect -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+    <!-- Modal Autores-->
+    <div class="modal fade" id="autoresModal" tabindex="-1" aria-labelledby="autoresModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="autoresModalLabel"><i class="fa fa-user-plus"></i>&nbsp;&nbsp;Agregar Colaborador</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid">
+              <form id="autorForm" method="post" action="{% url 'crear_autor' %}">
+                {% csrf_token %}
+                <div class="row mb-2">
+                  <div class="col-12 ms-auto" style="text-align: left">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="nombre" id="nombreAutor" placeholder="-">
+                      <label for="nombreAutor">Nombre del autor</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-12 ms-auto" style="text-align: left">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="apellido" id="apellidoAutor" placeholder="-">
+                      <label for="apellidoAutor">Apellido del autor</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-12 ms-auto" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="nacionalidadSelect" name="nacionalidad" aria-label="Floating label select example">
+                        <option value="" selected>Nacionalidad</option>
+                        <option value="CUB">Cuba</option>
+                        <option value="ITA">Italia</option>
+                        <option value="EUA">Estados Unidos</option>
+                      </select>
+                      <label for="nacionalidadSelect">Selecciona la nacionalidad del autor</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-12 ms-auto" style="text-align: left;">
+                    <div class="form-floating">
+                      <select class="form-select" id="rolSelect" name="rol" aria-label="Floating label select example">
+                        <option value="" selected>Rol</option>
+                        <option value="AUT">Autor</option>
+                        <option value="ADP">Adaptador</option>
+                        <option value="EDM">Editor Musical</option>
+                        <option value="ARR">Arreglista</option>
+                      </select>
+                      <label for="rolSelect">Selecciona el rol del colaborador</label>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" id="agregarAutorBtn">Agregar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+        .select2-container {
+            flex-grow: 1;
+        }
+
+        .select2-selection {
+            height: auto !important;
+        }
+
+        .select2-search__field {
+            min-width: 400px;
+        }
+
+        .select2-selection__rendered {
+            display: flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--multiple,
+        .select2-container--default .select2-selection--single {
+            padding-left: 5px; /* Ajusta el valor según tus necesidades */
+        }
+    </style>
+
     <div class="container w-75">
         <div class="card card-body border-dark mt-5">
             <span class="text-center"> {% block card-title %}
@@ -37,165 +129,434 @@
             <div class="col-lg-12">
 
                 <!-- Form -->
-                <form {% block Action %} action="/add_musical_publicaton/" {% endblock Action %} method="POST"
+                <form id="form_add_publication" {% block Action %}  action="/add_musical_publicaton/" {% endblock Action %} novalidate method="POST"
                                          enctype="multipart/form-data" class="card p-3 border-dark mt-3 form-register">
                     {% csrf_token %}
 
                     <!-- Input ID denied here -->
                     {% block Id-hidden %} {% endblock Id-hidden %}
-
+                    <!-- Informacion del Titulo -->
+                    <div class="alert alert-info d-flex justify-content-center" role="alert">
+                        <span class="mb-1 text-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Información del título</span>
+                    </div>
+                    <!-- Input Titulo y Subtitulo de la Publicacion -->
                     <div class="row">
-                        <div class="col-12">
-                            <div class="input-group input-group-sm mb-3">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm">
                                 <span class="input-group-text side-label-form justify-content-center"><i
-                                        class="fas fa fa-heading"></i></span>
+                                        class="fas fa fa-t"></i></span>
                                 <input type="text" class="form-control" maxlength="40" name="title" id="title"
-                                       placeholder="Título de la Obra" required
+                                       placeholder="Título de la publicación musical" required
                                         {% block Value-title %}{% endblock Value-title %}>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="input-group input-group-sm mb-3">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm">
                                 <span class="input-group-text side-label-form justify-content-center"><i
-                                        class="fas fa fa-pen"></i></span>
-                                <input type="text" class="form-control" maxlength="40" name="autor" id="autor"
-                                       placeholder="Autor de la publicación" required
-                                        {% block Value-autor %}{% endblock Value-autor %}>
+                                        class="fas fa fa-s"></i></span>
+                                <input type="text" class="form-control" maxlength="40" name="subtitle" id="subtitle"
+                                       placeholder="Subtitulo de la publicación musical" required
+                                        {% block Value-subtitle %}{% endblock Value-subtitle %}>
                             </div>
                         </div>
                     </div>
+                    <hr>
 
+                    <!-- Clasificacion Tematica-->
+                    <div class="alert alert-info mb-2" role="alert">
+                        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Clasificación Temática</span>
+                        <p class="mb-0" style="font-size: .9rem">Clasificación de Materias y Géneros Musicales de la publicación de acuerdo al Sistema de Clasificación Decimal Dewey.</p>
+                    </div>
+                    <!-- Inputs Materia y Genero -->
                     <div class="row">
                         <div class="col-6">
-                            <div class="input-group input-group-sm mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i
-                                        class="fas fa fa-user-edit"></i></span>
-                                <datalist id="editor">
-                                    {% for editor in editores %}
-                                        <option value="{{ editor }}"></option>
-                                    {% endfor %}
-                                </datalist>
-                                <input type="text" list="editor" class="form-control editor" maxlength="40"
-                                       name="editor"
-                                       placeholder="Editor de la publicación" required
-                                        {% block Value-editor %}{% endblock Value-editor %}>
-                            </div>
-                        </div>
-                        <div class="col-6" style="padding-left: 0">
-                            <div class="input-group input-group-sm mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i
-                                        class="fas fa fa-hashtag"></i></span>
-                                <input type="text" class="form-control readonly" name="prefijo-editor"
-                                       id="prefijo-editor"
-                                       title="Número de prefijo del editor" placeholder="Prefijo del Editor" readonly
-                                        {% block Value-prefijo-editor %}{% endblock Value-prefijo-editor %}>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="input-group input-group-sm mb-3">
-                                <span class="input-group-text side-label-form justify-content-center">
-                                    <i class="fas fa fa-hashtag"></i>
-                                </span>
-                                <input type="text" class="form-control readonly"
-                                       name="prefijo-publicacion"
-                                       id="prefijo-publicacion" placeholder="Prefijo de la publicación"
-                                       title="Número de prefijo de la publicación" readonly
-                                        {% block Value-prefijo-publicacion %}{% endblock Value-prefijo-publicacion %}>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="input-group input-group-sm mb-3">
-                                <span class="input-group-text side-label-form justify-content-center">
-                                    <i class="fas fa fa-barcode"></i>
-                                </span>
-                                <input type="text" class="form-control readonly" name="ismn"
-                                       id="ismn" placeholder="ISMN"
-                                       title="ISMN de la publicación" readonly
-                                        {% block Value-ISMN %}{% endblock Value-ISMN %}>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="input-group input-group-sm mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i
-                                        class="fas fa fa-music"></i></span>
-                                <select class="form-select" name="gender" id="gender" required>
-                                    {% block Value-Gender %}
-                                        <option value="" hidden>Seleccione un género musical</option>
-                                    {% endblock Value-Gender %}
-                                    <option disabled></option>
-                                    <option>Danzón</option>
-                                    <option>Fusión</option>
-                                    <option>Bolero</option>
-                                    <option>Popular Bailable</option>
-                                    <option>Mambo</option>
-                                    <option>ChaChaCha</option>
-                                    <option>Rumba</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="input-group input-group-sm mb-3">
-                                <span class="input-group-text side-label-form justify-content-center"><i
-                                        class="fas fa fa-calendar"></i></span>
-                                <input type="text" class="form-control" maxlength="40" name="date" id="date"
-                                       placeholder="Fecha de creación" required title="Fecha de creación"
-                                       onfocus="this(type='date')" onblur="this(type='text')"
-                                        {% block Value-date %}{% endblock Value-date %}>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <textarea style="field-sizing: content" class="form-control text-sm" name="note" maxlength="400" id="note" rows="3"
-                                  placeholder="La descripción es opcional...">{% block Value-description %}{% endblock Value-description %}</textarea>
-                    </div>
-
-                    <hr style="height: 2px;">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                {% block Value-letter %}{% endblock Value-letter %}
-                                <div class="mb-3" style="font-size: 14px;"><i class="fa fa-cloud-upload-alt"></i>&nbsp;&nbsp;
-                                    {% block Title-Letter-Sub %}
-                                        Subir letra de la canción
-                                    {% endblock Title-Letter-Sub %}
-                                </div>
-                                <input type="file" class="form-control form-control-sm" name="publication_letter"
-                                       accept="application/pdf,application/msword,.doc,.docx,.pdf,.txt">
-                                <div class="form-text" style="font-size: 12px;">* Extensiones permitidas: .docx - .pdf -
-                                    .txt
+                            <div class="input-group">
+                                <div class="input-group input-group-sm">
+                                    <label class="input-group-text side-label-form justify-content-center"><i
+                                            class="fa fa-book-reader"></i></label>
+                                    <select class="form-select form-control" name="materia" id="materia"
+                                            required>
+                                        {% block Value-materia %}
+                                            <option value="" hidden>Materia</option>
+                                        {% endblock Value-materia %}
+                                        <option disabled></option>
+                                        {% for materia in materias %}
+                                            <option title="{{ materia.descripcion }}" value="{{ materia.id }}">
+                                                {{ materia }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="col-6">
-                            <div class="mb-3">
-                                {% block Value-imagen %}{% endblock Value-imagen %}
-                                <div class="mb-3" style="font-size: 14px;"><i class="fa fa-cloud-upload-alt"></i>&nbsp;&nbsp;
-                                    {% block Title-Imagen-Sub %} Subir imagen de la
-                                        publicación {% endblock Title-Imagen-Sub %}
+                            <div class="input-group">
+                                <div class="input-group input-group-sm">
+                                    <label class="input-group-text side-label-form justify-content-center"><i
+                                            class="fa fa-music"></i></label>
+                                    <select class="form-select form-control" name="genero" id="genero"
+                                            required>
+                                        {% block Value-genero %}
+                                            <option value="" hidden>Género musical</option>
+                                        {% endblock Value-genero %}
+                                        <option disabled></option>
+                                        {% for genero in generos %}
+                                            <option title="{{ genero.descripcion }}" value="{{ genero.id }}">
+                                                {{ genero }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
-                                <input type="file" class="form-control form-control-sm" name="publication_image"
-                                       accept="image/*">
-                                <div class="form-text" style="font-size: 12px;">* Extensiones permitidas: jpg - png -
-                                    jpeg - *
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Title Tema -->
+                    <div class="alert alert-info mb-2" role="alert">
+                        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Tema</span>
+                    </div>
+                    <!-- Input Coleccion y Numero de Coleccion -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-book"></i></span>
+                                <input type="text" class="form-control" name="tema_coleccion" id="tema_coleccion" maxlength="50"
+                                       placeholder="Colección" {% block Value-Tema-Coleccion %} {% endblock Value-Tema-Coleccion %}>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm position-relative mb-3">
+                                <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-hashtag"></i></span>
+                                <input type="text" class="form-control" name="tema_numero_coleccion" id="tema_numero_coleccion"
+                                       placeholder="No. Colección" maxlength="5" required
+                                        {% block Value-Tema-NoColeccion %}{% endblock Value-Tema-NoColeccion %}>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Input Tipo de publicacion e Idioma-->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group">
+                                <div class="input-group input-group-sm">
+                                    <label class="input-group-text side-label-form justify-content-center"><i
+                                            class="fa fa-t"></i></label>
+                                    <select class="form-select form-control" name="tema_tipo_publicacion" id="tema_tipo_publicacion"
+                                            required>
+                                        {% block Value-Tema_tipo_publicacion %}
+                                            <option value="" hidden>Tipo de publicación</option>
+                                        {% endblock Value-Tema_tipo_publicacion %}
+                                        <option disabled></option>
+                                        {% for value, type in tipos_publicacion %}
+                                            <option value="{{ value }}">
+                                                {{ type }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group">
+                                <div class="input-group input-group-sm">
+                                    <label class="input-group-text side-label-form justify-content-center"><i
+                                            class="fa fa-language"></i></label>
+                                    <select class="form-select form-control" name="tema_idioma" id="tema_idioma"
+                                            required>
+                                        {% block Value-Tema-Idioma %}
+                                            <option value="" hidden>Idioma</option>
+                                        {% endblock Value-Tema-Idioma %}
+                                        <option disabled></option>
+                                        {% for value, idioma in idiomas %}
+                                            <option value="{{ value }}">
+                                                {{ idioma }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Title Colaboradores-->
+                        <div class="alert alert-info mb-2" role="alert">
+                            <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Colaboradores</span>
+                            <p class="mb-0" style="font-size: .9rem">Incluya aquí personas naturales o grupos de personas que han participado en la formación de la obra musical que se está registrando.</p>
+                        </div>
+                    {% block Colaboladores %}
+                        <!-- Inputs Autores y Editor-->
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="input-group d-flex align-items-center input-group-sm mb-3">
+                                    <label class="input-group-text side-label-form text-center"><i style="margin-left: 7px;" class="fa fa-user"></i>&nbsp;&nbsp;</label>
+                                    <select class="form-select form-control js-select2" name="colaborador" id="colaborador" required multiple="multiple">
+                                        {% block Value-Autores %}
+                                            <option disabled></option>
+                                            {% for autor in autores %}
+                                                <option value="{{ autor.id }}">
+                                                    {{ autor }} {{ autor.apellido }}
+                                                </option>
+                                            {% endfor %}
+                                        {% endblock Value-Autores %}
+                                    </select>
+                                    <button type="button" class="ml-1 btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#autoresModal" title="Agregar un nuevo colaborador"><i class="fa fa-plus"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-group input-group-sm mb-3" style="margin-top: 3px">
+                                    <span class="input-group-text side-label-form justify-content-center"><i
+                                            class="fas fa fa-user-edit"></i></span>
+                                    <datalist id="editor">
+                                        {% for editor in editores %}
+                                            <option value="{{ editor }}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                    <input type="text" list="editor" class="form-control editor" maxlength="40"
+                                           name="editor"
+                                           placeholder="Editor de la publicación" required
+                                            {% block Value-editor %}{% endblock Value-editor %}>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text side-label-form justify-content-center"><i
+                                            class="fas fa fa-hashtag"></i></span>
+                                    <input type="text" class="form-control readonly" name="prefijo-editor"
+                                           id="prefijo-editor"
+                                           title="Número de prefijo del editor" placeholder="Prefijo del Editor" readonly
+                                            {% block Value-prefijo-editor %}{% endblock Value-prefijo-editor %}>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text side-label-form justify-content-center">
+                                        <i class="fas fa fa-hashtag"></i>
+                                    </span>
+                                    <input type="text" class="form-control readonly"
+                                           name="prefijo-publicacion"
+                                           id="prefijo-publicacion" placeholder="Prefijo de la publicación"
+                                           title="Número de prefijo de la publicación" readonly
+                                            {% block Value-prefijo-publicacion %}{% endblock Value-prefijo-publicacion %}>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text side-label-form justify-content-center">
+                                        <i class="fas fa fa-barcode"></i>
+                                    </span>
+                                    <input type="text" class="form-control readonly" name="ismn"
+                                           id="ismn" placeholder="ISMN"
+                                           title="ISMN de la publicación" readonly
+                                            {% block Value-ISMN %}{% endblock Value-ISMN %}>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endblock Colaboladores %}
+
+                    <!-- Title Descripción Sustrato-->
+                    <div class="alert alert-info mb-2" role="alert">
+                        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Sustrato (Opcional)</span>
+                        <p class="mb-0" style="font-size: .9rem"><b>Para publicaciones electrónicas:</b> También llamada “Edición Digital”. Publicación cuyo mecanismo primario de distribución y su “soporte primario de lectura” está basado en la tecnología digital.</p>
+                    </div>
+                    <!--Botones de Activación-->
+                    <div class="row mb-3">
+                        <div class="col-6 d-flex justify-content-center">
+                          <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#fisica" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="fa fa-f"></i>&nbsp;&nbsp;Descripción Física
+                          </button>
+                        </div>
+                        <div class="col-6 d-flex justify-content-center">
+                          <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#electronica" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="fa fa-e"></i>&nbsp;&nbsp;Descrición Electrónica
+                          </button>
+                        </div>
+                    </div>
+                    <!-- Ambas Descripciones Fisica y Electronica-->
+                    <div class="row">
+                        <!-- Descripcion Fisica-->
+                        <div class="col-6">
+                          <div class="collapse show" id="fisica">
+                          <!-- Inputs Tipo de Descripcion Numero de Paginas-->
+                            <div class="row">
+                                <div class="col-6">
+                                  <div class="input-group">
+                                    <div class="input-group input-group-sm mb-3">
+                                        <label class="input-group-text side-label-form justify-content-center"><i
+                                                class="fa fa-d"></i></label>
+                                        <select class="form-select form-control" name="nombre_descripcion" id="nombre_descripcion"
+                                                required>
+                                            {% block Value-Nombre-Descripcion %}
+                                                <option value="" hidden>Descripcion física</option>
+                                            {% endblock Value-Nombre-Descripcion %}
+                                            <option disabled></option>
+                                            {% for key, descripcion in descripciones %}
+                                                <option value="{{ key }}">
+                                                    {{ descripcion }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                </div>
+                            </div>
+                              </div>
+                                <div class="col-6">
+                                  <div class="input-group input-group-sm position-relative mb-3">
+                                      <span class="input-group-text side-label-form justify-content-center"><i class="fa fa-hashtag"></i></span>
+                                      <input type="text" class="form-control" name="num_paginas" id="num_paginas"
+                                               placeholder="Número de Páginas" maxlength="5" required
+                                                {% block Value-num_paginas %}{% endblock Value-num_paginas %}>
+                                  </div>
+                                </div>
+                            </div>
+                          <!-- Inputs Tipo de Impresion y Tipo de Encuadernacion-->
+                            <div class="row">
+                                <div class="col-6">
+                                  <div class="input-group">
+                                    <div class="input-group input-group-sm mb-3">
+                                        <label class="input-group-text side-label-form justify-content-center"><i
+                                                class="fa fa-print"></i></label>
+                                        <select class="form-select form-control" name="tipo_impresion" id="tipo_impresion"
+                                                required>
+                                            {% block Value-Tipo-Impresion %}
+                                                <option value="" hidden>Tipo de Impresión</option>
+                                            {% endblock Value-Tipo-Impresion %}
+                                            <option disabled></option>
+                                            {% for key, impresion in impresiones %}
+                                                <option value="{{ key }}">
+                                                    {{ impresion }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                </div>
+                            </div>
+                                </div>
+                                <div class="col-6">
+                                  <div class="input-group">
+                                    <div class="input-group input-group-sm mb-3">
+                                        <label class="input-group-text side-label-form justify-content-center"><i
+                                                class="fa fa-book"></i></label>
+                                        <select class="form-select form-control" name="tipo_encuadernacion" id="tipo_encuadernacion"
+                                                required>
+                                            {% block Value-Tipo-Encuadernacion %}
+                                                <option value="" hidden>Tipo de Encuadernación</option>
+                                            {% endblock Value-Tipo-Encuadernacion %}
+                                            <option disabled></option>
+                                            {% for key, encuadernacion in encuadernaciones %}
+                                                <option value="{{ key }}">
+                                                    {{ encuadernacion }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                          <!-- Inputs Descripcion-->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <textarea class="form-control text-sm" name="descripcion_fisica_note" maxlength="1000" rows="2"
+                                                  placeholder="Descripción adicional (opcional)...">{% block Value-description %}{% endblock Value-description %}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Descripcion Electronica-->
+                        <div class="col-6" style="min-height: 171px">
+                          <div class="collapse show" id="electronica">
+                              <div class="row mb-2">
+                                  <div class="col-12">
+                                      <div class="input-group">
+                                          <div class="input-group input-group-sm mb-3">
+                                              <label class="input-group-text side-label-form"><i
+                                                        class="fa fa-compact-disc"></i></label>
+                                              <select class="form-select form-control" name="medio_electronico" id="medio_electronico"
+                                                        required>
+                                                    {% block Value-Medio-Electronico %}
+                                                        <option value="" hidden>Medio electrónico o digital</option>
+                                                    {% endblock Value-Medio-Electronico %}
+                                                    <option disabled></option>
+                                                    {% for key, medio in medios %}
+                                                        <option value="{{ key }}">
+                                                            {{ medio }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-12 ml-3">
+                                    {% block Value-letter %}{% endblock Value-letter %}
+                                    <div class="mb-1" style="font-size: 14px; margin-left: 7px"><i class="fa fa-cloud-upload-alt"></i>&nbsp;&nbsp;
+                                        {% block Title-Letter-Sub %}
+                                            Subir letra de la canción
+                                        {% endblock Title-Letter-Sub %}
+                                    </div>
+                                    <input type="file" class="form-control form-control-sm" name="publication_letter"
+                                           accept="application/pdf,application/msword,.doc,.docx,.pdf,.txt">
+                                    <div class="form-text" style="font-size: 12px;">* Extensiones permitidas: .docx - .pdf -
+                                        .txt
+                                    </div>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Información catálogo -->
+                    <div class="alert alert-info mb-2" role="alert">
+                        <span class="mb-1 d-flex justify-content-center mb-0 fw-bold"><i class="fa fa-info-circle fs-4 text-info"></i>&nbsp;&nbsp;Información de catálogo</span>
+                        <p class="mb-0" style="font-size: .9rem">Si usted desea que este título sea incorporado en nuestro catálogo, por favor ingrese la información correspondiente a la portada, reseña y fecha de realización.</p>
+                    </div>
+                    <!-- Fecha Portada y Descripción-->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <div class="input-group input-group-sm mb-3">
+                                        <span class="input-group-text side-label-form justify-content-center"><i
+                                                class="fas fa fa-calendar"></i></span>
+                                        <input type="text" class="form-control" maxlength="40" name="date" id="date"
+                                               placeholder="Fecha de creación" required title="Fecha de creación"
+                                               onfocus="this(type='date')" onblur="this(type='text')"
+                                                {% block Value-date %}{% endblock Value-date %}>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <div class="mb-3">
+                                        {% block Value-imagen %}{% endblock Value-imagen %}
+                                        <div class="mb-3" style="font-size: 14px; margin-left: 7px"><i class="fa fa-cloud-upload-alt"></i>&nbsp;&nbsp;
+                                            {% block Title-Imagen-Sub %} Subir imagen de portada {% endblock Title-Imagen-Sub %}
+                                        </div>
+                                        <input type="file" class="form-control form-control-sm" name="publication_image"
+                                               accept="image/*">
+                                        <div class="form-text" style="font-size: 12px;">* Extensiones permitidas: jpg - png -
+                                            jpeg - *
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
+                        <div class="col-6 mb-3">
+                            <div class="form-group mb-3">
+                                <textarea class="form-control text-sm" name="note" maxlength="1000" rows="5"
+                                          placeholder="Escriba una breve reseña de la publicación musical...(Opcional)">{% block Value-descripcion-general %}{% endblock Value-descripcion-general %}</textarea>
+                            </div>
+                        </div>
                     </div>
+
 
 
                     <div class="d-flex flex-column gap-2 mt-3">
@@ -313,7 +674,7 @@
                     } else prefijo_editor = '{{ editor.prefijo }}'
                     editor_prefijo_input.value = "Prefijo del Editor: " + prefijo_editor;
                     publicacion_prefijo_input.value = "Prefijo de la publicación: " + prefijo_publicacion;
-                    ismn.value = crear_ismn(prefijo_editor, prefijo_publicacion)
+                    ismn.value = crear_ismn(prefijo_editor, prefijo_publicacion);
                 }
             {% endfor %}
         })
@@ -322,4 +683,10 @@
 
     </script>
 
+    <!-- Multiselect -->
+    <script src="{% static 'multiselect-05/js/jquery.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+    <script src="{% static 'multiselect-05/js/main.js' %}"></script>
+
 {% endblock content %}
+

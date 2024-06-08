@@ -9,7 +9,7 @@ function validateEmail(email){
 
 function validateFormatPassword(password) {
     let passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return passwordPattern.test(password.val())
+    return passwordPattern.test(password.val());
 }
 
 function validateCI(ci) {
@@ -18,23 +18,26 @@ function validateCI(ci) {
     return ciPattern.test(ciValue);
 }
 
+function showAlert(field, message) {
+    field.addClass('is-invalid').removeClass('is-valid');
+    swal("Opss!", message, "error").then(() => {
+        field[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        field.focus();
+    });
+}
+
+function validateField(field, errorMessage) {
+    if (field.val() === '') {
+        showAlert(field, errorMessage);
+        return false;
+    } else {
+        field.removeClass('is-invalid').addClass('is-valid');
+        return true;
+    }
+}
+
 function validateAll() {
     let isValid = true;
-
-    function validateField(field, errorMessage) {
-        if (field.val() === '') {
-            field.addClass('is-invalid');
-            field.removeClass('is-valid');
-            swal("Opss !", errorMessage, "error").then(() => {
-                field[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                field.focus();
-            });
-            isValid = false;
-        } else {
-            field.removeClass('is-invalid');
-            field.addClass('is-valid');
-        }
-    }
 
     // Usuarios
     let check = $('#flexCheckDefault');
@@ -67,151 +70,133 @@ function validateAll() {
 
     // Publicacion
     let title = $("#title");
-    let autor = $("#autor");
-    let editor = $("input[name*='editor']");
-    let genero = $("#gender");
+    let editor = $("input[name='editor']");
+    let genero = $("#genero");
     let date = $("#date");
     let letra = $("input[name*='publication_letter']");
-
+    let materia = $("#materia");
+    let tema_coleccion = $("#tema_coleccion");
+    let tema_numero_coleccion = $("#tema_numero_coleccion");
+    let tema_tipo_publicacion = $("#tema_tipo_publicacion");
+    let tema_idioma = $("#tema_idioma");
 
     // Validar Checks
     if (check2.length && !check2.is(':checked')) {
-        check2.addClass('is-invalid');
-        swal("Opss!", "Asegúrese de leer y entender los terminos y condiciones.", "error")
-            .then(() => {
-                check2[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                check2.focus();
-            });
+        showAlert(check2, "Asegúrese de leer y entender los términos y condiciones.");
         isValid = false;
-        return isValid;
     } else {
         check2.removeClass('is-invalid').addClass('is-valid');
     }
 
     if (check.length && !check.is(':checked')) {
-        check.addClass('is-invalid');
-        swal("Opss!", "Asegúrese de leer y entender los terminos y condiciones y marque la opción de 'leido'.", "error")
-            .then(() => {
-                check[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                check.focus();
-            });
+        showAlert(check, "Asegúrese de leer y entender los términos y condiciones y marque la opción de 'leído'.");
         isValid = false;
-        return isValid;
     } else {
         check.removeClass('is-invalid').addClass('is-valid');
     }
 
     // Validar email
-    if (email.val() && !(validateEmail(email.val()))) {
-        email.addClass('is-invalid');
-        swal("Opsss !", "Inserte un correo válido.", "error").then(() => {
-                email[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                email.focus();
-            });
+    if (email.val() && !validateEmail(email.val())) {
+        showAlert(email, "Inserte un correo válido.");
         isValid = false;
-        return isValid;
     } else if (email.val()) {
-        email.removeClass('is-invalid');
-        email.addClass('is-valid');
+        email.removeClass('is-invalid').addClass('is-valid');
     }
 
     // Validación de la contraseña
     if (password.val() && !validateFormatPassword(password)) {
-        swal('Opsss !', 'La contraseña debe tener al menos 8 caracteres y ser alfanumérica.', 'error').then(() => {
-                password[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                password.focus();
-            });
-        password.removeClass('is-valid').addClass('is-invalid');
+        showAlert(password, 'La contraseña debe tener al menos 8 caracteres y ser alfanumérica.');
         isValid = false;
-        return isValid;
     } else if (password.val()) {
         password.removeClass('is-invalid').addClass('is-valid');
     }
 
     if (username.val() && password.val().includes(username.val())) {
-        swal('Opsss !', 'La contraseña NO debe contener el nombre de usuario.', 'error').then(() => {
-                password[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                password.focus();
-            });
-        password.removeClass('is-valid').addClass('is-invalid');
+        showAlert(password, 'La contraseña NO debe contener el nombre de usuario.');
         isValid = false;
-        return isValid;
     } else if (password.val()) {
         password.removeClass('is-invalid').addClass('is-valid');
     }
 
     // Validar el CI
     if (ci.val() && !validateCI(ci)){
-        swal('Opsss !', 'La número de carnet de identidad debe tener 11 dígitos.', 'error').then(() => {
-                ci[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                ci.focus();
-            });
-        ci.removeClass('is-valid').addClass('is-invalid');
+        showAlert(ci, 'El número de carnet de identidad debe tener 11 dígitos.');
         isValid = false;
-        return isValid;
     } else if (ci.val()) {
         ci.removeClass('is-invalid').addClass('is-valid');
     }
 
-    validateField(first_name, "Inserte su nombre.");
-    validateField(last_name, "Inserte su apellido.");
-    validateField(ci, "Inserte su Carnet de Identidad.");
-    validateField(birthday, "El campo 'Fecha de nacimiento' está vacío.");
-    validateField(idTribute, "Se ha olvidado el número de identificación tributaria.");
-    validateField(nombreEditorial, "Inserte el nombre o razón social de la Editorial.");
-    validateField(provincia, "Se ha olvidado seleccionar una provincia.");
-    validateField(municipio, "Se ha olvidado seleccionar un municipio.");
-    validateField(address, "La dirección está vacía.");
-    validateField(phone, "Inserte su número de teléfono.");
-    validateField(email, "Inserte su dirección de correo electrónico.");
-    validateField(fundacion_date, "Inserte la fecha de fundación de la Editorial.");
-    validateField(editorialActivity, "Seleccione la Actividad Principal de la Editorial.");
-    validateField(editorialNaturalezaJud, "Seleccione la Naturaleza Jurídica de la Editorial.");
-    validateField(representante_name, "Inserte el nombre del responsable  de la Editorial.");
-    validateField(representante_apellido, "Inserte el apellido del responsable  de la Editorial.");
-    validateField(username, "Inserte su nombre de usuario.");
-    validateField(password, "Inserte una contraseña.");
-    validateField(editorPrefijo, "Seleccione su número estimado de publicaciones por año.");
+    // Validar colaborador
+    // Verificar si existen elementos con la clase select2-selection__choice
+        if ($('#colaborador').length && $(".select2-selection__choice").length === 0) {
+            showAlert($('#colaborador'), 'Debe seleccionar al menos un colaborador.')
+            isValid=false;
+        } else if (ci.val()) {
+        ci.removeClass('is-invalid').addClass('is-valid');
+        }
 
-    if (letra.val() === '' && document.querySelector('div.edicion') == null) {
-        swal("Opss!", "Se ha olvidado la letra de la canción. Seleccione un archivo word, " +
-            "pdf o txt donde tenga guardada la letra de la obra musical", "error");
-        isValid = false;
-    } else if (title.val() === '') {
-        swal("Opss!", "Se ha olvidado el título de la obra.", "error");
-        isValid = false;
-    } else if (autor.val() === '') {
-        swal("Opss!", "Se ha olvidado el nombre del autor.", "error");
-        isValid = false;
-    } else if (editor.val() === '') {
-        swal("Opss!", "Se ha olvidado de elegir un editor.", "error");
-        isValid = false;
-    } else if (genero.val() === '') {
-        swal("Opss!", "Se ha olvidado de elegir un género musical.", "error");
-        isValid = false;
-    } else if (date.val() === '') {
-        swal("Opss!", "Se ha olvidado de elegir la fecha de creación de la obra musical.", "error");
+    isValid &= validateField(first_name, "Inserte su nombre.");
+    isValid &= validateField(last_name, "Inserte su apellido.");
+    isValid &= validateField(ci, "Inserte su Carnet de Identidad.");
+    isValid &= validateField(birthday, "El campo 'Fecha de nacimiento' está vacío.");
+    isValid &= validateField(idTribute, "Se ha olvidado el número de identificación tributaria.");
+    isValid &= validateField(nombreEditorial, "Inserte el nombre o razón social de la Editorial.");
+    isValid &= validateField(provincia, "Se ha olvidado seleccionar una provincia.");
+    isValid &= validateField(municipio, "Se ha olvidado seleccionar un municipio.");
+    isValid &= validateField(address, "La dirección está vacía.");
+    isValid &= validateField(phone, "Inserte su número de teléfono.");
+    isValid &= validateField(email, "Inserte su dirección de correo electrónico.");
+    isValid &= validateField(fundacion_date, "Inserte la fecha de fundación de la Editorial.");
+    isValid &= validateField(editorialActivity, "Seleccione la Actividad Principal de la Editorial.");
+    isValid &= validateField(editorialNaturalezaJud, "Seleccione la Naturaleza Jurídica de la Editorial.");
+    isValid &= validateField(representante_name, "Inserte el nombre del responsable de la Editorial.");
+    isValid &= validateField(representante_apellido, "Inserte el apellido del responsable de la Editorial.");
+    isValid &= validateField(username, "Inserte su nombre de usuario.");
+    isValid &= validateField(password, "Inserte una contraseña.");
+    isValid &= validateField(editorPrefijo, "Seleccione su número estimado de publicaciones por año.");
+
+    // Validar los campos de la publicación
+    isValid &= validateField(title, "Se ha olvidado el título de la publicación.");
+    isValid &= validateField(genero, "Se ha olvidado de elegir un género musical para la publicación.");
+    isValid &= validateField(materia, "Se ha olvidado de elegir la materia de la publicación musical.");
+    isValid &= validateField(tema_coleccion, "Se ha olvidado de elegir el tema de colección de la publicación musical.");
+    isValid &= validateField(tema_numero_coleccion, "Se ha olvidado de elegir el número de colección de la publicación musical.");
+    isValid &= validateField(tema_tipo_publicacion, "Se ha olvidado de elegir el tipo de publicación musical.");
+    isValid &= validateField(tema_idioma, "Se ha olvidado de elegir el idioma de publicación musical.");
+    isValid &= validateField(editor, "Seleccione un editor.");
+    isValid &= validateField(date, "Se ha olvidado de elegir la fecha de creación de la publicación musical.");
+
+    // Validar la letra de la canción
+    if (letra.val() === '' && document.querySelector('#medio_electronico') == null) {
+        showAlert(letra, "Se ha olvidado la letra de la canción. Seleccione un archivo word, pdf o txt donde tenga guardada la letra de la obra musical.");
         isValid = false;
     }
+
     return isValid;
 }
 
 function validateFieldOnInput() {
     let field = $(this);
     if (field.val().trim() === '') {
-        field.addClass('is-invalid');
-        field.removeClass('is-valid');
+        field.addClass('is-invalid').removeClass('is-valid');
     } else {
-        field.removeClass('is-invalid');
-        field.addClass('is-valid');
+        field.removeClass('is-invalid').addClass('is-valid');
     }
 }
 
 $(document).ready(function () {
-    $("#btn-add, #btn-send").bind("click", function() {
-        return validateAll();
+    $("#btn-add").click(function(event) {
+        let isValid = validateAll();
+
+        if (!isValid) {
+            event.preventDefault();
+        } else {
+            $("#prefijo-editor, #prefijo-publicacion, #ismn").removeAttr('readonly');
+            $("#form_add_publication").submit();
+        }
     });
 
+    // Manejar la validación en cambios de input y selección
     $("input, select").on("input change", validateFieldOnInput);
 });
 
@@ -220,7 +205,7 @@ $(document).ready(function () {
 $(document).ready(function (){
 
     // Only letter
-    $('#first_name, #last_name, #autor, #representante_apellido, #representante_name, #siglasEditorial, #floatingInput').keyup(function () {
+    $('#first_name, #apellidoAutor, #nombreAutor,  #last_name, #autor, #representante_apellido, #representante_name, #siglasEditorial, #floatingInput').keyup(function () {
         var letter = $(this).val();
         var allow = letter.replace(/[^a-zA-ZáéíóúñÑ]/g, '');
         $(this).val(allow);
@@ -251,7 +236,7 @@ $(document).ready(function (){
 });
 
 // 3) Script to put First Letter capitalized
-$("#autor, #first_name, #last_name, #representante_apellido, #representante_name").keyup(function () {
+$("#autor, #first_name,#apellidoAutor,  #last_name, #representante_apellido, #representante_name, #title, #subtitle").keyup(function () {
     var txt = $(this).val();
     $(this).val(txt.replace(/^(.)|\s(.)/g, function ($1){return $1.toUpperCase( );}));
 });
@@ -321,8 +306,12 @@ $(document).ready(function () {
         var allowedExtensions = /(\.pdf|\.docx|\.txt)/i;
         if (!allowedExtensions.exec(filePath)) {
             swal('Opsss !', 'Por favor, selecciona un archivo de documento válido.', 'error');
+            $(this).removeClass('is-valid').addClass('is-invalid');
             $(this).val('');
             return false;
+        }
+        else {
+            $(this).removeClass('is-invalid').addClass('is-valid');
         }
     });
 });
@@ -366,7 +355,7 @@ if (verify === 0) {
 }
 
 // 12) Script to allow only numbers in ID Tribute
-$("#idTribute, #CI, #floatingInput2").keyup(function () {
+$("#idTribute, #CI, #floatingInput2, #tema_numero_coleccion, #num_paginas").keyup(function () {
     if(!/^[0-9]*$/.test(this.value)) {
         this.value = this.value.split(/[^0-9]/).join('');
     }
@@ -437,7 +426,7 @@ function toggleFunction(){
 
 // 17 Validate Name Editorial
 // Only letter
-$('#nombreEditorial, #selloEditorial').keyup(function () {
+$('#nombreEditorial, #selloEditorial, #title, #tema_coleccion, #subtitle').keyup(function () {
     var letter = $(this).val();
     var allow = letter.replace(/[^a-zA-ZáéíóúñÑ0-9 ]/g, '');
     $(this).val(allow);
@@ -530,19 +519,130 @@ jQuery(function ($) {
 
 // 21 Validate Adress
 $('#address').keyup(function () {
-        var value = $(this).val();
-        var allow = value.replace(/[^a-zA-ZáéíóúñÑ./:,#0-9 ]/g, '');
-        $(this).val(allow);
+    var value = $(this).val();
+    var allow = value.replace(/[^a-zA-ZáéíóúñÑ./:,#0-9 ]/g, '');
+    $(this).val(allow);
 
-        // Validar después del reemplazo
-        if ($(this).val().trim() === '') {
-            $(this).removeClass('is-valid').addClass('is-invalid');
-        } else {
-            $(this).removeClass('is-invalid').addClass('is-valid');
+    // Validar después del reemplazo
+    if ($(this).val().trim() === '') {
+        $(this).removeClass('is-valid').addClass('is-invalid');
+    } else {
+        $(this).removeClass('is-invalid').addClass('is-valid');
+    }
+});
+
+// Solo un Colapse
+$(document).ready(function() {
+    // Detectar cambios en los inputs de la descripción física
+    $('#fisica input, #fisica select, #fisica textarea').on('input change', function() {
+        if (!$('#fisica').hasClass('show')) {
+            $('#fisica').collapse('show');
+        }
+        if ($('#electronica').hasClass('show')) {
+            $('#electronica').collapse('hide');
+            // Limpiar los valores de los inputs dentro del collapse de descripción electrónica
+            $('#electronica input, #electronica select, #electronica textarea').val('');
         }
     });
 
+    // Detectar cambios en los inputs de la descripción electrónica
+    $('#electronica input, #electronica select').on('input change', function() {
+        if (!$('#electronica').hasClass('show')) {
+            $('#electronica').collapse('show');
+        }
+        if ($('#fisica').hasClass('show')) {
+            $('#fisica').collapse('hide');
+            // Limpiar los valores de los inputs dentro del collapse de descripción física
+            $('#fisica input, #fisica select, #fisica textarea').val('');
+        }
+    });
+});
 
+// Crear Autor dinamicamente
+
+$(document).ready(function() {
+  $('#agregarAutorBtn').on('click', function() {
+    var isValid = true;
+
+    // Obtener valores de los inputs
+    var nombre = $('#nombreAutor').val();
+    var apellido = $('#apellidoAutor').val();
+    var nacionalidad = $('#nacionalidadSelect').val();
+    var rol = $('#rolSelect').val();
+
+    // Limpiar mensajes previos y clases de error
+    $('.is-invalid').removeClass('is-invalid');
+    $('.invalid-feedback').remove();
+
+    // Validar cada campo
+    if (!nombre) {
+      isValid = false;
+      $('#nombreAutor').addClass('is-invalid');
+      $('#nombreAutor').after('<div class="invalid-feedback">El nombre es requerido.</div>');
+    }
+    if (!apellido) {
+      isValid = false;
+      $('#apellidoAutor').addClass('is-invalid');
+      $('#apellidoAutor').after('<div class="invalid-feedback">El apellido es requerido.</div>');
+    }
+    if (!nacionalidad || nacionalidad === 'Nacionalidad') {
+      isValid = false;
+      $('#nacionalidadSelect').addClass('is-invalid');
+      $('#nacionalidadSelect').after('<div class="invalid-feedback">La nacionalidad es requerida.</div>');
+    }
+    if (!rol || rol === 'Rol') {
+      isValid = false;
+      $('#rolSelect').addClass('is-invalid');
+      $('#rolSelect').after('<div class="invalid-feedback">El rol es requerido.</div>');
+    }
+
+    // Si todos los campos son válidos, enviar la solicitud AJAX
+    if (isValid) {
+      $.ajax({
+        type: 'POST',
+        url: $('#autorForm').attr('action'),  // URL from the form's action attribute
+        data: {
+          'nombre': nombre,
+          'apellido': apellido,
+          'nacionalidad': nacionalidad,
+          'rol': rol,
+          'csrfmiddlewaretoken': $('[name="csrfmiddlewaretoken"]').val()  // CSRF token
+        },
+        success: function(data) {
+          // Lógica de éxito, por ejemplo, cerrar el modal y limpiar el formulario
+          $('#autoresModal').modal('hide');
+          $('#autorForm')[0].reset();
+          var newAuthorHTML = `
+                    <li class="select2-selection__choice" title="${data.nombre} ${data.apellido}">
+                        <span class="select2-selection__choice__remove" role="presentation">×</span>
+                        ${data.nombre} ${data.apellido}
+                    </li>
+                `;
+            $('.select2-selection__rendered .select2-search').before(newAuthorHTML);
+        },
+        error: function(response) {
+          // Lógica de error
+          console.log(response);
+        }
+      });
+    }
+  });
+});
+
+// Validate Editor
+$(document).ready(function () {
+    // Manejar el evento blur del campo editor
+    $("input[name='editor']").change(function() {
+        // Obtener el valor del elemento prefijo-publicacion
+        let prefijoPublicacion = $("#prefijo-publicacion").val();
+
+        // Si el valor está vacío, lanzar una alerta
+        if (!prefijoPublicacion) {
+            $("input[name='editor']").val('');
+            swal('Error', 'El campo editor no coincide con ningún editor registrado, revise.', 'error');
+        }
+    });
+});
 
 
 var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))

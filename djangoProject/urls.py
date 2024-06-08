@@ -27,6 +27,7 @@ urlpatterns = [
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     # Register User
     path('get-municipios/', views.get_municipios, name='get_municipios'),
+    path('crear_autor/', views.crear_autor, name='crear_autor'),
     path('register_autor_editor/', views.register_autor_editor, name='register_autor_editor'),
     path('register_editorial/', views.register_editorial, name='register_editorial'),
     # Email Confirmation

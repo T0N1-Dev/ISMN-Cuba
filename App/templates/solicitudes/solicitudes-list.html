@@ -300,7 +300,7 @@
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Autor:</strong> &nbsp;&nbsp;{{ solicitud.temporal.autor }}
+                                <strong>Autor:</strong> &nbsp;&nbsp;{{ solicitud.temporal.subtitle|default:'-' }}
                             </div>
                           </div>
                           <hr>
@@ -318,7 +318,25 @@
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Género Musical:</strong> &nbsp;&nbsp;{{ solicitud.temporal.gender }}
+                                <strong>Género Musical:</strong> &nbsp;&nbsp;{{ solicitud.temporal.genero_nombre }}
+                            </div>
+                          </div>
+                          <hr>
+                          <div class="row mb-1">
+                            <div class="col-12">
+                                <strong>Materia:</strong> &nbsp;&nbsp;{{ solicitud.temporal.materia_nombre }}
+                            </div>
+                          </div>
+                          <hr>
+                          <div class="row mb-1">
+                            <div class="col-12">
+                                <strong>Coleccion:</strong> &nbsp;&nbsp;{{ solicitud.temporal.tema_tipo_publicacion }}
+                            </div>
+                          </div>
+                          <hr>
+                          <div class="row mb-1">
+                            <div class="col-12">
+                                <strong>Idioma:</strong> &nbsp;&nbsp;{{ solicitud.temporal.tema_idioma }}
                             </div>
                           </div>
                           <hr>

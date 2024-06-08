@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
+from django.core import serializers
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import render
@@ -28,7 +29,8 @@ from reportlab.graphics.widgets import signsandsymbols
 from App.forms import ChangePasswordForm, EditProfileForm
 from App.models import (Editor, Musical_Publication, Registered_Data, PrefijoEditor, PrefijoPublicacion,
                         Rango_Prefijo_Editor, Rango_Prefijo_Publicacion, Solicitud, CopyDB, Provincia, Municipio,
-                        Caracterizacion, Editorial, Ubicacion)
+                        Caracterizacion, Editorial, Ubicacion, Materia, Genero, Tema, Autor, DescripcionFisica,
+                        DescripcionDigital)
 from django.views.decorators.cache import cache_control
 from django.contrib import messages  # Return messages
 from django.http import HttpResponseRedirect, JsonResponse
@@ -232,6 +234,28 @@ def get_municipios(request):
     provincia_id = request.GET.get('provincia_id')
     municipios = Municipio.objects.filter(provincia_id=provincia_id).values('id', 'nombre')
     return JsonResponse(list(municipios), safe=False)
+
+# Register an author
+def crear_autor(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        apellido = request.POST.get('apellido')
+        nacionalidad = request.POST.get('nacionalidad')
+        rol = request.POST.get('rol')
+
+        nuevo_autor = Autor.objects.create(
+            nombre=nombre,
+            apellido=apellido,
+            nacionalidad=nacionalidad,
+            Rol=rol
+        )
+
+        return JsonResponse({
+            'id': nuevo_autor.id,
+            'nombre': nuevo_autor.nombre,
+            'apellido': nuevo_autor.apellido
+        })
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 def register_autor_editor(request):
@@ -491,8 +515,8 @@ def backend_publicaciones(request, order):
             flag = 'list_dsc'
             q = request.GET['q']
             all_publication_list = Musical_Publication.objects.filter(
-                Q(name__icontains=q) | Q(autor__icontains=q) | Q(editor__user__username__icontains=q) |
-                Q(gender__icontains=q) | Q(ismn__icontains=q)
+                Q(name__icontains=q) | Q(autores__nombre__icontains=q) | Q(editor__user__first_name__icontains=q) |
+                Q(gender__nombre__icontains=q) | Q(ismn__icontains=q) | Q(editorial__user__first_name__icontains=q)
             ).order_by('-created_at')
         elif order == 'list_dsc':
             all_publication_list = Musical_Publication.objects.all().order_by('-created_at')
@@ -692,7 +716,6 @@ def reformat_path(path, ruta_pathlib):
     return Path(ruta_pathlib, part_path[0], part_path[1])
 
 
-# Function to Accept an Inscription
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url="login")
 def accept_ismn_solicitud(request, solicitud_id):
@@ -701,41 +724,75 @@ def accept_ismn_solicitud(request, solicitud_id):
     publicacion = Musical_Publication()
     prefijo_str_publicacion = solicitud.temporal['ismn'].split('-')[3]
     publicacion_prefijo = generate_prefijo_publicacion(prefijo_str_publicacion)
-    ruta_letra_publicacion = reformat_path(solicitud.temporal['publication_letra'], MEDIA_ROOT)
+
+    # Initialize ruta_letra_publicacion with a default value or None
+    ruta_letra_publicacion = None
+    if 'publication_letra' in solicitud.temporal:
+        ruta_letra_publicacion = reformat_path(solicitud.temporal['publication_letra'], MEDIA_ROOT)
+
+    # Initialize ruta_imagen_publicacion with a default image if not provided
+    ruta_imagen_publicacion = Path(f'{MEDIA_ROOT}/default.jpg')
     if solicitud.temporal['publication_image']:
         ruta_imagen_publicacion = reformat_path(solicitud.temporal['publication_image'], MEDIA_ROOT)
-    else:
-        ruta_imagen_publicacion = Path(f'{MEDIA_ROOT}\default.jpg')
 
     # Asignacion y salvas
     publicacion.name = solicitud.temporal['title']
-    publicacion.autor = solicitud.temporal['autor']
-    publicacion.editor = solicitud.editor
+    publicacion.subtitulo = solicitud.temporal['subtitle']
+    publicacion.materia = Materia.objects.get(id=solicitud.temporal['materia'])
+    publicacion.gender = Genero.objects.get(id=solicitud.temporal['genero'])
+    tema = Tema()
+    tema.coleccion = solicitud.temporal['tema_coleccion']
+    tema.tipo_publicacion = solicitud.temporal['tema_tipo_publicacion']
+    tema.numero_coleccion = solicitud.temporal['tema_numero_coleccion']
+    tema.idioma = solicitud.temporal['tema_tipo_publicacion']
+    tema.save()
+
+    descripcion_fisica = DescripcionFisica()
+    descripcion_fisica.descripcion = solicitud.temporal['descripcion_fisica_note']
+    descripcion_fisica.tipo = solicitud.temporal['nombre_descripcion']
+    if solicitud.temporal['num_paginas']:
+        descripcion_fisica.numero_paginas = solicitud.temporal['num_paginas']
+    descripcion_fisica.tipo_impresion = solicitud.temporal['tipo_impresion']
+    descripcion_fisica.save()
+
+
+    descripcion_digital = DescripcionDigital()
+    if solicitud.temporal['medio_electronico']:
+        descripcion_digital.medio = solicitud.temporal['medio_electronico']
+
+    descripcion_digital.save()
+    publicacion.descripcion_digital = descripcion_digital
+
+    if solicitud.editor:
+        publicacion.editor = solicitud.editor
+    else:
+        publicacion.editorial = solicitud.editorial
     publicacion.prefijo = publicacion_prefijo
     publicacion.ismn = solicitud.temporal['ismn']
     barcode_rute, barcode_io = generate_barcode(publicacion.ismn, publicacion.name)
     publicacion.description = solicitud.temporal['note']
     publicacion.date_time = datetime.strptime(solicitud.temporal['date'], '%Y-%m-%d')
-    publicacion.gender = solicitud.temporal['gender']
-    with open(ruta_letra_publicacion, 'rb') as letra_file:
-        publicacion.letra.save(f'{ruta_letra_publicacion.stem}.{ruta_letra_publicacion.suffix}',
-                               File(letra_file), save=True)
-        letra_file.close()
+    publicacion.tema = tema
+    if ruta_letra_publicacion:
+        with open(ruta_letra_publicacion, 'rb') as letra_file:
+            publicacion.descripcion_digital.letra.save(f'{ruta_letra_publicacion.stem}.{ruta_letra_publicacion.suffix}',
+                                   File(letra_file), save=True)
 
     if solicitud.temporal['publication_image']:
         with open(ruta_imagen_publicacion, 'rb') as image_file:
             publicacion.imagen.save(f'{ruta_imagen_publicacion.stem}.{ruta_imagen_publicacion.suffix}',
                                     File(image_file), save=True)
-            image_file.close()
     publicacion.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}', File(barcode_io), save=True)
+
     # Enviar email de aceptacion
     email_send = send_solicitud_ismn_accepted(request.user, publicacion)
     if email_send:
         solicitud.status = 'Atendido'
         # Eliminando datos temporales
         if solicitud.temporal['publication_image']:
-            os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_image']}")
-        os.remove(f"{BASE_DIR}\{solicitud.temporal['publication_letra']}")
+            os.remove(f"{BASE_DIR}/{solicitud.temporal['publication_image']}")
+        if 'publication_letra' in solicitud.temporal:
+            os.remove(f"{BASE_DIR}/{solicitud.temporal['publication_letra']}")
         del solicitud.temporal['publication_image']
         del solicitud.temporal['csrfmiddlewaretoken']
         publicacion.save()
@@ -1093,44 +1150,91 @@ def generate_barcode(ismn, titulo):
 @login_required(login_url="login")
 def add_musical_publication(request):
     if request.method == 'POST':
-        if request.POST.get('title') \
-                and request.POST.get('autor') \
-                and request.POST.get('editor') \
-                and request.POST.get('prefijo-publicacion') \
-                and request.POST.get('ismn') \
-                and request.POST.get('gender') \
-                and request.POST.get('date'):
-            musical_publication = Musical_Publication()
+        musical_publication = Musical_Publication()
+        musical_publication.name = request.POST.get('title')
+        musical_publication.subtitulo = request.POST.get('subtitle')
+        try:
             editor = Editor.objects.get(user__first_name=request.POST.get('editor'))
-            prefijo_value = request.POST.get('prefijo-publicacion').rpartition(" ")[2]
-            prefijo = generate_prefijo_publicacion(prefijo_value)
-            musical_publication.name = request.POST.get('title')
-            musical_publication.autor = request.POST.get('autor')
             musical_publication.editor = editor
-            musical_publication.prefijo = prefijo
-            musical_publication.ismn = request.POST.get('ismn')
-            barcode_rute, barcode_io = generate_barcode(musical_publication.ismn, musical_publication.name)
-            musical_publication.gender = request.POST.get('gender')
-            musical_publication.letra = request.FILES.get('publication_letter')
-            if request.FILES.get('publication_image'):
-                musical_publication.imagen = request.FILES.get('publication_image')
+        except:
+            editorial = Editorial.objects.get(user__first_name=request.POST.get('editor'))
+            musical_publication.editorial = editorial
+        materia = Materia.objects.get(id=request.POST.get('materia'))
+        genero = Genero.objects.get(id=request.POST.get('genero'))
+        if request.POST.get('num_paginas'):
+            descripcion_fisica = DescripcionFisica()
+            descripcion_fisica.tipo = request.POST.get('nombre_descripcion')
+            descripcion_fisica.tipo_encuadernacion = request.POST.get('tipo_encuadernacion')
+            descripcion_fisica.numero_paginas = request.POST.get('num_paginas')
+            descripcion_fisica.tipo_impresion = request.POST.get('tipo_impresion')
+            descripcion_fisica.descripcion = request.POST.get('descripcion_fisica_note')
+            descripcion_fisica.save()
+            musical_publication.descripcion_fisica = descripcion_fisica
+        elif request.POST.get('medio_electronico'):
+            descripcion_digital = DescripcionDigital()
+            descripcion_digital.medio = request.POST.get('medio_electronico')
+            if request.FILES.get('publication_letter'):
+                descripcion_digital.letra = request.FILES.get('publication_letter')
             else:
                 pass
-            musical_publication.description = request.POST.get('note')
-            musical_publication.date_time = request.POST.get('date')
-            musical_publication.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}',
-                                             File(barcode_io), save=True)
-            musical_publication.save()
-            messages.success(request, "Publicación musical añadida correctamente !")
-            return HttpResponseRedirect('/backend_publicaciones/list_dsc')
-    elif request.method == 'GET':
+            descripcion_digital.save()
+            musical_publication.descripcion_digital = descripcion_digital
+        tema = Tema()
+        tema.coleccion = request.POST.get('tema_coleccion')
+        tema.numero_coleccion = request.POST.get('tema_numero_coleccion')
+        tema.tipo_publicacion = request.POST.get('tema_tipo_publicacion')
+        tema.idioma = request.POST.get('tema_idioma')
+        tema.save()
+        musical_publication.tema = tema
+        prefijo_value = request.POST.get('prefijo-publicacion').rpartition(" ")[2]
+        prefijo = generate_prefijo_publicacion(prefijo_value)
+
+        musical_publication.prefijo = prefijo
+        musical_publication.ismn = request.POST.get('ismn')
+        barcode_rute, barcode_io = generate_barcode(musical_publication.ismn, musical_publication.name)
+        musical_publication.materia = materia
+        musical_publication.gender = genero
+        musical_publication.descripcion_general = request.POST.get('note')
+        musical_publication.date_time = request.POST.get('date')
+        if request.FILES.get('publication_image'):
+            musical_publication.imagen = request.FILES.get('publication_image')
+        else:
+            pass
+        musical_publication.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}',
+                                         File(barcode_io), save=True)
+        musical_publication.save()
+        if request.POST.get('colaborador'):
+            for colaborador in request.POST.get('colaborador'):
+                musical_publication.autores.add(colaborador)
+                musical_publication.autores.add(Autor.objects.last())
+        else:
+            musical_publication.autores.add(Autor.objects.last())
+        messages.success(request, "Publicación musical añadida correctamente !")
+        return HttpResponseRedirect('/backend_publicaciones/list_dsc')
+    else:
         if Solicitud.objects.filter(tipo='Solicitud-ISMN', status='Pendiente', deleted=False).exists():
             messages.error(request, 'No es posible añadir una publicación en estos momentos. '
                                     'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
             return HttpResponseRedirect('/backend_publicaciones/list_dsc')
         else:
-            editores = Editor.objects.annotate(Count('musical_publication'))
-            data = {'editores': editores}
+            editores_list = list(Editor.objects.annotate(Count('musical_publication')))
+            materias = Materia.objects.all()
+            generos = Genero.objects.all()
+            tipos_publicacion = Tema.TIPOS_PUBLICACION
+            idiomas = Tema.IDIOMA
+            autores = Autor.objects.all()
+            roles = Autor.ROL
+            nacionalidades = Autor.PAIS
+            tipo_descripcion_fisica = DescripcionFisica.TIPO
+            tipo_encuadernacion = DescripcionFisica.ENCUADERNACION
+            tipo_impresion = DescripcionFisica.TIPO_IMPRESION
+            medios_electronicos = DescripcionDigital.MEDIO_ELECTRONICO
+            editoriales_list = list(Editorial.objects.all())
+            editores = editoriales_list + editores_list
+            data = {'editores': editores, 'materias': materias, 'generos': generos, 'roles':roles, 'nacionalidades': nacionalidades,
+                    'tipos_publicacion': tipos_publicacion, 'idiomas': idiomas, 'autores': autores,
+                    'descripciones': tipo_descripcion_fisica, 'encuadernaciones': tipo_encuadernacion,
+                    'impresiones': tipo_impresion, 'medios': medios_electronicos}
             return render(request, "publicaciones/add_publication.html", data)
 
 
@@ -1188,7 +1292,6 @@ def edit_musical_publication(request):
 @login_required(login_url="login")
 def delete_musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
-    musical_publication.letra.delete()
     musical_publication.barcode.delete()
     if musical_publication.imagen.name != 'default.jpg':
         musical_publication.imagen.delete()
@@ -1348,17 +1451,43 @@ def almacenar_file_temporal(file):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def solicitud_ismn(request):
     if request.POST:
+        print(request.POST)
         solicitud = Solicitud()
-        solicitud.editor = Editor.objects.get(user__username=request.user)
         solicitud.temporal = request.POST.copy()
-        solicitud.temporal['ismn'] = generar_ismn(solicitud.editor)
+        try:
+            solicitud.editor = Editor.objects.get(user__username=request.user)
+            solicitud.temporal['ismn'] = generar_ismn(solicitud.editor)
+        except:
+            solicitud.temporal['ismn'] = generar_ismn(solicitud.editorial)
+            solicitud.editorial = Editorial.objects.get(user__username=request.user)
         try:
             imagen_file = request.FILES['publication_image']
             solicitud.temporal['publication_image'] = almacenar_file_temporal(imagen_file)
         except MultiValueDictKeyError:
             solicitud.temporal['publication_image'] = ''
-        letra_file = request.FILES['publication_letter']
-        solicitud.temporal['publication_letra'] = almacenar_file_temporal(letra_file)
+
+        if 'publication_letter' in request.FILES:
+            letra_file = request.FILES['publication_letter']
+            solicitud.temporal['publication_letra'] = almacenar_file_temporal(letra_file)
+        solicitud.temporal['materia_nombre'] = Materia.objects.get(id=solicitud.temporal['materia']).nombre
+        solicitud.temporal['genero_nombre'] = Genero.objects.get(id=solicitud.temporal['genero']).nombre
+
+        tema = Tema()
+        if solicitud.temporal['tema_tipo_publicacion']:
+            tema.tipo_publicacion = solicitud.temporal['tema_tipo_publicacion']
+            solicitud.temporal['tema_tipo_publicacion'] = tema.get_tipo_publicacion_display()
+        if solicitud.temporal['tema_idioma']:
+            tema.idioma = solicitud.temporal['tema_idioma']
+            solicitud.temporal['tema_idioma'] = tema.get_idioma_display()
+        descripcion_fisica = DescripcionFisica()
+        descripcion_fisica.tipo = solicitud.temporal['nombre_descripcion']
+        solicitud.temporal['nombre_descripcion'] = descripcion_fisica.get_tipo_display()
+        descripcion_fisica.tipo_impresion = solicitud.temporal['tipo_impresion']
+        solicitud.temporal['tipo_impresion'] = descripcion_fisica.get_tipo_impresion_display()
+        descripcion_fisica.tipo_encuadernacion = solicitud.temporal['tipo_encuadernacion']
+        solicitud.temporal['tipo_encuadernacion'] = descripcion_fisica.get_tipo_encuadernacion_display()
+
+
         solicitud.tipo = "Solicitud-ISMN"
         solicitud.status = "Pendiente"
         solicitud.save()
@@ -1366,7 +1495,23 @@ def solicitud_ismn(request):
                                   'le enviará un reporte de su publicación junto al ISMN asignado.')
         return HttpResponseRedirect('/')
     else:
-        return render(request, 'solicitudes/solicitud-ISMN.html')
+        materias = Materia.objects.all()
+        generos = Genero.objects.all()
+        tipos_publicacion = Tema.TIPOS_PUBLICACION
+        idiomas = Tema.IDIOMA
+        autores = Autor.objects.all()
+        roles = Autor.ROL
+        nacionalidades = Autor.PAIS
+        tipo_descripcion_fisica = DescripcionFisica.TIPO
+        tipo_encuadernacion = DescripcionFisica.ENCUADERNACION
+        tipo_impresion = DescripcionFisica.TIPO_IMPRESION
+        medios_electronicos = DescripcionDigital.MEDIO_ELECTRONICO
+        data = {'materias': materias, 'generos': generos, 'roles': roles,
+                'nacionalidades': nacionalidades,
+                'tipos_publicacion': tipos_publicacion, 'idiomas': idiomas, 'autores': autores,
+                'descripciones': tipo_descripcion_fisica, 'encuadernaciones': tipo_encuadernacion,
+                'impresiones': tipo_impresion, 'medios': medios_electronicos}
+        return render(request, 'solicitudes/solicitud-ISMN.html', data)
 
 
 def send_code_confirmation(request):
@@ -1537,11 +1682,7 @@ def send_solicitud_inscrip_reject(solicitante, email, descripcion):
 
 
 def crear_doc_publicacion(user, publication):
-    # Importar las fuentes externas
-    pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
-    pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
-    pdfmetrics.registerFont(TTFont('Roboto-Italic', 'fonts/RobotoCondensed-Italic.ttf'))
-    pdfmetrics.registerFont(TTFont('Roboto', 'fonts/RobotoCondensed-Regular.ttf'))
+
 
     PAGE_WIDTH, PAGE_HEIGHT = A4
     style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")
@@ -1850,10 +1991,10 @@ def crear_report_list(model_list, buffer):
         col_widths = [25, 100, 130, 90, 115, 90, 60]
 
     # Importar las fuentes externas
-    pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
-    pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
-    pdfmetrics.registerFont(TTFont('Roboto-Italic', 'fonts/RobotoCondensed-Italic.ttf'))
-    pdfmetrics.registerFont(TTFont('Roboto', 'fonts/RobotoCondensed-Regular.ttf'))
+    pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'templates/publicaciones/fonts/RobotoCondensed-Bold.ttf'))
+    pdfmetrics.registerFont(TTFont('RobotoSlab', 'templates/publicaciones/fonts/RobotoSlab-VariableFont_wght.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto-Italic', 'templates/publicaciones/fonts/RobotoCondensed-Italic.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto', 'templates/publicaciones/fonts/RobotoCondensed-Regular.ttf'))
 
     PAGE_HEIGHT, PAGE_WIDTH = A4
     style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")
@@ -2198,10 +2339,10 @@ def conformar_tabla_reportlab_solicitudes_aceptadas(solicites):
 
 def crear_report_statistics(buffer, title, total_solicitudes_enviadas, user):
     # Importar las fuentes externas
-    pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'fonts/RobotoCondensed-Bold.ttf'))
-    pdfmetrics.registerFont(TTFont('RobotoSlab', 'fonts/RobotoSlab-VariableFont_wght.ttf'))
-    pdfmetrics.registerFont(TTFont('Roboto-Italic', 'fonts/RobotoCondensed-Italic.ttf'))
-    pdfmetrics.registerFont(TTFont('Roboto', 'fonts/RobotoCondensed-Regular.ttf'))
+    pdfmetrics.registerFont(TTFont('RobotoCondensed-Bold', 'templates/publicaciones/fonts/RobotoCondensed-Bold.ttf'))
+    pdfmetrics.registerFont(TTFont('RobotoSlab', 'templates/publicaciones/fonts/RobotoSlab-VariableFont_wght.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto-Italic', 'templates/publicaciones/fonts/RobotoCondensed-Italic.ttf'))
+    pdfmetrics.registerFont(TTFont('Roboto', 'templates/publicaciones/fonts/RobotoCondensed-Regular.ttf'))
 
     PAGE_HEIGHT, PAGE_WIDTH = A4
     style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")

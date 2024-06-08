@@ -30,8 +30,10 @@
                     <div class="profile-image-container">
                         {% if form.instance.especialista %}
                             <img id="profile-image" src="{{ form.instance.especialista.image_profile.url }}" alt="Imagen de perfil">
-                        {% else %}
+                        {% elif form.instance.editor %}
                             <img id="profile-image" src="{{ form.instance.editor.image_profile.url }}" alt="Imagen de perfil">
+                        {% else %}
+                            <img id="profile-image" src="{{ form.instance.editorial.image_profile.url }}" alt="Imagen de perfil">
                         {% endif %}
                         <label for="file-input" id="file-input-label">
                             <i class="fas fa-camera"></i> Cambiar foto

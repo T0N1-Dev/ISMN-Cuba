@@ -265,7 +265,7 @@ class Especialista(models.Model):
         return self.user.first_name
 
 
-# Modelo perteneciente a la Publicacion Musical.
+#========== Modelos pertenecientes a las Publicaciones Musicales. =========
 class Genero(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(max_length=1000)
@@ -277,7 +277,6 @@ class Genero(models.Model):
         return self.nombre
 
 
-#
 class Materia(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(max_length=1000)
@@ -289,26 +288,62 @@ class Materia(models.Model):
         return self.nombre
 
 
-class EncuadernacionType(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(max_length=1000)
+class DescripcionFisica(models.Model):
+    TIPO = [
+        ('LIP', 'Libro Impreso en Papel'),
+        ('FO', 'Folleto'),
+        ('FA', 'Fascículo'),
+        ('B', 'Bralie')
+    ]
+
+    ENCUADERNACION = [
+        ('E', 'Espiral'),
+        ('P', 'Plástico'),
+        ('T', 'Tela'),
+        ('TD', 'Tapa Dura')
+    ]
+
+    TIPO_IMPRESION = [
+        ('O', 'Offset'),
+        ('D', 'Digital'),
+        ('T', 'Tipográfica'),
+        ('X', 'Xerográfica')
+    ]
+
+    tipo = models.CharField(max_length=50, choices=TIPO, blank=True, null=True)
+    tipo_encuadernacion = models.CharField(max_length=50, choices=ENCUADERNACION, blank=True, null=True)
+    tipo_impresion= models.CharField(max_length=50, choices=TIPO_IMPRESION, blank=True, null=True)
+    descripcion = models.TextField(max_length=1000, null=True, blank=True)
+    numero_paginas = models.PositiveSmallIntegerField(null=True, blank=True)
 
     class Meta:
-        verbose_name_plural = "encuadernaciones"
+        verbose_name_plural = "descripciones"
 
     def __str__(self):
-        return self.nombre
+        return self.tipo
 
 
-class DigitalMediaType(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(max_length=1000)
+class DescripcionDigital(models.Model):
+
+    MEDIO_ELECTRONICO = [
+        ('A', 'AudioLibro'),
+        ('CA', 'Casete-audio'),
+        ('EB', 'E-book'),
+        ('CD', 'CD-ROM')
+    ]
+
+    medio = models.CharField(max_length=50, choices=MEDIO_ELECTRONICO, blank=True, null=True)
+    letra = models.FileField(upload_to="publications/letters", blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "medios digitales"
 
     def __str__(self):
-        return self.nombre
+        return self.medio
+
+    def letra_base_name(self):
+        rute = self.letra.path
+        return os.path.basename(rute)
 
 
 class Tema(models.Model):
@@ -316,13 +351,19 @@ class Tema(models.Model):
     TIPOS_PUBLICACION = [
         ('P', 'Partitura'),
         ('PO', 'Partitura de Orquesta'),
-        ('RP', 'Reducción para Piano')
+        ('RP', 'Reducción para Piano'),
+        ('PV', 'Partitura Vocal'),
+        ('CPI', 'Conjunto de partes instrumentales'),
     ]
 
     IDIOMA = {
         ('ES', 'Español'),
         ('EN', 'Inglés'),
-        ('RU', 'Ruso')
+        ('FR', 'Francés'),
+        ('PO', 'Portugués'),
+        ('IT', 'Italiano'),
+        ('AL', 'Alemán'),
+        ('RU', 'Ruso'),
     }
 
     coleccion = models.CharField(max_length=100, null=True, blank=True)
@@ -342,7 +383,10 @@ class Autor(models.Model):
     PAIS = [
         ('CUB', 'Cuba'),
         ('ITA', 'Italia'),
-        ('EUA', 'Estados Unidos')
+        ('EUA', 'Estados Unidos'),
+        ('RU', 'Rusia'),
+        ('MX', 'Mexico'),
+        ('FR', 'Francia')
     ]
 
     ROL = [
@@ -362,23 +406,17 @@ class Autor(models.Model):
     def __str__(self):
         return self.nombre
 
-# Modelo que representa a cada publicación musical
-class Musical_Publication(models.Model):
 
-    SUSTRATO = [
-        ('PI', 'Publicación Impresa'),
-        ('PE', 'Publicacion Electrónica')
-    ]
+# Modelo que representa a cada publicación musical individual
+class Musical_Publication(models.Model):
 
     name = models.CharField(max_length=50)
     subtitulo = models.CharField(max_length=50, null=True, blank=True)
-    autor = models.CharField(max_length=100)
     editor = models.ForeignKey(Editor, on_delete=models.SET_NULL, null=True)
     editorial = models.ForeignKey(Editorial, on_delete=models.SET_NULL, null=True)
     prefijo = models.OneToOneField(PrefijoPublicacion, on_delete=models.CASCADE)
     ismn = models.CharField(max_length=20, unique=True)
     barcode = models.ImageField(upload_to="publications/barcodes")
-    letra = models.FileField(upload_to="publications/letters")
     imagen = models.ImageField(upload_to="publications", blank=True, default="default.jpg")
     date_time = models.DateTimeField(validators=[validate_date])
     created_at = models.DateTimeField(auto_now_add=True)
@@ -386,22 +424,15 @@ class Musical_Publication(models.Model):
     tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
     autores = models.ManyToManyField(Autor)
     materia = models.ForeignKey(Materia, on_delete=models.CASCADE)
-    sustrato = models.CharField(max_length=2, choices=SUSTRATO, default='PI')
-    encuadernacion = models.ForeignKey(EncuadernacionType, on_delete=models.SET_NULL, null=True, blank=True)
-    numero_paginas = models.PositiveSmallIntegerField(null=True, blank=True)
-    description = models.TextField(blank=True)
-    medio_digital = models.ForeignKey(DigitalMediaType, on_delete=models.CASCADE, null=True, blank=True)
-
+    descripcion_fisica = models.ForeignKey(DescripcionFisica, on_delete=models.SET_NULL, null=True, blank=True)
+    descripcion_digital = models.ForeignKey(DescripcionDigital, on_delete=models.CASCADE, null=True, blank=True)
+    descripcion_general = models.CharField(max_length=1000, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "publicaciones"
 
     def __str__(self):
         return self.name
-
-    def letra_base_name(self):
-        rute = self.letra.path
-        return os.path.basename(rute)
 
     def barcode_base_name(self):
         rute = self.barcode.path
@@ -410,6 +441,12 @@ class Musical_Publication(models.Model):
     def image_base_name(self):
         rute = self.imagen.path
         return os.path.basename(rute)
+
+    def autor_con_rol_autor(self):
+        autor = self.autores.filter(Rol='AUT').first()
+        if autor:
+            return autor.nombre
+        return None
 
 
 # Solicitudes

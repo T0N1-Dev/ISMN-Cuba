@@ -38,7 +38,7 @@
             <a class="btn btn-dark" href="{% url 'backend_publicaciones' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista
                 de Publicaciones</a>
             <a class="btn btn-dark" href="{% url 'backend_solicitudes' 'list_dsc' %}"><i class="fas fa-list"></i>&nbsp;&nbsp;Lista de Solicitudes</a>
-        {% elif request.user.editor %}
+        {% elif request.user.editor or request.user.editorial %}
             <a class="btn btn-dark" href="{% url 'edit_profile' %}"><img class="img-profile" src="{{ user.editor.image_profile.url }}" alt="imagen perfil"
                     style="border-color: black">&nbsp;&nbsp;Información de Perfil</a>
             <a class="btn btn-dark" href="{% url 'solicitud-ismn' %}"><i class="fas fa-paper-plane"></i>&nbsp;&nbsp;Solicitud ISMN</a>

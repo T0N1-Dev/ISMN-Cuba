@@ -159,14 +159,14 @@
             ID &nbsp;<i class="fa fa-arrows-up-down"></i>
         </a>
     </th>
-    <th style="width: 12%" class="th_button">
+    <th style="width: 15%" class="th_button">
         <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
             Nombre &nbsp;<i class="fa fa-arrows-up-down"></i>
         </a>
     </th>
-    <th style="width: 15%" class="th_button">
+    <th style="width: 21%" class="th_button">
         <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
-            Autor &nbsp;<i class="fa fa-arrows-up-down"></i>
+            Colaboradores &nbsp;<i class="fa fa-arrows-up-down"></i>
         </a>
     </th>
     <th style="width: 15%" class="th_button">
@@ -179,12 +179,12 @@
             ISMN &nbsp;<i class="fa fa-arrows-up-down"></i>
         </a>
     </th>
-    <th style="width: 21%" class="th_button">
+    <th style="width: 15%" class="th_button">
         <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
             Fecha &nbsp;<i class="fa fa-arrows-up-down"></i>
         </a>
     </th>
-    <th style="width: 21%" class="th_button">
+    <th style="width: 15%" class="th_button">
         <a style="border-radius: 0" href="/backend_publicaciones/{{ flag }}" class="btn btn-secondary btn-header-list">
             Género &nbsp;<i class="fa fa-arrows-up-down"></i>
         </a>
@@ -197,8 +197,18 @@
     <tr id="chk_td">
         <td>{{ publicacion.id }}</td>
         <td>{{ publicacion.name }}</td>
-        <td>{{ publicacion.autor }}</td>
-        <td>{{ publicacion.editor }}</td>
+        <td>
+            {% for autor in publicacion.autores.all %}
+                {{ autor.nombre }} {{ autor.apellido }} - {{ autor.get_Rol_display }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+        <td>
+            {% if publicacion.editor %}
+                {{ publicacion.editor }}
+            {% else %}
+                {{ publicacion.editorial }}
+            {% endif %}
+        </td>
         <td>{{ publicacion.ismn }}</td>
         <td>{{ publicacion.date_time }}</td>
         <td>{{ publicacion.gender }}</td>
@@ -266,7 +276,7 @@
                   <hr>
                   <div class="row mb-1">
                     <div class="col-12">
-                        <strong>Autor:</strong> &nbsp;&nbsp;{{ publicacion.autor }}
+                        <strong>Colaborador principal:</strong> &nbsp;&nbsp;{{ publicacion }}
                     </div>
                   </div>
                   <hr>
@@ -302,7 +312,7 @@
                   <hr>
                   <div class="row mb-1">
                     <div class="col-12">
-                        <strong>Letra:</strong> &nbsp;&nbsp;<a href="/media/{{ publicacion.letra }}">{{ publicacion.letra_base_name }}</a>
+                        <strong>Letra:</strong> &nbsp;&nbsp;<a href="/media/{{ publicacion.descripcion_digital.letra }}">{{ publicacion.descripcion_digital.letra_base_name }}</a>
                     </div>
                   </div>
                   <hr>

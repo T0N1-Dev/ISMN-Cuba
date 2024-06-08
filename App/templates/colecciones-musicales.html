@@ -34,8 +34,8 @@
                         <img class="imagen" src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}" onclick="toogleFlip(this)">
                         <div class="details-public">
                             <h2>{{ publicacion.name }}</h2>
-                            <h3>Por: &nbsp; {{ publicacion.autor }}</h3>
-                            <h3>Editor: {{ publicacion.editor.user.first_name }}</h3>
+                            <h3>Por: &nbsp; {{ publicacion.autor|default:publicacion.subtitulo }}</h3>
+                            <h3>Editor: {{ publicacion.editor.user.first_name|default:publicacion.editorial.user.first_name }}</h3>
                         </div>
                     </div>
                     <div class="back" hidden>
