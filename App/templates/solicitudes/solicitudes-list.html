@@ -318,31 +318,49 @@
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Género Musical:</strong> &nbsp;&nbsp;{{ solicitud.temporal.genero_nombre }}
+                                <strong>Género Musical:</strong> &nbsp;&nbsp;{{ solicitud.return_genero_temporal }}
                             </div>
                           </div>
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Materia:</strong> &nbsp;&nbsp;{{ solicitud.temporal.materia_nombre }}
+                                <strong>Materia:</strong> &nbsp;&nbsp;{{ solicitud.return_materia_temporal }}
                             </div>
                           </div>
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Coleccion:</strong> &nbsp;&nbsp;{{ solicitud.temporal.tema_tipo_publicacion }}
+                                <strong>Coleccion:</strong> &nbsp;&nbsp;{{ solicitud.temporal.tema_coleccion }}
                             </div>
                           </div>
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
-                                <strong>Idioma:</strong> &nbsp;&nbsp;{{ solicitud.temporal.tema_idioma }}
+                                <strong>No de Colección:</strong> &nbsp;&nbsp;{{ solicitud.temporal.tema_numero_coleccion }}
+                            </div>
+                          </div>
+                          <hr>
+                          <div class="row mb-1">
+                            <div class="col-12">
+                                <strong>Tipo de publicación:</strong> &nbsp;&nbsp;{{ solicitud.get_tipo_publicacion_display }}
+                            </div>
+                          </div>
+                          <hr>
+                          <div class="row mb-1">
+                            <div class="col-12">
+                                <strong>Idioma:</strong> &nbsp;&nbsp;{{ solicitud.get_idioma_display }}
                             </div>
                           </div>
                           <hr>
                           <div class="row mb-1">
                             <div class="col-12">
                                 <strong>Letra:</strong> &nbsp;&nbsp;<a href="{{ solicitud.temporal.publication_letra }}">{{ solicitud.temporal.publication_letra }}</a>
+                            </div>
+                          </div>
+                          <hr>
+                          <div class="row mb-1">
+                            <div class="col-12">
+                                <strong>Colaboradores:</strong> &nbsp;&nbsp;{{ solicitud.get_colaboradores }}
                             </div>
                           </div>
                           <hr>

@@ -16,7 +16,7 @@ class Custom404Middleware:
 
 class TranslationMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        if 'text/html' in response['Content-Type']:
+        if response.get('Content-Type', '').startswith('text/html'):
             content = response.content.decode('utf-8')
             content = content.replace("Easy Audit Application", _("Trazas"))
             content = content.replace("CRUD events", _("Eventos CRUD"))

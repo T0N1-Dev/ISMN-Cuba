@@ -1,10 +1,11 @@
 from django.contrib import admin
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from App.forms import CustomUserAdminForm
 from App.models import (Editor, Especialista, Rango_Prefijo_Editor,
-                        Rango_Prefijo_Publicacion)
+                        Rango_Prefijo_Publicacion, Editorial)
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -12,11 +13,10 @@ from django import forms
 from django.contrib import messages
 
 
-class CustomUserChangeForm(forms.ModelForm):
+class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
-        fields = '__all__'
-
+        fields = ['username', 'password']
 
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
@@ -55,37 +55,20 @@ class CustomUserChangeForm(forms.ModelForm):
 
 class CustomUserAdmin(UserAdmin):
 
-    form = CustomUserAdminForm
+    form = CustomUserChangeForm
     readonly_fields = ('last_login', 'date_joined')
-
-    # Puedes personalizar más opciones si lo necesitas
-    fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Información Personal', {'fields': ('first_name', 'last_name', 'email')}),
-        ('Fechas Importantes', {'fields': ('last_login', 'date_joined')}),
-        ('Permisos', {'fields': ('is_active', 'is_staff', 'groups', 'user_permissions')}),
-    )
+    list_display = ['username', 'first_name', 'email', 'is_staff', 'is_active']
 
     def get_fieldsets(self, request, obj=None):
-        fieldsets = [
-            (None, {'fields': ('username', 'password')}),
-            ('Información Personal', {'fields': ('first_name', 'last_name', 'email')}),
-            ('Fechas Importantes', {'fields': ('last_login', 'date_joined')}),
-        ]
-
-        if obj != request.user:
-            fieldsets.append(
-                ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}))
-
-        return fieldsets
+        if not obj:
+            return self.add_fieldsets
+        return super().get_fieldsets(request, obj)
 
     def has_delete_permission(self, request, obj=None):
         if obj is None:
             return True
         else:
             return not obj
-
-    form = CustomUserChangeForm
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -162,6 +145,49 @@ class EditorAdmin(admin.ModelAdmin):
     form = CustomEditorAdminForm
 
 
+class CustomEditorialAdminForm(forms.ModelForm):
+    class Meta:
+        model = Editorial
+        fields = '__all__'
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+
+        if not all(char.isdigit() or char in ['+', '-'] for char in phone):
+            raise ValidationError("El teléfono solo puede contener números, '+' y '-'.")
+
+        if len(phone) > 14:
+            raise ValidationError("El teléfono no puede tener más de 14 dígitos.")
+
+        return phone
+
+    def clean_id_tribute(self):
+        id_tribute = self.cleaned_data.get('id_tribute')
+
+        if len(str(id_tribute)) > 14:
+            raise ValidationError("El ID Tributario no puede tener más de 14 dígitos.")
+
+        return id_tribute
+
+    def clean_birthday(self):
+        birthday = self.cleaned_data.get('birthday')
+
+        if birthday:
+            if birthday > timezone.now().date():
+                raise ValidationError("La fecha de nacimiento no puede ser en el futuro.")
+
+            if birthday.year < 1900:
+                raise ValidationError("La fecha de nacimiento no puede ser anterior a 1900.")
+
+        return birthday
+
+class EditorialAdmin(admin.ModelAdmin):
+    list_display = ['user', 'phone', 'prefijo']
+    search_fields = ['user__first_name', 'phone', 'prefijo']
+    list_per_page = 8
+    form = CustomEditorialAdminForm
+
+
 class CustomEspecialistaAdminForm(forms.ModelForm):
     class Meta:
         model = Editor
@@ -191,7 +217,7 @@ class EspecialistaAdmin(admin.ModelAdmin):
 
 admin.site.register(Rango_Prefijo_Editor)
 admin.site.register(Rango_Prefijo_Publicacion)
-admin.site.register(Editor, EditorAdmin)
+# admin.site.register(Editor, EditorAdmin)
 # Desregistras el UserAdmin predeterminado
 admin.site.unregister(User)
 # Registras tu UserAdmin personalizado

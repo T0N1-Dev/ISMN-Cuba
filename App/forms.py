@@ -1,13 +1,7 @@
 from django import forms
-from django.contrib.admin.widgets import FilteredSelectMultiple
-from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm, PasswordResetForm
+from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from App.models import Musical_Publication, Autor
-
-
-class ResetPasswordForm(PasswordResetForm):
-    pass
 
 
 class ChangePasswordForm(PasswordChangeForm):

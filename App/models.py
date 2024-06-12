@@ -12,6 +12,7 @@ from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.utils.functional import cached_property
 
 
 def validate_date(value):
@@ -63,7 +64,7 @@ class Rango_Prefijo_Editor(models.Model):
 
     PUBLICADOR_SUPERIOR = "P-Superior"  # rango-inferior: 0 rango-superior: 19
     PUBLICADOR_MEDIO = "P-Medio"  # rango-inferior: 200 rango-superior: 699
-    PUBLICADOR_MEDIO_INFERIOR = "P-Medio_Inferior"  # rango-inferior: 7000  rango-superior: 8499
+    PUBLICADOR_MEDIO_INFERIOR = "P-Medio_Inferior"  # rango-medio-inferior: 7000  rango-superior: 8499
     PUBLICADOR_INFERIOR = "P-Inferior"  # rango-inferior: 85000 rango-superior: 99999
 
     TYPE = {
@@ -481,6 +482,56 @@ class Solicitud(models.Model):
 
     def __str__(self):
         return self.tipo
+
+    # Retorna el nombre de cada colaborador almacenado en el temporal de una solicitud ISMN separados por ','
+    @cached_property
+    def get_colaboradores(self):
+        lista_colaboradores = self.temporal.get('colaborador')
+        colaboradores = []
+        if lista_colaboradores:
+            for colaborador_id in lista_colaboradores:
+                colaboradores.append(Autor.objects.get(id=colaborador_id).__str__())
+            return ", ".join(colaboradores)
+        else:
+            return None
+
+    # Retorna el tipo de publicación del modelo Tema almacenada en temporal para solicitudes ISMN
+    @cached_property
+    def get_tipo_publicacion_display(self):
+        tema = Tema()
+        tema.tipo_publicacion = self.temporal.get('tema_tipo_publicacion')
+        if tema.tipo_publicacion:
+            return tema.get_tipo_publicacion_display()
+        else:
+            return None
+
+    # Retorna el idioma del modelo Tema almacenada en temporal para solicitudes ISMN
+    @cached_property
+    def get_idioma_display(self):
+        tema = Tema()
+        tema.idioma = self.temporal.get('tema_idioma')
+        if tema.idioma:
+            return tema.get_idioma_display()
+        else:
+            return None
+
+        # Retorna el género al que pertenece la publicación musical en temporal para solicitudes ISMN
+    @cached_property
+    def return_genero_temporal(self):
+        gener_id = self.temporal.get('genero')
+        if gener_id:
+            return Genero.objects.get(id=gener_id)
+        else:
+            return None
+
+    # Retorna la materia a la que pertenece la publicación musical en solicitud.temporal
+    @cached_property
+    def return_materia_temporal(self):
+        materia_id = self.temporal.get('materia')
+        if materia_id:
+            return Materia.objects.get(id=materia_id)
+        else:
+            return None
 
     # Retorna todas las solicitudes que han sido aceptadas hasta ahora
     @classmethod

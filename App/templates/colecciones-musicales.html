@@ -35,7 +35,12 @@
                         <div class="details-public">
                             <h2>{{ publicacion.name }}</h2>
                             <h3>Por: &nbsp; {{ publicacion.autor|default:publicacion.subtitulo }}</h3>
-                            <h3>Editor: {{ publicacion.editor.user.first_name|default:publicacion.editorial.user.first_name }}</h3>
+                            {% if publicacion.editor %}
+                                <h3>Editor: {{ publicacion.editor.user.first_name }}</h3>
+                            {% else %}
+                                <h3>Editor: {{ publicacion.editorial.user.first_name }}</h3>
+                            {% endif %}
+
                         </div>
                     </div>
                     <div class="back" hidden>
