@@ -321,7 +321,7 @@ class DescripcionFisica(models.Model):
         verbose_name_plural = "descripciones"
 
     def __str__(self):
-        return self.tipo
+        return self.get_tipo_display()
 
 
 class DescripcionDigital(models.Model):
@@ -340,7 +340,7 @@ class DescripcionDigital(models.Model):
         verbose_name_plural = "medios digitales"
 
     def __str__(self):
-        return self.medio
+        return self.get_medio_display()
 
     def letra_base_name(self):
         rute = self.letra.path
@@ -424,6 +424,7 @@ class Musical_Publication(models.Model):
     gender = models.ForeignKey(Genero, on_delete=models.CASCADE)
     tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
     autores = models.ManyToManyField(Autor)
+    autores_html = models.TextField(blank=True, null=True)
     materia = models.ForeignKey(Materia, on_delete=models.CASCADE)
     descripcion_fisica = models.ForeignKey(DescripcionFisica, on_delete=models.SET_NULL, null=True, blank=True)
     descripcion_digital = models.ForeignKey(DescripcionDigital, on_delete=models.CASCADE, null=True, blank=True)
@@ -447,7 +448,7 @@ class Musical_Publication(models.Model):
         autor = self.autores.filter(Rol='AUT').first()
         if autor:
             return autor.nombre
-        return None
+        return self.editor
 
 
 # Solicitudes

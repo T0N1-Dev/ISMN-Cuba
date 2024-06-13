@@ -25,109 +25,130 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-12 ms-auto mb-3" style="text-align: left">
-                        <div class="form-floating">
-                          <input type="text" class="form-control" name="new_genero" id="floatingInput" placeholder="Genero">
-                          <label for="floatingInput">Nuevo género musical</label>
+              <form method="POST">
+              {% csrf_token %}
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-12 ms-auto mb-1" style="text-align: left">
+                            <div class="form-floating">
+                              <input type="text" class="form-control" name="new_genero" id="floatingInput" placeholder="Genero">
+                              <label for="floatingInput">Nuevo género musical</label>
+                            </div>
+                            <div class="form-group mt-1 mb-3">
+                                <textarea class="form-control text-sm" name="descripcion_ngenero" maxlength="1000" rows="1"
+                                          placeholder="Descripción"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-12 ms-auto" style="text-align: left">
+                            <p>
+                              <a class="btn btn-info" data-bs-toggle="collapse" href="#genero" role="button" aria-expanded="false" aria-controls="genero">
+                                <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver géneros existentes.
+                              </a>
+                            </p>
+                            <div class="collapse" id="genero">
+                              <div class="card card-body">
+                                <ul>
+                                    {% for genero in generos %}
+                                        <li><a tabindex="0" class="btn btn-sm btn-light" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="{{ genero.nombre }}" data-bs-content="{{ genero.descripcion }}">{{ genero.nombre }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                              </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-12 ms-auto" style="text-align: left">
-                        <p>
-                          <a class="btn btn-info" data-bs-toggle="collapse" href="#genero" role="button" aria-expanded="false" aria-controls="genero">
-                            <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver géneros existentes.
-                          </a>
-                        </p>
-                        <div class="collapse" id="genero">
-                          <div class="card card-body">
-                            <ul>
-                              <li><a tabindex="0" class="btn btn-sm btn-light" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="Dismissible popover" data-bs-content="And here's some amazing content. It's very engaging. Right?">Fusión</a></li>
-                            </ul>
-                          </div>
+                    <hr>
+                    <div class="row mb-2">
+                        <div class="col-12 ms-auto mb-3" style="text-align: left">
+                            <div class="form-floating">
+                              <input type="text" class="form-control" name="new_materia" id="floatingInput" placeholder="Materia">
+                              <label for="floatingInput">Nueva materia</label>
+                            </div>
+                            <div class="form-group mt-1 mb-3">
+                                <textarea class="form-control text-sm" name="descripcion_nmateria" maxlength="1000" rows="1"
+                                          placeholder="Descripción"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-12 ms-auto" style="text-align: left">
+                            <p>
+                              <a class="btn btn-info" data-bs-toggle="collapse" href="#materias" role="button" aria-expanded="false" aria-controls="materias">
+                                <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver materias existentes.
+                              </a>
+                            </p>
+                            <div class="collapse" id="materias">
+                              <div class="card card-body">
+                                <ul>
+                                    {% for materia in materias %}
+                                        <li><a tabindex="0" class="btn btn-sm btn-light" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="{{ materia.nombre }}" data-bs-content="{{ materia.descripcion }}">{{ materia.nombre }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-2">
+                        <div class="col-12 ms-auto mb-3" style="text-align: left">
+                            <div class="form-floating">
+                              <input type="text" class="form-control" name="new_encuadernacion" id="floatingInput" placeholder="Encuadernacion">
+                              <label for="floatingInput">Nuevo tipo de encuadernación</label>
+                            </div>
+                            <div class="form-group mt-1 mb-3">
+                                <textarea class="form-control text-sm" name="descripcion_nencuadernacion" maxlength="1000" rows="1"
+                                          placeholder="Descripción"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-12 ms-auto" style="text-align: left">
+                            <p>
+                              <a class="btn btn-info" data-bs-toggle="collapse" href="#encuadernacion" role="button" aria-expanded="false" aria-controls="encuadernacion">
+                                <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver tipos de encuadernacion existentes.
+                              </a>
+                            </p>
+                            <div class="collapse" id="encuadernacion">
+                              <div class="card card-body">
+                                <ul>
+                                  <li>Espiral</li>
+                                  <li>Grapas wire binding</li>
+                                  <li>Lujo</li>
+                                </ul>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-2">
+                        <div class="col-12 ms-auto mb-3" style="text-align: left">
+                            <div class="form-floating">
+                              <input type="text" class="form-control" name="new_medio_digital" id="floatingInput" placeholder="Medio Digital">
+                              <label for="floatingInput">Nuevo tipo de medio digital</label>
+                            </div>
+                            <div class="form-group mt-1 mb-3">
+                                <textarea class="form-control text-sm" name="descripcion_ntipo_medio" maxlength="1000" rows="1"
+                                          placeholder="Descripción"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-12 ms-auto" style="text-align: left">
+                            <p>
+                              <a class="btn btn-info" data-bs-toggle="collapse" href="#mediodigital" role="button" aria-expanded="false" aria-controls="mediodigital">
+                                <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver tipos de medio digital existentes.
+                              </a>
+                            </p>
+                            <div class="collapse" id="mediodigital">
+                              <div class="card card-body">
+                                <ul>
+                                  <li>AudioLibro</li>
+                                  <li>CD Audio</li>
+                                  <li>Digitalización (Obra digitalizada)</li>
+                                </ul>
+                              </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <hr>
-                <div class="row mb-2">
-                    <div class="col-12 ms-auto mb-3" style="text-align: left">
-                        <div class="form-floating">
-                          <input type="text" class="form-control" name="new_materia" id="floatingInput" placeholder="Materia">
-                          <label for="floatingInput">Nueva materia</label>
-                        </div>
-                    </div>
-                    <div class="col-12 ms-auto" style="text-align: left">
-                        <p>
-                          <a class="btn btn-info" data-bs-toggle="collapse" href="#materias" role="button" aria-expanded="false" aria-controls="materias">
-                            <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver materias existentes.
-                          </a>
-                        </p>
-                        <div class="collapse" id="materias">
-                          <div class="card card-body">
-                            <ul>
-                              <li>Música</li>
-                              <li>Filosofía y teoría de la música</li>
-                              <li>Tratamiento histórico de personalidades</li>
-                            </ul>
-                          </div>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <div class="row mb-2">
-                    <div class="col-12 ms-auto mb-3" style="text-align: left">
-                        <div class="form-floating">
-                          <input type="text" class="form-control" name="new_encuadernacion" id="floatingInput" placeholder="Encuadernacion">
-                          <label for="floatingInput">Nuevo tipo de encuadernación</label>
-                        </div>
-                    </div>
-                    <div class="col-12 ms-auto" style="text-align: left">
-                        <p>
-                          <a class="btn btn-info" data-bs-toggle="collapse" href="#encuadernacion" role="button" aria-expanded="false" aria-controls="encuadernacion">
-                            <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver tipos de encuadernacion existentes.
-                          </a>
-                        </p>
-                        <div class="collapse" id="encuadernacion">
-                          <div class="card card-body">
-                            <ul>
-                              <li>Espiral</li>
-                              <li>Grapas wire binding</li>
-                              <li>Lujo</li>
-                            </ul>
-                          </div>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <div class="row mb-2">
-                    <div class="col-12 ms-auto mb-3" style="text-align: left">
-                        <div class="form-floating">
-                          <input type="text" class="form-control" name="new_medio_digital" id="floatingInput" placeholder="Medio Digital">
-                          <label for="floatingInput">Nuevo tipo de medio digital</label>
-                        </div>
-                    </div>
-                    <div class="col-12 ms-auto" style="text-align: left">
-                        <p>
-                          <a class="btn btn-info" data-bs-toggle="collapse" href="#mediodigital" role="button" aria-expanded="false" aria-controls="mediodigital">
-                            <i class="fa fa-eye"></i>&nbsp;&nbsp;Ver tipos de medio digital existentes.
-                          </a>
-                        </p>
-                        <div class="collapse" id="mediodigital">
-                          <div class="card card-body">
-                            <ul>
-                              <li>AudioLibro</li>
-                              <li>CD Audio</li>
-                              <li>Digitalización (Obra digitalizada)</li>
-                            </ul>
-                          </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp;Agregar</button>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" name="nomencladores" class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp;Agregar</button>
+                  </div>
+              </form>
           </div>
         </div>
       </div>
@@ -276,7 +297,7 @@
                   <hr>
                   <div class="row mb-1">
                     <div class="col-12">
-                        <strong>Colaborador principal:</strong> &nbsp;&nbsp;{{ publicacion }}
+                        <strong>Colaborador principal:</strong> &nbsp;&nbsp;{{ publicacion.autor_con_rol_autor }}
                     </div>
                   </div>
                   <hr>
@@ -310,15 +331,37 @@
                     </div>
                   </div>
                   <hr>
+                  {% if publicacion.descripcion_digital.medio %}
+                      <div class="row mb-1">
+                        <div class="col-12">
+                            <strong>Letra:</strong> &nbsp;&nbsp;<a href="/media/{{ publicacion.descripcion_digital.letra }}">{{ publicacion.descripcion_digital.letra_base_name }}</a>
+                        </div>
+                      </div>
+                      <hr>
+                  {% else %}
+                      <div class="row mb-1">
+                        <div class="col-12">
+                            <strong>Descripción Física:</strong> &nbsp;&nbsp;{{ publicacion.descripcion_fisica.get_tipo_display|default:'-' }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row mb-1">
+                        <div class="col-12">
+                            <strong>No de páginas:</strong> &nbsp;&nbsp;{{ publicacion.descripcion_fisica.numero_paginas|default:'-' }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row mb-1">
+                        <div class="col-12">
+                            <strong>Tipo de impresión:</strong> &nbsp;&nbsp;{{ publicacion.descripcion_fisica.get_tipo_impresion_display|default:'-' }}
+                        </div>
+                      </div>
+                      <hr>
+                  {% endif %}
+
                   <div class="row mb-1">
                     <div class="col-12">
-                        <strong>Letra:</strong> &nbsp;&nbsp;<a href="/media/{{ publicacion.descripcion_digital.letra }}">{{ publicacion.descripcion_digital.letra_base_name }}</a>
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row mb-1">
-                    <div class="col-12">
-                        <strong>Descripción:</strong> &nbsp;&nbsp;{{ publicacion.description }}
+                        <strong>Descripción General:</strong> &nbsp;&nbsp;{{ publicacion.descripcion_general|default:'-' }}
                     </div>
                   </div>
                   <hr>
@@ -330,7 +373,7 @@
                   <hr>
                   <div class="row mb-1">
                     <div class="col-12">
-                        <strong>Fecha de creación:</strong> &nbsp;&nbsp;{{ publicacion.date_time }}
+                        <strong>Fecha de creación:</strong> &nbsp;&nbsp;{{ publicacion.date_time|date:"Y-m-d" }}
                     </div>
                   </div>
                   <hr>
@@ -372,7 +415,7 @@
             <div class="row mb-2">
                 <div class="col-6 ms-auto mb-3" style="text-align: left">
                     <div class="form-floating">
-                      <input type="text" class="form-control" name="editor" id="floatingInput" placeholder="Editor">
+                      <input type="text" class="form-control" name="editor_filter" id="floatingInput" placeholder="Editor">
                       <label for="floatingInput">Nombre del editor</label>
                     </div>
                 </div>

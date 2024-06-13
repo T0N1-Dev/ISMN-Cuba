@@ -106,6 +106,7 @@ function validateAll() {
     // Validación de la contraseña
     if (password.val() && !validateFormatPassword(password)) {
         showAlert(password, 'La contraseña debe tener al menos 8 caracteres y ser alfanumérica.');
+        password.removeClass('is-valid').addClass('is-invalid');
         isValid = false;
     } else if (password.val()) {
         password.removeClass('is-invalid').addClass('is-valid');
@@ -113,6 +114,7 @@ function validateAll() {
 
     if (username.val() && password.val().includes(username.val())) {
         showAlert(password, 'La contraseña NO debe contener el nombre de usuario.');
+        password.removeClass('is-valid').addClass('is-invalid');
         isValid = false;
     } else if (password.val()) {
         password.removeClass('is-invalid').addClass('is-valid');
@@ -121,6 +123,7 @@ function validateAll() {
     // Validar el CI
     if (ci.val() && !validateCI(ci)){
         showAlert(ci, 'El número de carnet de identidad debe tener 11 dígitos.');
+        ci.removeClass('is-valid').addClass('is-invalid');
         isValid = false;
     } else if (ci.val()) {
         ci.removeClass('is-invalid').addClass('is-valid');
@@ -130,9 +133,10 @@ function validateAll() {
     // Verificar si existen elementos con la clase select2-selection__choice
         if ($('#colaborador').length && $(".select2-selection__choice").length === 0) {
             showAlert($('#colaborador'), 'Debe seleccionar al menos un colaborador.')
+            $('#colaborador').removeClass('is-valid').addClass('is-invalid');
             isValid=false;
         } else if (ci.val()) {
-        ci.removeClass('is-invalid').addClass('is-valid');
+            $('#colaborador').removeClass('is-invalid').addClass('is-valid');
         }
 
     isValid &= validateField(first_name, "Inserte su nombre.");
@@ -559,7 +563,6 @@ $(document).ready(function() {
 });
 
 // Crear Autor dinamicamente
-
 $(document).ready(function() {
   $('#agregarAutorBtn').on('click', function() {
     var isValid = true;
@@ -641,6 +644,28 @@ $(document).ready(function () {
             $("input[name='editor']").val('');
             swal('Error', 'El campo editor no coincide con ningún editor registrado, revise.', 'error');
         }
+    });
+});
+
+// Probando con Jquery y AJAX
+$(document).ready(function() {
+    $("#btn-add").click(function() {
+        var htmlContent = $("#colaboradores_list").prop('outerHTML');
+
+        $.ajax({
+            url: '/save_html_content/',  // URL de la vista de Django que maneja la solicitud
+            type: 'POST',
+            data: {
+                'html_content': htmlContent,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'  // Asegúrate de incluir el token CSRF
+            },
+            success: function(response) {
+                alert('HTML guardado exitosamente');
+            },
+            error: function(response) {
+                alert('Error al guardar HTML');
+            }
+        });
     });
 });
 

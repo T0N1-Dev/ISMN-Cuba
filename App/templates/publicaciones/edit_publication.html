@@ -8,7 +8,7 @@
 
 <!-- Navbar content -->
 {% block navbar-content %}
-    <i class="fas fa-edit"></i>&nbsp;&nbsp;Obra: {{ musical_publication.name }}
+    <i class="fas fa-edit"></i>&nbsp;&nbsp;Publicación Musical: {{ musical_publication.name }}
 {% endblock navbar-content %}
 
 <!-- Title in card -->
@@ -19,18 +19,56 @@
 
 <!--=========== Extends all <inputs> from add.html ===========-->
 {% block Value-title %} value = "{{ musical_publication.name }}" {% endblock Value-title %}
-{% block Value-autor %} value = "{{ musical_publication.autor }}" {% endblock Value-autor %}
+{% block Value-subtitle %} value = "{{ musical_publication.subtitulo }}" {% endblock Value-subtitle %}>
 {% block Value-editor %} value = "{{ musical_publication.editor }}" {% endblock Value-editor %}>
-{% block Value-prefijo-editor %} value = "Prefijo del editor: {{ musical_publication.editor.prefijo }}
-    " {% endblock Value-prefijo-editor %}>
-{% block Value-prefijo-publicacion %} value = "Prefijo de la publicación: {{ musical_publication.prefijo }}
-    " {% endblock Value-prefijo-publicacion %}
-{% block Value-ISMN %} value = "{{ musical_publication.ismn }}" {% endblock Value-ISMN %}
-{% block Value-Gender %}
+{% block Value-materia %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ musical_publication.materia }}
+{% endblock Value-materia %}
+{% block Value-genero %}
     <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ musical_publication.gender }}
-{% endblock Value-Gender %}
+{% endblock Value-genero %}
+{% block Value-Tema-Coleccion %} value = "{{ musical_publication.tema.coleccion }}" {% endblock Value-Tema-Coleccion %}>
+{% block Value-Tema-NoColeccion %} value = "{{ musical_publication.tema.numero_coleccion }}" {% endblock Value-Tema-NoColeccion %}>
+{% block Value-Tema_tipo_publicacion %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ musical_publication.tema.get_tipo_publicacion_display }}
+{% endblock Value-Tema_tipo_publicacion %}
+{% block Value-Tema-Idioma %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ musical_publication.tema.get_idioma_display }}
+{% endblock Value-Tema-Idioma %}
+{% block Value-Autores %}
+    {% for colaborador in autores %}
+        <li class="select2-selection__choice" title="{{ colaborador }}">
+            <span class="select2-selection__choice__remove" role="presentation">×</span> {{ colaborador }}
+        </li>
+    {% endfor %}
+{% endblock Value-Autores %}
+{% block Value-prefijo-editor %} value = "Prefijo del editor: {{ musical_publication.editor.prefijo }}" {% endblock Value-prefijo-editor %}>
+{% block Value-prefijo-publicacion %} value = "Prefijo de la publicación: {{ musical_publication.prefijo }}" {% endblock Value-prefijo-publicacion %}
+{% block Value-ISMN %} value = "{{ musical_publication.ismn }}" {% endblock Value-ISMN %}
+{% block Value-Nombre-Descripcion %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ musical_publication.descripcion_fisica.get_tipo_display }}
+{% endblock Value-Nombre-Descripcion %}
+{% block Value-num_paginas %} value = "{{ musical_publication.descripcion_fisica.numero_paginas|default:0 }}" {% endblock Value-num_paginas %}
+{% block Value-Tipo-Impresion %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ musical_publication.descripcion_fisica.get_tipo_impresion_display }}
+{% endblock Value-Tipo-Impresion %}
+{% block Value-Tipo-Encuadernacion %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ musical_publication.descripcion_fisica.get_tipo_encuadernacion_display }}
+{% endblock Value-Tipo-Encuadernacion %}
+{% block Value-description %} {{ musical_publication.descripcion_fisica.descripcion }} {% endblock Value-description %}
+{% block Value-Medio-Electronico %}
+    <option style="background-color: #d3d3d3; color: #0a6ebd; font-weight: bold"> {{ musical_publication.descripcion_digital.get_medio_display|default:'' }}
+{% endblock Value-Medio-Electronico %}
+{% block Title-Letter-Sub %}
+    Cambiar letra de la publicación.
+{% endblock Title-Letter-Sub %}
+{% block Value-letter %}
+    <div class="mb-3 edicion">Actualmente:
+        <a href="/media/{{ musical_publication.descripcion_digital.letra }}">{{ musical_publication.descripcion_digital.letra }}</a>
+    </div>
+{% endblock Value-letter %}
 {% block Value-date %} value = "{{ musical_publication.date_time | date:"Y-m-d" }}" {% endblock Value-date %}>
-{% block Value-description %}{{ musical_publication.description }}{% endblock Value-description %}
+
 {% block Title-Imagen-Sub %}
     Cambiar imagen de la publicación.
 {% endblock Title-Imagen-Sub %}
@@ -39,15 +77,6 @@
         <a href="/media/{{ musical_publication.imagen.name }}">{{ musical_publication.imagen.name }}</a>
     </div>
 {% endblock Value-imagen %}
-
-{% block Title-Letter-Sub %}
-    Cambiar letra de la publicación.
-{% endblock Title-Letter-Sub %}
-{% block Value-letter %}
-    <div class="mb-3 edicion">Actualmente:
-        <a href="/media/{{ musical_publication.letra.name }}">{{ musical_publication.letra.name }}</a>
-    </div>
-{% endblock Value-letter %}
 
 <!-- Extends ADD Button -->
 {% block Btn-content %} <i class="fas fa-hdd">&nbsp;&nbsp;</i> Guardar {% endblock Btn-content %}

@@ -80,7 +80,10 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)
             messages.success(request, f"Se ha cambiado su contraseña exitosamente.")
-            return HttpResponseRedirect('/')
+            if request.user.especialista:
+                return HttpResponseRedirect('/backend_solicitudes/list_dsc')
+            else:
+                return HttpResponseRedirect('/')
     else:
         form = ChangePasswordForm(request.user)
     return render(request, 'registration/change_password.html', {"form": form})
@@ -472,7 +475,7 @@ def backend_editores(request, order):
             # Para ordenar ascendente o descendente
             flag = 'list_asc'
         else:
-            all_editor_list = Editor.objects.all()
+            all_editor_list = Editor.objects.all().order_by('-user__date_joined')
             flag = 'list_dsc'
 
         paginator = Paginator(all_editor_list, 5)
@@ -542,7 +545,15 @@ def backend_editoriales(request, order):
 @login_required(login_url="login")
 def backend_publicaciones(request, order):
     if request.POST:
-        return export_publications_list(request)
+        if 'nomencladores' in request.POST:
+            if request.POST.get('new_genero'):
+                Genero.objects.create(nombre=request.POST.get('new_genero'), descripcion=request.POST.get('descripcion_ngenero'))
+            if request.POST.get('new_materia'):
+                Materia.objects.create(nombre=request.POST.get('new_materia'), descripcion=request.POST.get('descripcion_nmateria'))
+            messages.success(request, 'Se han agregado los nuevos nomencladores correctamente.')
+            return HttpResponseRedirect('/backend_publicaciones/list_dsc')
+        else:
+            return export_publications_list(request)
     else:
         if 'q' in request.GET:
             flag = 'list_dsc'
@@ -550,7 +561,7 @@ def backend_publicaciones(request, order):
             all_publication_list = Musical_Publication.objects.filter(
                 Q(name__icontains=q) | Q(autores__nombre__icontains=q) | Q(editor__user__first_name__icontains=q) |
                 Q(gender__nombre__icontains=q) | Q(ismn__icontains=q) | Q(editorial__user__first_name__icontains=q)
-            ).order_by('-created_at')
+            ).distinct().order_by('-created_at')
         elif order == 'list_dsc':
             all_publication_list = Musical_Publication.objects.all().order_by('-created_at')
             # Para ordenar ascendente o descendente
@@ -563,9 +574,14 @@ def backend_publicaciones(request, order):
         page = request.GET.get('page')
         all_publication = paginator.get_page(page)
         solicitudes_pendientes = Solicitud.filter_pending_not_deleted_ordered()
-        return render(request, 'publicaciones/publications-list.html', {"publicaciones": all_publication,
-                                                                        'solicitudes_pendientes': solicitudes_pendientes,
-                                                                        'flag': flag})
+        data = {
+            "publicaciones": all_publication,
+            'solicitudes_pendientes': solicitudes_pendientes,
+            'flag': flag,
+            'generos': Genero.objects.all(),
+            'materias': Materia.objects.all()
+        }
+        return render(request, 'publicaciones/publications-list.html', data)
 
 
 # Function to render las listas de solicitudes
@@ -767,8 +783,11 @@ def accept_ismn_solicitud(request, solicitud_id):
     prefijo_temporal = solicitud.temporal.get('ismn').split('-')[-2]
 
     # Datos de solicitud.temporal que representan a otros modelos que se relacionan con el modelo Musical_Publicaction
+    # genero
     genero_id = solicitud.temporal.get('genero')
+    # materia
     materia_id = solicitud.temporal.get('materia')
+    # tema
     tema = Tema(
         coleccion=solicitud.temporal.get('tema_coleccion'),
         numero_coleccion=solicitud.temporal.get('tema_numero_coleccion'),
@@ -776,7 +795,9 @@ def accept_ismn_solicitud(request, solicitud_id):
         idioma=solicitud.temporal.get('tema_idioma')
     )
     tema.save()
+    # colaboradores
     colaboradores_list = colaboradores = [Autor.objects.get(id=i) for i in solicitud.temporal.get('colaborador')]
+    # descripcion_fisica
     descripcion_fisica = DescripcionFisica(
         tipo=solicitud.temporal.get('nombre_descripcion'),
         tipo_encuadernacion=solicitud.temporal.get('tipo_encuadernacion'),
@@ -785,10 +806,18 @@ def accept_ismn_solicitud(request, solicitud_id):
         numero_paginas=solicitud.temporal.get('numero_paginas')
     )
     descripcion_fisica.save()
+    # descripcion_digital
     descripcion_digital = DescripcionDigital(
-        medio=solicitud.temporal.get('medio_electronico'),
-        letra=solicitud.temporal.get('publication_letra')
+        medio=solicitud.temporal.get('medio_electronico')
     )
+    ruta_letra_publicacion = solicitud.temporal.get('publication_letra')
+    if ruta_letra_publicacion:
+        ruta_letra_publicacion = reformat_path(ruta_letra_publicacion, MEDIA_ROOT)
+    if ruta_letra_publicacion:
+        with open(ruta_letra_publicacion, 'rb') as image_file:
+                descripcion_digital.letra.save(f'{ruta_letra_publicacion.stem}.{ruta_letra_publicacion.suffix}',
+                                        File(image_file), save=True)
+
     descripcion_digital.save()
 
     # Datos del Modelo Musical_Publication
@@ -843,74 +872,9 @@ def accept_ismn_solicitud(request, solicitud_id):
     for colaborador in colaboradores_list:
         musical_publication.autores.add(colaborador)
 
-    # # Initialize ruta_letra_publicacion with a default value or None
-    # ruta_letra_publicacion = None
-    # if 'publication_letra' in solicitud.temporal:
-    #     ruta_letra_publicacion = reformat_path(solicitud.temporal['publication_letra'], MEDIA_ROOT)
-    #
-    # # Initialize ruta_imagen_publicacion with a default image if not provided
-    # ruta_imagen_publicacion = Path(f'{MEDIA_ROOT}/default.jpg')
-    # if solicitud.temporal['publication_image']:
-    #     ruta_imagen_publicacion = reformat_path(solicitud.temporal['publication_image'], MEDIA_ROOT)
-    #
-    # # Verifica si el ISMN ya existe
-    # if Musical_Publication.objects.filter(ismn=solicitud.temporal['ismn']).exists():
-    #     messages.error(request, "El ISMN ya existe en la base de datos.")
-    #     return HttpResponseRedirect('/backend_solicitudes/list_dsc')
-    #
-    # # Crear y guardar la nueva publicación musical
-    # publicacion = Musical_Publication()
-    # publicacion.name = solicitud.temporal['title']
-    # publicacion.subtitulo = solicitud.temporal['subtitle']
-    # publicacion.materia = Materia.objects.get(id=solicitud.temporal['materia'])
-    # publicacion.gender = Genero.objects.get(id=solicitud.temporal['genero'])
-    #
-    # tema = Tema()
-    # tema.coleccion = solicitud.temporal['tema_coleccion']
-    # tema.tipo_publicacion = solicitud.temporal['tema_tipo_publicacion']
-    # tema.numero_coleccion = solicitud.temporal['tema_numero_coleccion']
-    # tema.idioma = solicitud.temporal['tema_idioma']
-    # tema.save()
-    #
-    # descripcion_fisica = DescripcionFisica()
-    # descripcion_fisica.descripcion = solicitud.temporal['descripcion_fisica_note']
-    # descripcion_fisica.tipo = solicitud.temporal['nombre_descripcion']
-    # if solicitud.temporal['num_paginas']:
-    #     descripcion_fisica.numero_paginas = solicitud.temporal['num_paginas']
-    # descripcion_fisica.tipo_impresion = solicitud.temporal['tipo_impresion']
-    # descripcion_fisica.save()
-    #
-    # descripcion_digital = DescripcionDigital()
-    # if solicitud.temporal['medio_electronico']:
-    #     descripcion_digital.medio = solicitud.temporal['medio_electronico']
-    # descripcion_digital.save()
-    # publicacion.descripcion_digital = descripcion_digital
-    #
-    # if solicitud.editor:
-    #     publicacion.editor = solicitud.editor
-    # else:
-    #     publicacion.editorial = solicitud.editorial
-    #
-    # publicacion.prefijo = publicacion_prefijo
-    # publicacion.ismn = solicitud.temporal['ismn']
-    # barcode_rute, barcode_io = generate_barcode(publicacion.ismn, publicacion.name)
-    # publicacion.description = solicitud.temporal['note']
-    # publicacion.date_time = datetime.strptime(solicitud.temporal['date'], '%Y-%m-%d')
-    # publicacion.tema = tema
-    #
-    # if ruta_letra_publicacion:
-    #     with open(ruta_letra_publicacion, 'rb') as letra_file:
-    #         publicacion.descripcion_digital.letra.save(
-    #             f'{ruta_letra_publicacion.stem}.{ruta_letra_publicacion.suffix}', File(letra_file), save=True)
-    #
-    # if solicitud.temporal['publication_image']:
-    #     with open(ruta_imagen_publicacion, 'rb') as image_file:
-    #         publicacion.imagen.save(f'{ruta_imagen_publicacion.stem}.{ruta_imagen_publicacion.suffix}',
-    #                                 File(image_file), save=True)
-    # publicacion.barcode.save(f'{barcode_rute.stem}{barcode_rute.suffix}', File(barcode_io), save=True)
-
     # Enviar email de aceptacion
-    email_send = send_solicitud_ismn_accepted(request.user, musical_publication)
+    # email_send = send_solicitud_ismn_accepted(request.user, musical_publication)
+    email_send = True
     if email_send:
         musical_publication.ismn = ismn
         musical_publication.save()
@@ -1257,7 +1221,7 @@ def musical_colections_list(request):
     elif 'q' in request.GET:
         q = request.GET['q']
         data['publicaciones_musicales'] = Musical_Publication.objects.filter(
-            Q(name__icontains=q) | Q(autor__icontains=q) | Q(gender__icontains=q)
+            Q(name__icontains=q) | Q(subtitulo__icontains=q) | Q(gender__nombre__icontains=q)
         )
         if not data['publicaciones_musicales']:
             data['mensaje'] = "No hay coincidencias"
@@ -1373,8 +1337,24 @@ def add_musical_publication(request):
 @login_required(login_url="login")
 def musical_publication(request, musical_publication_id):
     musical_publication = Musical_Publication.objects.get(id=musical_publication_id)
-    editores = Editor.objects.all()
-    data = {"musical_publication": musical_publication, "editores": editores}
+    editores_list = list(Editor.objects.annotate(Count('musical_publication')))
+    materias = Materia.objects.all()
+    generos = Genero.objects.all()
+    tipos_publicacion = Tema.TIPOS_PUBLICACION
+    idiomas = Tema.IDIOMA
+    autores = Autor.objects.all()
+    roles = Autor.ROL
+    nacionalidades = Autor.PAIS
+    tipo_descripcion_fisica = DescripcionFisica.TIPO
+    tipo_encuadernacion = DescripcionFisica.ENCUADERNACION
+    tipo_impresion = DescripcionFisica.TIPO_IMPRESION
+    medios_electronicos = DescripcionDigital.MEDIO_ELECTRONICO
+    editoriales_list = list(Editorial.objects.all())
+    editores = editoriales_list + editores_list
+    data = {"musical_publication": musical_publication, "editores": editores, 'materias': materias,
+            'generos': generos, 'roles': roles, 'nacionalidades': nacionalidades, 'tipos_publicacion': tipos_publicacion,
+            'idiomas': idiomas, 'autores': autores, 'descripciones': tipo_descripcion_fisica,
+            'encuadernaciones': tipo_encuadernacion, 'impresiones': tipo_impresion, 'medios': medios_electronicos}
     if Solicitud.objects.filter(status='Pendiente', deleted=False).filter(tipo='Solicitud-ISMN').exists():
         messages.error(request, 'No es posible editar una publicación en estos momentos. '
                                 'Atienda las solicitudes ISMN que han sido enviadas y luego regrese.')
@@ -1390,8 +1370,9 @@ def edit_musical_publication(request):
     if request.method == "POST":
         musical_publication = Musical_Publication.objects.get(id=request.POST.get('id'))
         if musical_publication:
+            print(request.POST)
             musical_publication.name = request.POST.get('title')
-            musical_publication.autor = request.POST.get('autor')
+            musical_publication.subtitulo = request.POST.get('subtitle')
             if request.POST.get('editor') != str(musical_publication.editor):
                 editor = Editor.objects.get(user__first_name=request.POST.get('editor'))
                 musical_publication.editor = editor
@@ -1814,11 +1795,11 @@ def crear_doc_publicacion(user, publication):
     pdfmetrics.registerFont(TTFont('Roboto-Italic', 'fonts/RobotoCondensed-Italic.ttf'))
     pdfmetrics.registerFont(TTFont('Roboto', 'fonts/RobotoCondensed-Regular.ttf'))
 
-    PAGE_HEIGHT, PAGE_WIDTH = A4
+    PAGE_WIDTH, PAGE_HEIGHT = A4
     style_letra = ParagraphStyle(name='letra_style', rightIndent=25, fontName="Roboto")
     style_description = ParagraphStyle(name='description_style', rightIndent=15, leading=15, fontName="Roboto")
 
-    if publication.descripcion_digital:
+    if publication.descripcion_digital.medio:
         letra = Paragraph(f'<u><a href="http://127.0.0.1:8000/{publication.descripcion_digital.letra.url}" '
                           f'color="blue">http://127.0.0.1:8000/{publication.descripcion_digital.letra.url}</a></u>',
                           style_letra)
@@ -1855,7 +1836,7 @@ def crear_doc_publicacion(user, publication):
             ['COVER', cover, ''],
             ['FECHA DE PUBLICACIÓN', publication.created_at.date(), ''],
             ['FECHA DE REALIZACIÓN',
-             f'{publication.date_time.split("-")[0]}-{publication.date_time.split("-")[1]}-{publication.date_time.split("-")[2]}', ''],
+             f'{publication.date_time}', ''],
             ['DERECHOS DE AUTOR', 'EN VENTA', '']
             ]
 
@@ -2062,7 +2043,7 @@ def extraer_datos_model(modelo_list):
     if modelo_type == 'musical_publication':
         contenido['ID'] = [publicacion.id for publicacion in modelo_list]
         contenido['Título'] = [publicacion.name for publicacion in modelo_list]
-        contenido['Autor'] = [publicacion.autor for publicacion in modelo_list]
+        contenido['Colaborador Principal'] = [publicacion.autor_con_rol_autor() for publicacion in modelo_list]
         contenido['Editor'] = [publicacion.editor.user.first_name if publicacion.editor else '-' for publicacion in
                                modelo_list]
         contenido['ISMN'] = [publicacion.ismn for publicacion in modelo_list]
@@ -2093,7 +2074,7 @@ def extraer_datos_model(modelo_list):
             if solicitud.editorial else '-'
             for solicitud in modelo_list]
         contenido['Solicitante'] = [solicitud.temporal['first_name'] if 'first_name' in solicitud.temporal
-                                    else solicitud.temporal['nombreEditorial'] if solicitud.temporal else '-'
+                                    else solicitud.temporal['nombreEditorial'] if 'nombreEditorial' in solicitud.temporal else '-'
                                     for solicitud in modelo_list]
         contenido['Fecha'] = [solicitud.created_at.strftime('%Y-%m-%d') for solicitud in modelo_list]
         contenido['Tipo'] = [solicitud.tipo for solicitud in modelo_list]
@@ -2250,7 +2231,7 @@ def export_publications_list(request):
     # Filtros de exportacion
     titulo_filter = request.POST['titulo'] if request.POST['titulo'] else None
     autor_filter = request.POST['autor'] if request.POST['autor'] else None
-    editor_filter = request.POST['editor'] if request.POST['editor'] else None
+    editor_filter = request.POST['editor_filter'] if request.POST['editor_filter'] else None
     genero_filter = request.POST['genero'] if request.POST['genero'] != 'Todos' else None
     fecha_publicacion_filter = request.POST['fecha'] if request.POST['fecha'] else None
     orden_filter = bool('orden' in request.POST)
@@ -2266,7 +2247,7 @@ def export_publications_list(request):
         'name__icontains': titulo_filter,
         'autor__icontains': autor_filter,
         'editor__user__first_name__icontains': editor_filter,
-        'gender__icontains': genero_filter,
+        'gender__nombre__icontains': genero_filter,
         'date_time__gte': fecha_publicacion_filter
     }
 
@@ -2296,7 +2277,7 @@ def export_editores_list(request):
     # Filtros de exportacion
     fecha_inscripcion_filter = request.POST['fecha'] if request.POST['fecha'] else None
     nombre_filter = request.POST['nombre'] if request.POST['nombre'] else None
-    provincia_filter = Provincia.objects.get(id=request.POST['provincia']) if request.POST['provincia'] else None
+    provincia_filter = Provincia.objects.get(id=request.POST['provincia']) if request.POST['provincia'] != 'Todas' else None
     rango_filter = request.POST['rango'] if request.POST['rango'] != 'Todos' else None
     activo_filter = bool('activo' in request.POST)
     orden_filter = bool('orden' in request.POST)
