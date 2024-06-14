@@ -16,7 +16,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
 from datetime import datetime
@@ -561,6 +561,7 @@ def backend_publicaciones(request, order):
             all_publication_list = Musical_Publication.objects.filter(
                 Q(name__icontains=q) | Q(autores__nombre__icontains=q) | Q(editor__user__first_name__icontains=q) |
                 Q(gender__nombre__icontains=q) | Q(ismn__icontains=q) | Q(editorial__user__first_name__icontains=q)
+                | Q(autores__apellido__icontains=q)
             ).distinct().order_by('-created_at')
         elif order == 'list_dsc':
             all_publication_list = Musical_Publication.objects.all().order_by('-created_at')
@@ -700,6 +701,7 @@ def accept_inscription(request, solicitud_id):
         contact.phone = phone
         contact.user_name = user.username
         contact.CI = editor.CI
+        contact.id_tribute = editor.id_tribute
         correo = send_info_inscripcion(nombre=user.first_name, user_email=user.email,
                                        username=user.username, password=solicitud.temporal['password'])
         solicitud.temporal = {}
@@ -873,7 +875,7 @@ def accept_ismn_solicitud(request, solicitud_id):
         musical_publication.autores.add(colaborador)
 
     # Enviar email de aceptacion
-    # email_send = send_solicitud_ismn_accepted(request.user, musical_publication)
+    email_send = send_solicitud_ismn_accepted(request.user, musical_publication)
     email_send = True
     if email_send:
         musical_publication.ismn = ismn
@@ -1094,11 +1096,8 @@ def delete_editor(request, editor_id):
     user = User.objects.get(id=editor.user.id)
     if editor.image_profile.name != 'profile_default.png':
         editor.image_profile.delete()
-    Registered_Data.objects.get(phone=editor.phone).delete()
-    Registered_Data.objects.get(id_tribute=editor.id_tribute).delete()
-    Registered_Data.objects.get(CI=editor.CI).delete()
-    Registered_Data.objects.get(user_name=editor.user.username).delete()
-    Registered_Data.objects.get(email=editor.user.email).delete()
+    register_data = get_object_or_404(Registered_Data, phone=editor.phone)
+    register_data.delete()
     user.delete()
     editor.delete()
     messages.success(request, "Editor eliminado correctamente !")
@@ -1567,6 +1566,10 @@ def solicitud_ismn(request):
         solicitud.temporal = convert_querydict_to_dict(request.POST)
         user_type = get_user_type(request.user)
 
+        # Solución temporal para cuando agregan un solo Autor no existente
+        colaboradores = solicitud.temporal.get('colaborador')
+        if not colaboradores:
+            solicitud.temporal['colaborador'] = [Autor.objects.last().id]
         # Validando de lado del servidor
         if not (solicitud.temporal['title'] or solicitud.temporal['subtitle'] or solicitud.temporal['materia']
                 or solicitud.temporal['genero'] or solicitud.temporal['tema_coleccion'] or

@@ -647,27 +647,27 @@ $(document).ready(function () {
     });
 });
 
-// Probando con Jquery y AJAX
-$(document).ready(function() {
-    $("#btn-add").click(function() {
-        var htmlContent = $("#colaboradores_list").prop('outerHTML');
-
-        $.ajax({
-            url: '/save_html_content/',  // URL de la vista de Django que maneja la solicitud
-            type: 'POST',
-            data: {
-                'html_content': htmlContent,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'  // Asegúrate de incluir el token CSRF
-            },
-            success: function(response) {
-                alert('HTML guardado exitosamente');
-            },
-            error: function(response) {
-                alert('Error al guardar HTML');
-            }
-        });
-    });
-});
+// // Probando con Jquery y AJAX
+// $(document).ready(function() {
+//     $("#btn-add").click(function() {
+//         var htmlContent = $("#colaboradores_list").prop('outerHTML');
+//
+//         $.ajax({
+//             url: '/save_html_content/',  // URL de la vista de Django que maneja la solicitud
+//             type: 'POST',
+//             data: {
+//                 'html_content': htmlContent,
+//                 'csrfmiddlewaretoken': '{{ csrf_token }}'  // Asegúrate de incluir el token CSRF
+//             },
+//             success: function(response) {
+//                 alert('HTML guardado exitosamente');
+//             },
+//             error: function(response) {
+//                 alert('Error al guardar HTML');
+//             }
+//         });
+//     });
+// });
 
 
 var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
