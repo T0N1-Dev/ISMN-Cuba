@@ -15,5 +15,12 @@
       <jdbc-url>jdbc:sqlite:C:\Users\T0N1\Desktop\djangoProject\.coverage</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="db.sqlite3" uuid="1eb8c1c3-65f3-4e9c-a2b6-009db59ae527">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\T0N1\Desktop\djangoProject\db.sqlite3.backup</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

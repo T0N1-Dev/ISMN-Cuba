@@ -8,8 +8,6 @@ import os
 # Validate Dates
 from django.db.models import Min, Count
 from django.db.models.functions import TruncDate
-from django.db.models.signals import pre_save, post_save
-from django.dispatch import receiver
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.utils.functional import cached_property
@@ -35,8 +33,8 @@ class Registered_Data(models.Model):
     user_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=50)
     phone = models.CharField(max_length=20)
-    id_tribute = models.PositiveSmallIntegerField(default=0)
-    CI = models.PositiveSmallIntegerField(default=0)
+    id_tribute = models.PositiveBigIntegerField(default=0)
+    CI = models.PositiveBigIntegerField(default=0)
 
     class Meta:
         verbose_name_plural = "Registrados"
@@ -129,7 +127,7 @@ class PrefijoEditor(models.Model):
         rango = self.rango
         if self.value > rango.rango_superior:
             raise ValidationError({
-                'value': _('El valor de PrefijoEditor no puede exceder el rango superior del Rango_Prefijo_Editor.')
+                'value': 'El valor de PrefijoEditor no puede exceder el rango superior del Rango_Prefijo_Editor.'
             })
 
     def save(self, *args, **kwargs):
@@ -206,7 +204,7 @@ class Editorial(models.Model):
     prefijo = models.OneToOneField(PrefijoEditor, on_delete=models.PROTECT)
     image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png",
                                       validators=[validate_image_extension])
-    id_tribute = models.PositiveSmallIntegerField(unique=True)
+    id_tribute = models.PositiveBigIntegerField(unique=True)
     state = models.BooleanField(default=True)
     ubicacion = models.OneToOneField(Ubicacion, models.CASCADE)
     caracterizacion = models.ForeignKey(Caracterizacion, models.CASCADE, null=True, blank=True)
@@ -234,9 +232,9 @@ class Editor(models.Model):
     prefijo = models.OneToOneField(PrefijoEditor, on_delete=models.PROTECT)
     image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png",
                                       validators=[validate_image_extension])
-    id_tribute = models.PositiveSmallIntegerField(unique=True)
+    id_tribute = models.PositiveBigIntegerField(unique=True)
     state = models.BooleanField(default=True)
-    CI = models.PositiveSmallIntegerField(unique=True, null=True, blank=True)
+    CI = models.PositiveBigIntegerField(unique=True, null=True, blank=True)
     ubicacion = models.OneToOneField(Ubicacion, models.CASCADE)
     descripcion = models.CharField(max_length=200, blank=True, null=True)
 
@@ -257,7 +255,7 @@ class Especialista(models.Model):
     image_profile = models.ImageField(upload_to="profile", blank=True, default="profile_default.png",
                                       validators=[validate_image_extension])
     directions = models.CharField(max_length=150)
-    CI = models.PositiveSmallIntegerField(unique=True)
+    CI = models.PositiveBigIntegerField(unique=True)
 
     class Meta:
         verbose_name_plural = "especialistas"

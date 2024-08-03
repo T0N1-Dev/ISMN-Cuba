@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -26,7 +26,6 @@ SECRET_KEY = 'django-insecure-aweeop%d2l09z%hzb!xmt-&p7fxb9x(+ddtv@u=07y^*5z9@5_
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -48,6 +47,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.file"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -81,17 +81,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangoProject.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Replace the SQLite DATABASES configuration with PostgreSQL:
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='postgres://postgres:cruz9412@localhost:5433/MyDataBase?sslmode=disable'
+    )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -110,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -134,12 +131,17 @@ USE_I18N = True
 
 USE_TZ = False
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+import os
 
 STATIC_URL = 'static/'
 
+if not DEBUG:  # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
+    # and renames the files with unique names for each version to support long-term caching
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # LOGIN
 LOGIN_REDIRECT_URL = 'backend'
@@ -151,7 +153,7 @@ LOGOUT_REDIRECT_URL = 'frontend'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR/"media"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # EMAIL SERVER (GMAIL)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -171,11 +173,11 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Bienvenido a la administración ISMN-CUBA",
     "copyright": "Cámara Cubana del Libro. Departamento ISMN",
     "topmenu_links": [
-            {"name": "Inicio",  "url": "admin:index", "permissions": ["auth.view_user"]},
-            {"name": "Ayuda", "url": "https://www.filhcuba.cu/mision-y-vision", "new_window": True},
-            {"model": "auth.User"},
-            {"name": "Salvar BD",  "url": "http://127.0.0.1:8000/salvasBD/", "permissions": ["auth.view_user"]},
-            {"name": "Restaurar BD",  "url": "http://127.0.0.1:8000/restaurarBD/", "permissions": ["auth.view_user"]},
+        {"name": "Inicio", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Ayuda", "url": "https://www.filhcuba.cu/mision-y-vision", "new_window": True},
+        {"model": "auth.User"},
+        {"name": "Salvar BD", "url": "http://127.0.0.1:8000/salvasBD/", "permissions": ["auth.view_user"]},
+        {"name": "Restaurar BD", "url": "http://127.0.0.1:8000/restaurarBD/", "permissions": ["auth.view_user"]},
     ],
 }
 
@@ -189,4 +191,3 @@ DJANGO_EASY_AUDIT_UNREGISTERED_CLASSES_EXTRA = ['App.CopyDB']
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-

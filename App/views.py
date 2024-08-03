@@ -465,17 +465,17 @@ def backend_editores(request, order):
                 Q(user__username__icontains=q) | Q(user__email__icontains=q) | Q(
                     ubicacion__provincia__nombre__icontains=q) |
                 Q(ubicacion__municipio__nombre__icontains=q) | Q(ubicacion__direccion__icontains=q) |
-                Q(descripcion__icontains=q) | Q(user__first_name__icontains=q)
+                Q(descripcion__icontains=q) | Q(user__first_name__icontains=q, state=True)
             ).order_by('-user__date_joined')
             if q.isnumeric():
                 all_editor_list = Editor.objects.filter(Q(phone__contains=q) | Q(prefijo__value__contains=int(q)) |
-                                                        Q(id_tribute__contains=q)).order_by('-user__date_joined')
+                                                        Q(id_tribute__contains=q), state=True).order_by('-user__date_joined')
         elif order == 'list_dsc':
-            all_editor_list = Editor.objects.all()[::-1]
+            all_editor_list = Editor.objects.filter(state=True)[::-1]
             # Para ordenar ascendente o descendente
             flag = 'list_asc'
         else:
-            all_editor_list = Editor.objects.all().order_by('-user__date_joined')
+            all_editor_list = Editor.objects.filter(state=True).order_by('-user__date_joined')
             flag = 'list_dsc'
 
         paginator = Paginator(all_editor_list, 5)
@@ -1094,12 +1094,10 @@ def add_editorial(request):
 def delete_editor(request, editor_id):
     editor = Editor.objects.get(id=editor_id)
     user = User.objects.get(id=editor.user.id)
-    if editor.image_profile.name != 'profile_default.png':
-        editor.image_profile.delete()
-    register_data = get_object_or_404(Registered_Data, phone=editor.phone)
-    register_data.delete()
-    user.delete()
-    editor.delete()
+    user.is_active = False
+    editor.state = False
+    user.save()
+    editor.save()
     messages.success(request, "Editor eliminado correctamente !")
     return HttpResponseRedirect('/backend/list_dsc')
 
