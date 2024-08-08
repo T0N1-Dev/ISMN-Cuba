@@ -1,0 +1,246 @@
+body {
+    background-color: black;
+    font-family: system-ui;
+    margin: 0;
+    color: white;
+}
+
+/* Barra de Búsqueda */
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+}
+
+.search-bar {
+    width: 35%;
+    min-width: 170px;
+    margin-left: auto;
+    height: 25px;
+    background-color: white;
+    opacity: .9;
+    text-align: right;
+    border-radius: 60px;
+    padding: 10px 20px;
+    animation: enhance-search linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 300px;
+}
+
+.search-bar input {
+    background: transparent;
+    border: 0;
+    outline: none;
+    font-size: 17px;
+    color: gray;
+}
+
+.search-bar button {
+    width: 25px;
+    font-size: 15px;
+    color: gray;
+    border: 0;
+    background: transparent;
+}
+
+/* Content */
+section {
+    columns: 3;
+    padding: 16px 32px;
+    column-gap: 32px;
+}
+
+@media screen and (max-width: 900px){
+    section {
+        columns: 2;
+    }
+}
+
+section img {
+    border-radius: 4px;
+    width: 100%;
+    height: auto;
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 15% cover 35%;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: all 0.5s ease;
+}
+
+.container-public {
+    position: relative;
+    margin-bottom: 32px;
+}
+
+.details-public {
+    background-color: #B1000A;
+    margin: 0;
+    bottom: 0;
+    opacity: .8;
+    padding: 7px 0 8px 0;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    height: 19%;
+    max-height: 60px;
+    transition: background-color 0.5s;
+}
+
+.details-public h2, h3, h4 {
+    margin:0;
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: normal;
+    margin-bottom: 4px;
+}
+
+h3 {
+    font-size: 15px;
+    font-weight: lighter;
+}
+
+header {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    position: sticky;
+    margin: 0;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    animation: enhance-header linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 300px;
+}
+
+header h1 {
+    width: 50%;
+    text-align: left;
+    margin-right: 10px;
+    margin-left: 35px;
+    padding-block: 6px;
+}
+
+.back_arrow {
+    text-decoration: none;
+    min-width: 25px;
+    text-align: center;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+.back_arrow i {
+    font-size: 1.5em;
+    color: white;
+    opacity: 0.9;
+    animation: enhance-arrow linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 300px;
+}
+
+.footerBottom {
+    font-size: 20px;
+    text-align: center;
+    padding-bottom: 10px;
+    padding-inline: 10px;
+}
+
+.socialIcons{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.socialIcons a {
+    text-decoration: none;
+    padding: 10px;
+    margin: 10px;
+    background-color: white;
+    border-radius: 50%;
+    min-width: 25px;
+    text-align: center;
+}
+
+.socialIcons a i {
+    font-size: 1.5em;
+    color: black;
+    opacity: 0.9;
+}
+
+.socialIcons a:hover {
+    background-color: black;
+    transition: 0.3s;
+}
+
+.socialIcons a:hover i {
+    color: white;
+}
+
+@keyframes reveal {
+    from {
+        opacity: 0;
+        scale: .5;
+    }
+
+    to {
+        opacity: 1;
+        scale: 1;
+    }
+}
+
+@keyframes enhance-header {
+    to {
+        background: rgba(255, 255, 255, .5);
+        backdrop-filter: blur(5px);
+        font-size: 12px;
+        color: black;
+    }
+}
+
+@keyframes enhance-search {
+    to {
+        opacity: .0;
+    }
+}
+
+@keyframes enhance-arrow {
+    to {
+        font-size: 22px;
+        color: black;
+    }
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+.flip {
+    transform: rotateY(180deg);
+    filter: blur(5px);
+}
+
+.thecard {
+    position: relative;
+}
+
+.back {
+    position: absolute;
+    top: 20px;
+    transform-style: preserve-3d;
+    animation: reveal;
+    animation-duration: 500ms;
+}
+
+.front {
+    transform-style: flat;
+    transition: all 0.5s ease;
+}
+
+
+
