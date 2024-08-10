@@ -1,0 +1,22 @@
+Internal Server Error: /backend_solicitudes/list_dsc
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\views\decorators\cache.py", line 54, in _view_wrapper
+    response = viewfunc(request, *args, **kw)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 621, in backend_solicitudes
+    solicitudes_aceptadas = dict(list(Solicitud.return_accepted().items())[-31:])
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\models.py", line 564, in return_accepted
+    resultados[fecha][tipo] += total
+    ~~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'Solicitud-Inscripci¾n'
+"GET /backend_solicitudes/list_dsc HTTP/1.1" 500 145
