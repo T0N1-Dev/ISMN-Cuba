@@ -451,11 +451,11 @@ class Musical_Publication(models.Model):
 
 # Solicitudes
 class Solicitud(models.Model):
-    EDITOR_ADD_SOLIC = 'Solicitud-Inscripción'
+    EDITOR_ADD_SOLIC = 'Solicitud-Inscripcion'
     ISMN_ADD_SOLIC = 'Solicitud-ISMN'
 
     SOLICITUD_TYPE = {
-        (EDITOR_ADD_SOLIC, "Solicitud-Inscripción"),
+        (EDITOR_ADD_SOLIC, "Solicitud-Inscripcion"),
         (ISMN_ADD_SOLIC, "Solicitud-ISMN")
     }
 
@@ -549,7 +549,7 @@ class Solicitud(models.Model):
         fecha_minima = fecha_minima.date()
 
         # Inicializar el diccionario de resultados con todas las fechas desde la mínima hasta la actual
-        resultados = {fecha_minima + datetime.timedelta(days=d): {'Solicitud-ISMN': 0, 'Solicitud-Inscripción': 0} for d
+        resultados = {fecha_minima + datetime.timedelta(days=d): {'Solicitud-ISMN': 0, 'Solicitud-Inscripcion': 0} for d
                       in range((fecha_actual - fecha_minima).days + 1)}
 
         # Contar las solicitudes por fecha y actualizar el diccionario de resultados

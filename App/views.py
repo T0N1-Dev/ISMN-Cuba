@@ -1218,7 +1218,8 @@ def musical_colections_list(request):
     elif 'q' in request.GET:
         q = request.GET['q']
         data['publicaciones_musicales'] = Musical_Publication.objects.filter(
-            Q(name__icontains=q) | Q(subtitulo__icontains=q) | Q(gender__nombre__icontains=q)
+            Q(name__icontains=q) | Q(subtitulo__icontains=q) | Q(gender__nombre__icontains=q) |
+            Q(editor__user__first_name__icontains=q)
         )
         if not data['publicaciones_musicales']:
             data['mensaje'] = "No hay coincidencias"

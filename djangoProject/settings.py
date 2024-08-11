@@ -28,7 +28,6 @@ DEBUG = False
 ALLOWED_HOSTS = ['mysite-zjf1.onrender.com', 'localhost', '127.0.0.1']
 
 # Application definition
-
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -87,7 +86,7 @@ WSGI_APPLICATION = 'djangoProject.wsgi.application'
 # Replace the SQLite DATABASES configuration with PostgreSQL:
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://postgres:cruz9412@localhost:5433/MyDataBase?sslmode=disable'
+        default='postgres://postgres:cruz9412@localhost:5433/ISMNCuba?sslmode=disable'
     )
 }
 
@@ -133,12 +132,9 @@ USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-import os
-
 STATIC_URL = 'static/'
-
 if not DEBUG:  # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATIC_ROOT = BASE_DIR / "staticfiles"
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
     # and renames the files with unique names for each version to support long-term caching
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -199,7 +195,7 @@ LOGGING = {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'django_error.log'),
+            'filename': BASE_DIR / 'django_error.log',
         },
     },
     'loggers': {

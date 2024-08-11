@@ -131,13 +131,13 @@ function validateAll() {
 
     // Validar colaborador
     // Verificar si existen elementos con la clase select2-selection__choice
-        if ($('#colaborador').length && $(".select2-selection__choice").length === 0) {
-            showAlert($('#colaborador'), 'Debe seleccionar al menos un colaborador.')
-            $('#colaborador').removeClass('is-valid').addClass('is-invalid');
-            isValid=false;
-        } else if (ci.val()) {
-            $('#colaborador').removeClass('is-invalid').addClass('is-valid');
-        }
+    //     if ($('#colaborador').length && $(".select2-selection__choice").length === 0) {
+    //         showAlert($('#colaborador'), 'Debe seleccionar al menos un colaborador.')
+    //         $('#colaborador').removeClass('is-valid').addClass('is-invalid');
+    //         isValid=false;
+    //     } else if (ci.val()) {
+    //         $('#colaborador').removeClass('is-invalid').addClass('is-valid');
+    //     }
 
     isValid &= validateField(first_name, "Inserte su nombre.");
     isValid &= validateField(last_name, "Inserte su apellido.");
