@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'djangoProject.wsgi.application'
 # Replace the SQLite DATABASES configuration with PostgreSQL:
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://postgres:cruz9412@localhost:5433/ISMNCuba?sslmode=disable'
+        default='postgresql://postgres:cruz9412@localhost:5433/ISMNCuba?sslmode=disable'
     )
 }
 
