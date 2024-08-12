@@ -1,22 +1,22 @@
 databases:
-  - name: mysitedb
+  - name: ISMNCubaDB
     plan: free
-    databaseName: mysite_6940
-    user: mysite
+    databaseName: ISMNCuba
+    user: ISMNCuba
 
 services:
   - type: web
     plan: free
-    name: ismn-cuba-service
+    name: ismn-cuba
     runtime: python
     buildCommand: "./build.sh"
     startCommand: "python -m gunicorn djangoProject.asgi:application -k uvicorn.workers.UvicornWorker"
     envVars:
-      - key: 'postgres://postgres:cruz9412@localhost:5433/MyDataBase?sslmode=disable'
+      - key: DATABASE_URL
         fromDatabase:
           name: mysitedb
           property: connectionString
-      - key: 'django-insecure-aweeop%d2l09z%hzb!xmt-&p7fxb9x(+ddtv@u=07y^*5z9@5_'
+      - key: SECRET_KEY
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
