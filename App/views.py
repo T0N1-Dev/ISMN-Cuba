@@ -54,6 +54,14 @@ from reportlab.lib.pagesizes import A4, landscape
 from djangoProject.settings import MEDIA_ROOT, BASE_DIR
 
 
+def create_super_user(request):
+    User.objects.create_superuser(
+        username='kadil',
+        email='kadil@gmail.com',
+        password='cruz9412'
+    )
+    return HttpResponseRedirect('/login')
+
 # ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
 class MyLoginView(LoginView):
     template_name = 'registration/login.html'

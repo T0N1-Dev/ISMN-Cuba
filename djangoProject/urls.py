@@ -6,8 +6,8 @@ from App import views
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 urlpatterns = [
+    path('createsuperuser/', views.create_super_user),
     path('admin/', admin.site.urls),
     path('salvasBD/', views.backup_database, name='salvasBD'),
     path('restaurarBD/', views.restore_database, name='restoreBD'),
