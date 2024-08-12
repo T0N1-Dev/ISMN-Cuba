@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-aweeop%d2l09z%hzb!xmt-&p7fxb9x(+ddtv@u=07y^*5z9@5_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['mysite-zjf1.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['ismn-cuba.onrender.com', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
