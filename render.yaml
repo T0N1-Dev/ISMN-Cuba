@@ -1,8 +1,8 @@
 databases:
   - name: ISMNCubaDB
     plan: free
-    databaseName: ISMNCuba
-    user: ISMNCuba
+    databaseName: ismncuba
+    user: ismncuba
 
 services:
   - type: web
