@@ -509,3 +509,5 @@ Traceback (most recent call last):
     raise ValueError(
 ValueError: Missing staticfiles manifest entry for 'multiselect-05/js/jquery.min.js'
 "GET /add_musical_publicaton/ HTTP/1.1" 500 145
+"GET / HTTP/1.1" 500 59
+"GET / HTTP/1.1" 500 59
