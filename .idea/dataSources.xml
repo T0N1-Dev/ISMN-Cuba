@@ -22,5 +22,12 @@
       <jdbc-url>jdbc:sqlite:C:\Users\T0N1\Desktop\djangoProject\db.sqlite3.backup</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="CubaISMN" uuid="2559c5cd-910d-48d7-95c2-ccf9e07b8ff9">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\T0N1\Desktop\djangoProject\CubaISMN</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

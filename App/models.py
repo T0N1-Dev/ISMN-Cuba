@@ -266,7 +266,7 @@ class Especialista(models.Model):
 
 #========== Modelos pertenecientes a las Publicaciones Musicales. =========
 class Genero(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.TextField(max_length=1000)
 
     class Meta:

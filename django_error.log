@@ -638,3 +638,344 @@ django.db.utils.IntegrityError: llave duplicada viola restricción de unicidad «a
 DETAIL:  Ya existe la llave (username)=(kadil).
 
 "GET /createsuperuser/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 74, in loaddata
+    subprocess.run(comando, shell=True, check=True)
+  File "C:\Program Files\Python311\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command 'loaddata initial_data.json' returned non-zero exit status 1.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 75, in loaddata
+    subprocess.run(comando, shell=True, check=True)
+  File "C:\Program Files\Python311\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command 'loaddata initial_data.json' returned non-zero exit status 1.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 74, in loaddata
+    subprocess.run(comando, shell=True, check=True)
+  File "C:\Program Files\Python311\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command 'python manage.py loaddata initial_data.json' returned non-zero exit status 1.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 74, in loaddata
+    subprocess.run(comando, shell=True, check=True)
+  File "C:\Program Files\Python311\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command 'python manage.py loaddata initial_data.json' returned non-zero exit status 1.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 77, in loaddata
+    with open('/path/to/initial_data.json', 'r') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/path/to/initial_data.json'
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 78, in loaddata
+    data = json.load(file)
+           ^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+                 ^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\encodings\cp1252.py", line 23, in decode
+    return codecs.charmap_decode(input,self.errors,decoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeDecodeError: 'charmap' codec can't decode byte 0x81 in position 982: character maps to <undefined>
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 78, in loaddata
+    data = json.load(file)
+           ^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+                 ^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\encodings\cp1252.py", line 23, in decode
+    return codecs.charmap_decode(input,self.errors,decoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeDecodeError: 'charmap' codec can't decode byte 0x81 in position 982: character maps to <undefined>
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 81, in loaddata
+    for autor_data in data.get('autores', []):
+                      ^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 81, in loaddata
+    for autor_data in data.get('autores', []):
+                      ^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 108, in loaddata
+    Genero.objects.update_or_create(
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 949, in update_or_create
+    obj, created = self.select_for_update().get_or_create(defaults, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 916, in get_or_create
+    return self.get(**kwargs), False
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 640, in get
+    raise self.model.MultipleObjectsReturned(
+App.models.Genero.MultipleObjectsReturned: get() returned more than one Genero -- it returned 5!
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 108, in loaddata
+    Genero.objects.update_or_create(
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 949, in update_or_create
+    obj, created = self.select_for_update().get_or_create(defaults, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 916, in get_or_create
+    return self.get(**kwargs), False
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 640, in get
+    raise self.model.MultipleObjectsReturned(
+App.models.Genero.MultipleObjectsReturned: get() returned more than one Genero -- it returned 5!
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(nombre=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(nombre=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(nombre=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(pk=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(pk=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(nombre=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(nombre=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(pk=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /loaddata/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 127, in loaddata
+    provincia_obj = Provincia.objects.get(pk=municipio_data['provincia'])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\db\models\query.py", line 637, in get
+    raise self.model.DoesNotExist(
+App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
+"GET /loaddata/ HTTP/1.1" 500 145

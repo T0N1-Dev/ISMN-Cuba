@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import socket
+import subprocess
 from email import encoders
 from email.mime.base import MIMEBase
 from random import randint
@@ -61,10 +62,79 @@ def create_super_user(request):
             email='kadil@gmail.com',
             password='cruz9412'
         )
+        messages.success(request, 'Superusuario creado exitosamente.')
         return HttpResponseRedirect('/login')
     except IntegrityError:
         messages.error(request, 'Superusuario ya existente.')
         return HttpResponseRedirect('/')
+
+
+def loaddata(request):
+    import json
+    from App.models import Autor, Materia, Genero, Provincia, Municipio
+
+    # Cargar el archivo JSON
+    with open('initial_data.json', 'r', encoding='utf-8') as file:
+        data = json.load(file)
+
+    # Cargar datos para el modelo Autor
+    for item in data:
+        if item.get('model') == 'App.autor':
+            autor_data = item['fields']
+            Autor.objects.update_or_create(
+                nombre=autor_data['nombre'],
+                apellido=autor_data['apellido'],
+                defaults={
+                    'nacionalidad': autor_data['nacionalidad'],
+                    'Rol': autor_data['Rol']
+                }
+            )
+
+    # Cargar datos para el modelo Materia
+    for item in data:
+        if item.get('model') == 'App.materia':
+            materia_data = item['fields']
+            Materia.objects.update_or_create(
+                nombre=materia_data['nombre'],
+                defaults={
+                    'descripcion': materia_data['descripcion']
+                }
+            )
+
+    # Cargar datos para el modelo Genero
+    for item in data:
+        if item.get('model') == 'App.genero':
+            genero_data = item['fields']
+            Genero.objects.update_or_create(
+                nombre=genero_data['nombre'],
+                defaults={
+                    'descripcion': genero_data['descripcion']
+                }
+            )
+
+    # Cargar datos para el modelo Provincia
+    for item in data:
+        if item.get('model') == 'App.provincia':
+            provincia_data = item['fields']
+            Provincia.objects.update_or_create(
+                nombre=provincia_data['nombre']
+            )
+
+    # Cargar datos para el modelo Municipio
+    for item in data:
+        if item.get('model') == 'App.municipio':
+            municipio_data = item['fields']
+            provincia_obj = Provincia.objects.get(pk=municipio_data['provincia'])
+            Municipio.objects.update_or_create(
+                nombre=municipio_data['nombre'],
+                defaults={
+                    'provincia': provincia_obj
+                }
+            )
+
+    messages.success(request, 'Datos cargados correctamente.')
+    return HttpResponseRedirect('/')
+
 
 # ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
 class MyLoginView(LoginView):

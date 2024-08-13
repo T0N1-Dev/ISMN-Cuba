@@ -10,6 +10,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('createsuperuser/', views.create_super_user),
+    path('loaddata/', views.loaddata),
     path('admin/', admin.site.urls),
     path('salvasBD/', views.backup_database, name='salvasBD'),
     path('restaurarBD/', views.restore_database, name='restoreBD'),
@@ -89,7 +90,7 @@ urlpatterns = [
     # ========================== SEND EMAIL ==========================
     # Path to send confirmation-code
     path('send_code_confirmation', views.send_code_confirmation, name="home"),
-    # re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
 ]
 
 if not settings.DEBUG:

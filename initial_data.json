@@ -1454,6 +1454,121 @@
       "nombre": "Yara",
       "provincia": 16
     }
+  },
+  {
+      "model": "App.genero",
+      "fields": {
+          "nombre": "Son Cubano",
+          "descripcion": "El son cubano es un estilo de música que combina elementos de la música africana y española."
+      }
+  },
+  {
+      "model": "App.genero",
+      "fields": {
+          "nombre": "Danzón",
+          "descripcion": "El danzón es un género musical y de baile de salón cubano que se originó en Matanzas."
+      }
+  },
+  {
+      "model": "App.genero",
+      "fields": {
+          "nombre": "Rumba",
+          "descripcion": "La rumba cubana es una familia de ritmos, bailes y géneros musicales afrocubanos."
+      }
+  },
+  {
+      "model": "App.genero",
+      "fields": {
+          "nombre": "Bolero",
+          "descripcion": "El bolero cubano es un género musical lento y melódico, conocido por sus letras románticas."
+      }
+  },
+  {
+      "model": "App.genero",
+      "fields": {
+          "nombre": "Guaguancó",
+          "descripcion": "El guaguancó es un subgénero de la rumba cubana, conocido por sus complejos ritmos y danzas."
+      }
+  },
+  {
+      "model": "App.genero",
+      "fields": {
+          "nombre": "Cha-cha-chá",
+          "descripcion": "El cha-cha-chá es un género musical cubano que surgió a partir del danzón-mambo."
+      }
+  },
+  {
+      "model": "App.genero",
+      "fields": {
+          "nombre": "Mambo",
+          "descripcion": "El mambo es un género de música y danza que se originó en Cuba en la década de 1940."
+      }
+  },
+  {
+      "model": "App.materia",
+      "pk": 1,
+      "fields": {
+          "nombre": "Música general",
+          "descripcion": "Incluye teorías y métodos generales de la música, historia y biografía de la música."
+      }
+  },
+  {
+      "model": "App.materia",
+      "pk": 2,
+      "fields": {
+          "nombre": "Música clásica",
+          "descripcion": "Incluye obras de compositores clásicos, sinfonías, óperas y música de cámara."
+      }
+  },
+  {
+      "model": "App.materia",
+      "pk": 3,
+      "fields": {
+          "nombre": "Música folclórica y tradicional",
+          "descripcion": "Estudio de las músicas tradicionales y folclóricas de diversas culturas."
+      }
+  },
+  {
+      "model": "App.materia",
+      "pk": 4,
+      "fields": {
+          "nombre": "Música vocal",
+          "descripcion": "Incluye canto coral, canto lírico, óperas y música vocal contemporánea."
+      }
+  },
+  {
+      "model": "App.materia",
+      "pk": 5,
+      "fields": {
+          "nombre": "Música instrumental",
+          "descripcion": "Estudio y desempeño de instrumentos musicales, incluyendo orquesta y bandas."
+      }
+  },
+  {
+      "model": "App.materia",
+      "pk": 6,
+      "fields": {
+          "nombre": "Música popular",
+          "descripcion": "Incluye géneros como rock, pop, jazz, blues y otros estilos populares."
+      }
+  },
+  {
+      "model": "App.materia",
+      "pk": 7,
+      "fields": {
+          "nombre": "Música electrónica",
+          "descripcion": "Estudio y producción de música creada con instrumentos electrónicos y computadoras."
+      }
+  },
+  {
+    "model": "App.autor",
+      "pk": 1,
+      "fields": {
+          "nombre": "Haila",
+          "apellido": "María",
+          "nacionalidad": "CUB",
+          "Rol": "ADP"
+      }
   }
 ]
 
