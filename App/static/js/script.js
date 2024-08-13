@@ -493,8 +493,16 @@ jQuery(function ($) {
     $('#editorProvincia').change(function () {
         var provinciaId = $(this).val();
         if (provinciaId) {
+            var baseUrl;
+
+            // Detectar si estamos en localhost o en producción
+            if (window.location.host === '127.0.0.1:8000') {
+                baseUrl = 'http://127.0.0.1:8000';
+            } else {
+                baseUrl = 'https://ismn-cuba.onrender.com';
+            }
             $.ajax({
-                url: 'http://https://ismn-cuba.onrender.com//get-municipios/',
+                url: baseUrl + '/get-municipios/',
                 data: {
                     'provincia_id': provinciaId
                 },
