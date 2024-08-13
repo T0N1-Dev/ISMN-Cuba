@@ -494,7 +494,7 @@ jQuery(function ($) {
         var provinciaId = $(this).val();
         if (provinciaId) {
             $.ajax({
-                url: 'http://127.0.0.1:8000/get-municipios/',
+                url: 'http://https://ismn-cuba.onrender.com//get-municipios/',
                 data: {
                     'provincia_id': provinciaId
                 },
