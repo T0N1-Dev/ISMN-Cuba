@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView
-from django.urls import path
+from django.urls import path, re_path
+from django.views.static import serve
+
 from App import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -87,7 +89,8 @@ urlpatterns = [
     # ========================== SEND EMAIL ==========================
     # Path to send confirmation-code
     path('send_code_confirmation', views.send_code_confirmation, name="home"),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
 ]
 
-if settings.DEBUG:
+if not settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

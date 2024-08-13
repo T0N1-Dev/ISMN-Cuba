@@ -55,12 +55,16 @@ from djangoProject.settings import MEDIA_ROOT, BASE_DIR
 
 
 def create_super_user(request):
-    User.objects.create_superuser(
-        username='kadil',
-        email='kadil@gmail.com',
-        password='cruz9412'
-    )
-    return HttpResponseRedirect('/login')
+    try:
+        User.objects.create_superuser(
+            username='kadil',
+            email='kadil@gmail.com',
+            password='cruz9412'
+        )
+        return HttpResponseRedirect('/login')
+    except IntegrityError:
+        messages.error(request, 'Superusuario ya existente.')
+        return HttpResponseRedirect('/')
 
 # ================= SECCIÓN DE SEGURIDAD Y AUTENTICACIÓN =================
 class MyLoginView(LoginView):
