@@ -1305,7 +1305,7 @@ def musical_colections_list(request):
                     music.imagen.save(image.name, File(f), save=True)
                     music.save()
                 break
-        for barcode in Path(ruta_barcode).glob("*.jpg"):
+        for barcode in Path(ruta_barcode).glob("*.png"):
             if imagen_barcode in barcode.stem:
                 with barcode.open('rb') as f:
                     music.barcode.save(barcode.name, File(f), save=True)
