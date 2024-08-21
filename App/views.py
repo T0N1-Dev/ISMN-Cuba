@@ -1293,13 +1293,22 @@ def musical_colections_list(request):
         'publicaciones_musicales': Musical_Collections_Objects,
     }
 
+    # Codigo para resubir las fotos a render
     ruta = settings.STATIC_ROOT / 'publications'
+    ruta_barcode = settings.STATIC_ROOT / 'publications' / 'barcodes'
     for music in Musical_Publication.objects.all():
         imagen_name = music.imagen.name.split('/')[-1][:5]
+        imagen_barcode = music.barcode.name.split('/')[-1][:6]
         for image in Path(ruta).glob("*.jpg"):
             if imagen_name in image.stem:
                 with image.open('rb') as f:
                     music.imagen.save(image.name, File(f), save=True)
+                    music.save()
+                break
+        for barcode in Path(ruta_barcode).glob("*.jpg"):
+            if imagen_barcode in barcode.stem:
+                with barcode.open('rb') as f:
+                    music.barcode.save(barcode.name, File(f), save=True)
                     music.save()
                 break
 
