@@ -3,7 +3,6 @@ import json
 import os
 import shutil
 import socket
-import subprocess
 from email import encoders
 from email.mime.base import MIMEBase
 from random import randint
@@ -17,7 +16,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pathlib import Path
 from datetime import datetime
@@ -1293,6 +1292,16 @@ def musical_colections_list(request):
     data = {
         'publicaciones_musicales': Musical_Collections_Objects,
     }
+
+    ruta = settings.STATIC_ROOT / 'publications'
+    for music in Musical_Publication.objects.all():
+        imagen_name = music.imagen.name.split('/')[-1][:5]
+        for image in Path(ruta).glob("*.jpg"):
+            if imagen_name in image.stem:
+                with image.open('rb') as f:
+                    music.imagen.save(image.name, File(f), save=True)
+                    music.save()
+                break
 
     if not Musical_Collections_Objects:
         data['mensaje'] = "No hay publicaciones musicales en el sistema"

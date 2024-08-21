@@ -50,8 +50,23 @@
     {% endif %}
 
     <hr>
-    <a href="#" class="btn btn-dark">
+    <a class="btn btn-dark" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
         <i class="fas fa-headset"></i>&nbsp;&nbsp; Ayuda
     </a>
+    <div class="collapse" id="collapseExample">
+      <div class="card card-body">
+          <p class="text-center">Bienvenido a nuestro sitio web! &#128400;</p>
+          Para poder enviar una solicitud de ISMN (International Standard Music Number) y
+          recibir notificaciones sobre el estado de tu solicitud, primero deberás crear una cuenta. Durante el registro,
+          se te pedirá que ingreses algunos datos importantes que te identificarán como Editor o Editorial.
+          <br>
+          Una vez que hayas creado tu cuenta y hayas iniciado sesión, podrás enviar tu primera solicitud de ISMN a
+          través de nuestro sitio. Recibirás una notificación por correo electrónico cuando tu solicitud haya sido
+          atendida. La publicación musical correspondiente será añadida automáticamente a nuestro catálogo en línea,
+          que puedes encontrar en la sección llamada 'Colecciones Musicales'.
+          <br>
+          ¡Gracias por confiar en nosotros para gestionar tus ISMN!
+      </div>
+    </div>
 {% endblock Offcanvas %}
 

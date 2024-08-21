@@ -979,3 +979,16 @@ Traceback (most recent call last):
     raise self.model.DoesNotExist(
 App.models.Provincia.DoesNotExist: Provincia matching query does not exist.
 "GET /loaddata/ HTTP/1.1" 500 145
+Internal Server Error: /move_root_images/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 62, in move_rutes
+    if imagen_name in image:
+       ^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'WindowsPath' is not iterable
+"GET /move_root_images/ HTTP/1.1" 500 145

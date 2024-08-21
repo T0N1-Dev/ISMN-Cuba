@@ -71,15 +71,16 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="bg-dark text-center text-lg-start" id="footer" style="color: #ffffff;">
-        <div class="text-center p-3">
+    <footer class="bg-dark text-center text-lg-start" id="footer" style="color: #ffffff; position: fixed; bottom: 0; left: 0; width: 100%; padding: 10px 0;">
+        <p class="text-center m-0">
             Copyright &copy; {% now "Y" %} Todos los derechos reservados | Agencia Cubana del ISBN |
             Cámara Cubana del Libro | Hecho con
             <i class="text-danger fas fa-heart fa-beat" style="font-size: 15px"></i> por
             <a href="https://www.linkedin.com/in/antonio-cruz-gonzalez94" target="_blank"
                style="color: #0dcaf0; text-decoration: none;">T0N1</a>
-        </div>
+        </p>
     </footer>
+
 
     <!-- Message from backend -->
     {% for message in messages %}

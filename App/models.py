@@ -11,6 +11,7 @@ from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.utils.functional import cached_property
+from django.templatetags.static import static
 
 
 def validate_date(value):
@@ -447,6 +448,12 @@ class Musical_Publication(models.Model):
         if autor:
             return autor.nombre
         return self.editor
+
+    @property
+    def imagen_url(self):
+        if self.imagen:
+            return static(f'mediacopy/{self.imagen.name}')
+        return None
 
 
 # Solicitudes

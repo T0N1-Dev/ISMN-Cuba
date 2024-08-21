@@ -267,9 +267,6 @@ th.th_button {
  -------------------------------*/
 /* Resolution for Tablets */
 @media screen and (max-width: 1024px) {
-    #footer {
-        font-size: 15px;
-    }
     #loginForm {
         max-width: 400px;
     }
@@ -280,9 +277,6 @@ th.th_button {
     #footer {
         font-size: 12px;
     }
-    body {
-        overflow-y: visible;
-    }
     #navbar-content {
         font-size: 16px;
         margin-left: 25px;
@@ -290,7 +284,6 @@ th.th_button {
     #loginForm {
         max-width: 300px;
     }
-
     .notificaciones {
         margin-right: 25px;
         gap: 20px;
