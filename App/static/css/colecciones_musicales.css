@@ -248,10 +248,10 @@ body::-webkit-scrollbar {
         padding: 3px 0 12px 0;
     }
     .details-public h2 {
-        font-size: 10px;
+        font-size: 8px;
     }
     .details-public h3 {
-        font-size: 8px;
+        font-size: 6px;
         font-weight: normal;
     }
     footer {
