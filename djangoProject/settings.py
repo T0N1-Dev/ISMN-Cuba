@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-aweeop%d2l09z%hzb!xmt-&p7fxb9x(+ddtv@u=07y^*5z9@5_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['ismn-cuba.onrender.com', 'localhost', '127.0.0.1']
 
@@ -133,6 +133,7 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "App/static"
 if not DEBUG:  # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
     STATIC_ROOT = BASE_DIR / "staticfiles"
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use

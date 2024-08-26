@@ -1005,3 +1005,48 @@ Traceback (most recent call last):
                      ^^^^^^^^^^^^^^^^^^^
 AttributeError: 'ImageFieldFile' object has no attribute 'split'
 "GET /musical_colections/ HTTP/1.1" 500 145
+Internal Server Error: /static/css/colecciones_musicales.18b448c6c535.css
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\whitenoise\middleware.py", line 123, in __call__
+    return self.serve(static_file, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\whitenoise\middleware.py", line 128, in serve
+    response = static_file.get_response(request.method, request.META)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\whitenoise\responders.py", line 86, in get_response
+    file_handle = open(path, "rb")
+                  ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\T0N1\\Desktop\\djangoProject\\staticfiles\\css\\colecciones_musicales.18b448c6c535.css.br'
+"GET /static/css/colecciones_musicales.18b448c6c535.css HTTP/1.1" 500 145
+Internal Server Error: /static/css/colecciones_musicales.18b448c6c535.css
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\whitenoise\middleware.py", line 123, in __call__
+    return self.serve(static_file, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\whitenoise\middleware.py", line 128, in serve
+    response = static_file.get_response(request.method, request.META)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\whitenoise\responders.py", line 86, in get_response
+    file_handle = open(path, "rb")
+                  ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\T0N1\\Desktop\\djangoProject\\staticfiles\\css\\colecciones_musicales.18b448c6c535.css.br'
+"GET /static/css/colecciones_musicales.18b448c6c535.css HTTP/1.1" 500 145
+Internal Server Error: /musical_colections/
+Traceback (most recent call last):
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\.virtualenvs\djangoProject-rjKEZ1nr\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\T0N1\Desktop\djangoProject\App\views.py", line 1297, in musical_colections_list
+    ruta = settings.STATIC_ROOT / 'publications'
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for /: 'NoneType' and 'str'
+"GET /musical_colections/ HTTP/1.1" 500 63797
