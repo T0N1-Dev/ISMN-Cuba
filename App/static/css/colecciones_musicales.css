@@ -23,7 +23,7 @@ form {
     padding: 10px 20px;
     animation: enhance-search linear both;
     animation-timeline: scroll(root block);
-    animation-range: 0 300px;
+    animation-range: 0 250px;
 }
 
 form input {
@@ -258,7 +258,8 @@ body::-webkit-scrollbar {
     }
 
     footer .socialIcons {
-        margin-bottom: 5px;
+        margin-top: 35px;
+        margin-bottom: 15px;
     }
 
     footer .socialIcons a {
