@@ -291,6 +291,10 @@ body::-webkit-scrollbar {
         font-size: 12px; /* Ajusta el tamaño del texto en el enlace */
     }
 
+    header {
+        height: 3rem;
+    }
+
     header h1 {
         width: 60%;
         font-size: 18px
