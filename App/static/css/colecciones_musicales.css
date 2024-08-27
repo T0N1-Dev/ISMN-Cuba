@@ -242,6 +242,15 @@ body::-webkit-scrollbar {
     transition: all 0.5s ease;
 }
 
+@media (max-width: 1450px){
+    .details-public h2 {
+        font-size: 13px;
+    }
+    .details-public h3 {
+        font-size: 11px;
+    }
+}
+
 @media (max-width: 600px){
     .details-public {
         height: 15%;
@@ -309,4 +318,6 @@ body::-webkit-scrollbar {
         font-size: 10px;
     }
 }
+
+
 

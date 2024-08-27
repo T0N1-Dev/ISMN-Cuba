@@ -1299,13 +1299,13 @@ def musical_colections_list(request):
     for music in Musical_Publication.objects.all():
         imagen_name = music.imagen.name.split('/')[-1][:5]
         imagen_barcode = music.barcode.name.split('/')[-1][:6]
-        for image in Path(ruta).glob("*.jpg"):
+        for image in Path(ruta).glob("*.webp"):
             if imagen_name in image.stem:
                 with image.open('rb') as f:
                     music.imagen.save(image.name, File(f), save=True)
                     music.save()
                 break
-        for barcode in Path(ruta_barcode).glob("*.png"):
+        for barcode in Path(ruta_barcode).glob("*.webp"):
             if imagen_barcode in barcode.stem:
                 with barcode.open('rb') as f:
                     music.barcode.save(barcode.name, File(f), save=True)

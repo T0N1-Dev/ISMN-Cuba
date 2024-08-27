@@ -28,7 +28,7 @@
             <div class="container-public">
                 <div class="thecard">
                     <div class="front">
-                        <img class="imagen" src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}" onclick="toogleFlip(this)">
+                        <img class="imagen" src="{{ publicacion.imagen.url }}" alt="imagen de {{ publicacion }}" loading="lazy" onclick="toogleFlip(this)">
                         <div class="details-public">
                             <h2>{{ publicacion.name }}</h2>
                             <h3>Por: &nbsp; {{ publicacion.autor|default:publicacion.subtitulo }}</h3>
