@@ -196,6 +196,33 @@
     </footer>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('input[name="q"]');
+            const containers = document.querySelectorAll('.container-public');
+
+            // Función para filtrar los elementos según el término de búsqueda
+            function filterContainers() {
+                const searchTerm = searchInput.value.toLowerCase();
+
+                containers.forEach(function(container) {
+                    const details = container.querySelector('.details-public');
+                    const textContent = details.textContent.toLowerCase();
+
+                    if (textContent.includes(searchTerm)) {
+                        container.style.display = 'block';  // Mostrar el contenedor si el texto coincide
+                    } else {
+                        container.style.display = 'none';  // Ocultar el contenedor si no coincide
+                    }
+                });
+            }
+
+            // Llamar a la función cuando el usuario escriba en el input
+            searchInput.addEventListener('input', filterContainers);
+
+            // Llamar a la función al cargar la página para mostrar los resultados iniciales
+            filterContainers();
+        });
+        
         function toogleFlip(element) {
             let isFlipped = element.classList.contains('flip');
             let barcode = element.parentNode.nextElementSibling;
