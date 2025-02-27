@@ -5,6 +5,33 @@
 ## 📌 Descripción del Proyecto
 Este proyecto permite la **asignación, control y gestión** del **Número Internacional Normalizado para la Música (ISMN)** en Cuba. Proporciona una plataforma segura y eficiente para que los usuarios soliciten registros y códigos ISMN, además de ofrecer herramientas administrativas para la gestión de solicitudes y usuarios.
 
+### 🖼️ Imágenes de la Aplicación
+1. **Página principal de la aplicación**  
+   ![Página principal](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688088/front_lfokr8.png)
+   
+2. **Colecciones musicales alojadas en el sitio y de dominio público**  
+   ![Colecciones musicales](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688059/ColeccionMusical_yoabwj.png)
+
+3. **Error 404 personalizado**  
+   ![Error 404](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688007/Error_404_yzdmag.png)
+
+4. **Dashboard principal para los trabajadores de la Agencia Cubana del ISMN**  
+   ![Dashboard](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688016/backendSolicitudes_yw1nul.jpg)
+
+5. **Estadísticas que ofrece la aplicación a partir de los datos**  
+   ![Estadísticas 1](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688023/Estadistica_en_el_dash_2_zqrb14.jpg)  
+   ![Estadísticas 2](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688023/Estadistica_en_el_dash_dnaaex.jpg)
+
+6. **Opciones de filtro para la creación de reportes**  
+   ![Filtros de reporte](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688023/Filtros_de_export_xdcdtg.jpg)
+
+7. **Ejemplo de reporte en PDF**  
+   ![Reporte en PDF](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688011/Reporte_tnede9.jpg)
+
+8. **Algunas validaciones de la aplicación y reglas del negocio**  
+   ![Validaciones 1](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688010/Data_already_exists_kyaghp.jpg)  
+   ![Validaciones 2](https://res.cloudinary.com/dmfs1od9n/image/upload/v1740688010/Error_dbhvsr.png)
+
 ### 🖥️ Tecnologías Utilizadas
 
 | Tecnología    | Descripción |
@@ -37,4 +64,3 @@ La aplicación está actualmente alojada en **Render.com**, proporcionando un en
 📌 **¡Gracias por visitar este repositorio!** 🚀
 
 Si tienes alguna sugerencia o encuentras un problema, no dudes en abrir un **issue** o contribuir con un **pull request**. 🙌
-
