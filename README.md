@@ -1,14 +1,40 @@
-Este repositorio contiene todo el código que permite insertar en Cuba todo lo relacionado con la asignación, control y gestión del Número Internacional Normalizado para la Música en la Cámara Cubana del Libro y la Agencia del ISMN en Cuba.
-La parte backend se desarrolló con Python y el framework Django mientras que el frontend fué desarrollado con JQuery, Javascript y Bootstrap.
-Actualmente el sitio web está desplegado en el sitio render.com.
-Estas son algunas de las tareas que se realizaron durante el proyecto:
-1. Despliegue de una aplicación web que permitió a los usuarios realizar solicitudes de registro al sistema y solicitudes del Número Internacional Estándar de Música (ISMN) para publicaciones musicales.
-2. Desarrollo del sistema de seguridad y autenticación de usuarios (Registro, Iniciar sesión, Cerrar sesión, Restablecer contraseña, Cambiar contraseña, Confirmación por correo electrónico).
-3. Creación de un dashboard para los trabajadores de la empresa que facilita la gestión de solicitudes, publicaciones y usuarios registrados en la base de datos.
-4. Desarrollo un sitio administrativo para la gestión y seguridad del sistema (roles de usuario, permisos, registro de actividad, respaldos de bases de datos).
-5. Utilización de manejo de base de datos con SQLite3 para la etapa de desarrollo y PostgreSQL para la etapa de producción.
-6. Generación de informes y reportes estadísticos.
-7. Creación y asignación automática de los códigos de barras a los ISMN generados por el sistema.
-8. Desarrollo de un catálogo musical con vista atractiva y moderna para los clientes (animaciones, filtrado, búsquedas avanzadas).
-9. Módulos desarrollados que notifican a los usuarios por correo electrónico sobre el estado de sus solicitudes.
-10. Realización de la etapa de pruebas (usando pruebas con Django y reuniéndome con usuarios reales para conocer su experiencia con el software en sus primeros usos).
+# 🎵 Sistema de Gestión ISMN - Cuba
+
+🚀 **Este repositorio contiene el código completo del sistema de gestión del ISMN (Número Internacional Normalizado para la Música) utilizado por la Cámara Cubana del Libro y la Agencia del ISMN en Cuba.**
+
+## 📌 Descripción del Proyecto
+Este proyecto permite la **asignación, control y gestión** del **Número Internacional Normalizado para la Música (ISMN)** en Cuba. Proporciona una plataforma segura y eficiente para que los usuarios soliciten registros y códigos ISMN, además de ofrecer herramientas administrativas para la gestión de solicitudes y usuarios.
+
+### 🖥️ Tecnologías Utilizadas
+
+| Tecnología    | Descripción |
+|--------------|------------|
+| **Python**   | Desarrollo del backend |
+| **Django**   | Framework web para la lógica del backend y APIs |
+| **JQuery**   | Interactividad en el frontend |
+| **JavaScript** | Comportamiento dinámico en el frontend |
+| **Bootstrap** | Estilos y diseño responsivo |
+| **SQLite3**  | Base de datos en desarrollo |
+| **PostgreSQL** | Base de datos en producción |
+
+## 🌍 Despliegue
+La aplicación está actualmente alojada en **Render.com**, proporcionando un entorno confiable y escalable para que los usuarios accedan a la plataforma.
+
+## 🔹 Funcionalidades Implementadas
+- 🌐 **Despliegue de Aplicación Web**: Permite a los usuarios registrarse, enviar solicitudes de ISMN y gestionar sus publicaciones.
+- 🔒 **Sistema de Autenticación**: Registro de usuarios, inicio de sesión, cierre de sesión, restablecimiento/cambio de contraseña y confirmación por correo electrónico.
+- 📊 **Panel de Administración**: Permite al personal gestionar solicitudes, publicaciones y usuarios registrados de manera eficiente.
+- ⚙️ **Panel Administrativo**: Proporciona funciones de seguridad del sistema como roles de usuario, permisos, registros de actividad y copias de seguridad de la base de datos.
+- 🗄️ **Gestión de Bases de Datos**: SQLite3 para desarrollo y PostgreSQL para producción.
+- 📈 **Informes y Estadísticas**: Generación de reportes detallados y análisis de datos.
+- 🔢 **Generación Automática de Códigos de Barras**: Asigna códigos de barras a los ISMN generados por el sistema.
+- 🎶 **Catálogo Musical**: Catálogo atractivo con funciones de búsqueda y filtrado.
+- 📩 **Notificaciones por Correo Electrónico**: Informa a los usuarios sobre el estado de sus solicitudes.
+- 🛠️ **Fase de Pruebas**: Pruebas unitarias con el framework de Django y sesiones de retroalimentación con usuarios reales.
+
+---
+
+📌 **¡Gracias por visitar este repositorio!** 🚀
+
+Si tienes alguna sugerencia o encuentras un problema, no dudes en abrir un **issue** o contribuir con un **pull request**. 🙌
+
